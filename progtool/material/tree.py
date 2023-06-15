@@ -1,11 +1,12 @@
 from __future__ import annotations
+from abc import ABC
 from pathlib import Path
 from typing import Optional
 import logging
 import os
 
 
-class MaterialTreeNode:
+class MaterialTreeNode(ABC):
     __path: Path
 
     def __init__(self, path: Path):
