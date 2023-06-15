@@ -15,6 +15,5 @@ def process_command_line_arguments():
         _show_help()
 
 
-
 def _show_help():
     print('Help!')

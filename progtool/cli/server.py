@@ -1,8 +1,8 @@
-import argparse
+import progtool.server
 
 
 def _run_server():
-    print('Running server...')
+    progtool.server.run()
 
 
 def add_command_line_parser(subparser) -> None:
