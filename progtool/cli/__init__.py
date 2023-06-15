@@ -21,7 +21,11 @@ def process_command_line_arguments():
 
 
 def _show_help():
-    print('Help!')
+    # print('Help!')
+    from progtool.material.tree import create_material_tree
+    from progtool.repository import find_exercises_root
+    tree = create_material_tree(find_exercises_root())
+    print(tree.children)
 
 
 def _set_verbosity_level(level):
