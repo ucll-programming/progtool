@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "progtool"
+version = "0.1.0"
+description = ""
+authors = ["Frederic Vogels <frederic.vogels@ucll.be>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
