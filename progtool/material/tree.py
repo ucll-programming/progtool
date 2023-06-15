@@ -1,5 +1,5 @@
 from __future__ import annotations
-from abc import ABC
+from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Optional
 import logging
@@ -8,9 +8,11 @@ import os
 
 class MaterialTreeNode(ABC):
     __path: Path
+    __tree_path: tuple[str, ...]
 
-    def __init__(self, path: Path):
+    def __init__(self, path: Path, tree_path: tuple[str, ...]):
         self.__path = path
+        self.__tree_path = tuple(tree_path)
 
     @property
     def name(self) -> str:
@@ -20,24 +22,44 @@ class MaterialTreeNode(ABC):
     def path(self) -> Path:
         return self.__path
 
+    @property
+    def tree_path(self) -> tuple[str, ...]:
+        return self.__tree_path
+
+    @abstractmethod
+    def __str__(self) -> str:
+        ...
+
+    @abstractmethod
+    def __repr__(self) -> str:
+        ...
+
 
 class MaterialTreeLeaf(MaterialTreeNode):
     pass
 
 
 class ExplanationLeaf(MaterialTreeLeaf):
-    pass
+    def __str__(self) -> str:
+        return f'Explanation[{self.tree_path}]'
+
+    def __repr__(self) -> str:
+        return str(self)
 
 
 class ExerciseLeaf(MaterialTreeLeaf):
-    pass
+    def __str__(self) -> str:
+        return f'Exercise[{self.tree_path}]'
+
+    def __repr__(self) -> str:
+        return str(self)
 
 
 class SectionNode(MaterialTreeNode):
     __children: dict[str, MaterialTreeNode]
 
-    def __init__(self, path: Path):
-        super().__init__(path)
+    def __init__(self, path: Path, tree_path: tuple[str, ...]):
+        super().__init__(path, tree_path)
         self.__children = None
 
     def __getitem__(self, key: str) -> MaterialTreeNode:
@@ -51,20 +73,26 @@ class SectionNode(MaterialTreeNode):
 
     def __compute_children(self) -> list[MaterialTreeNode]:
         entries = os.listdir(self.path)
-        nodes = (_create_node(self.path / entry) for entry in entries) # Can contain None values
+        nodes = (_create_node(self.path / entry, (*self.tree_path, entry)) for entry in entries) # Can contain None values
         return {node.name: node for node in nodes if node}
 
+    def __str__(self) -> str:
+        return f'Section[{self.tree_path}]'
 
-def _create_node(path: Path) -> Optional[MaterialTreeNode]:
+    def __repr__(self) -> str:
+        return str(self)
+
+
+def _create_node(path: Path, tree_path: tuple[str, ...]) -> Optional[MaterialTreeNode]:
     if _is_exercise_node(path):
         logging.debug(f'{path} recognized as exercise')
-        return ExerciseLeaf(path)
+        return ExerciseLeaf(path, tree_path)
     elif _is_explanations_node(path):
         logging.debug(f'{path} recognized as explanations')
-        return ExplanationLeaf(path)
+        return ExplanationLeaf(path, tree_path)
     elif _is_section_node(path):
         logging.debug(f'{path} recognized as section')
-        return SectionNode(path)
+        return SectionNode(path, tree_path)
     else:
         logging.debug(f'{path} not recognized as node')
         return None
@@ -83,4 +111,5 @@ def _is_section_node(path: Path) -> bool:
 
 
 def create_material_tree(root_path: Path) -> MaterialTreeNode:
-    return _create_node(root_path)
+    empty_tree_path: tuple[str, ...] = tuple()
+    return _create_node(root_path, empty_tree_path)
