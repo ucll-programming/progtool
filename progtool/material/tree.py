@@ -47,7 +47,7 @@ class MaterialTreeLeaf(MaterialTreeNode):
     pass
 
 
-class ExplanationLeaf(MaterialTreeLeaf):
+class Explanation(MaterialTreeLeaf):
     def __str__(self) -> str:
         return f'Explanation[{self.tree_path}]'
 
@@ -58,7 +58,7 @@ class ExplanationLeaf(MaterialTreeLeaf):
         return 'explanations'
 
 
-class ExerciseLeaf(MaterialTreeLeaf):
+class Exercise(MaterialTreeLeaf):
     def __str__(self) -> str:
         return f'Exercise[{self.tree_path}]'
 
@@ -91,7 +91,7 @@ class MaterialTreeBranch(MaterialTreeNode):
         return {node.name: node for node in nodes if node}
 
 
-class SectionNode(MaterialTreeBranch):
+class Section(MaterialTreeBranch):
     def __str__(self) -> str:
         return f'Section[{self.tree_path}]'
 
@@ -105,13 +105,13 @@ class SectionNode(MaterialTreeBranch):
 def _create_node(path: Path, tree_path: TreePath) -> Optional[MaterialTreeNode]:
     if _is_exercise_node(path):
         logging.debug(f'{path} recognized as exercise')
-        return ExerciseLeaf(path, tree_path)
+        return Exercise(path, tree_path)
     elif _is_explanations_node(path):
         logging.debug(f'{path} recognized as explanations')
-        return ExplanationLeaf(path, tree_path)
+        return Explanation(path, tree_path)
     elif _is_section_node(path):
         logging.debug(f'{path} recognized as section')
-        return SectionNode(path, tree_path)
+        return Section(path, tree_path)
     else:
         logging.debug(f'{path} not recognized as node')
         return None
