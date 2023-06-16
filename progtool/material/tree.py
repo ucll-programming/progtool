@@ -69,7 +69,7 @@ class ExerciseLeaf(MaterialTreeLeaf):
 
 
 class SectionNode(MaterialTreeNode):
-    __children: dict[str, MaterialTreeNode]
+    __children: Optional[dict[str, MaterialTreeNode]]
 
     def __init__(self, path: Path, tree_path: tuple[str, ...]):
         super().__init__(path, tree_path)
@@ -84,7 +84,7 @@ class SectionNode(MaterialTreeNode):
             self.__children = self.__compute_children()
         return self.__children
 
-    def __compute_children(self) -> list[MaterialTreeNode]:
+    def __compute_children(self) -> dict[str, MaterialTreeNode]:
         entries = os.listdir(self.path)
         nodes = (_create_node(self.path / entry, (*self.tree_path, entry)) for entry in entries) # Can contain None values
         return {node.name: node for node in nodes if node}
@@ -126,6 +126,6 @@ def _is_section_node(path: Path) -> bool:
     return os.path.isfile(path / 'section.yaml')
 
 
-def create_material_tree(root_path: Path) -> MaterialTreeNode:
+def create_material_tree(root_path: Path) -> Optional[MaterialTreeNode]:
     empty_tree_path: tuple[str, ...] = tuple()
     return _create_node(root_path, empty_tree_path)
