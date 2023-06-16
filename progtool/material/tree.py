@@ -2,6 +2,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Literal, Optional
+from progtool.material.treepath import TreePath
 import logging
 import os
 
@@ -11,9 +12,9 @@ NodeType = Literal['exercise'] | Literal['explanations'] | Literal['section']
 
 class MaterialTreeNode(ABC):
     __path: Path
-    __tree_path: tuple[str, ...]
+    __tree_path: TreePath
 
-    def __init__(self, path: Path, tree_path: tuple[str, ...]):
+    def __init__(self, path: Path, tree_path: TreePath):
         self.__path = path
         self.__tree_path = tree_path
 
@@ -26,7 +27,7 @@ class MaterialTreeNode(ABC):
         return self.__path
 
     @property
-    def tree_path(self) -> tuple[str, ...]:
+    def tree_path(self) -> TreePath:
         return self.__tree_path
 
     @abstractmethod
@@ -71,7 +72,7 @@ class ExerciseLeaf(MaterialTreeLeaf):
 class MaterialTreeBranch(MaterialTreeNode):
     __children: Optional[dict[str, MaterialTreeNode]]
 
-    def __init__(self, path: Path, tree_path: tuple[str, ...]):
+    def __init__(self, path: Path, tree_path: TreePath):
         super().__init__(path, tree_path)
         self.__children = None
 
@@ -86,7 +87,7 @@ class MaterialTreeBranch(MaterialTreeNode):
 
     def __compute_children(self) -> dict[str, MaterialTreeNode]:
         entries = os.listdir(self.path)
-        nodes = (_create_node(self.path / entry, (*self.tree_path, entry)) for entry in entries) # Can contain None values
+        nodes = (_create_node(self.path / entry, self.tree_path / entry) for entry in entries) # Can contain None values
         return {node.name: node for node in nodes if node}
 
 
@@ -101,7 +102,7 @@ class SectionNode(MaterialTreeBranch):
         return 'section'
 
 
-def _create_node(path: Path, tree_path: tuple[str, ...]) -> Optional[MaterialTreeNode]:
+def _create_node(path: Path, tree_path: TreePath) -> Optional[MaterialTreeNode]:
     if _is_exercise_node(path):
         logging.debug(f'{path} recognized as exercise')
         return ExerciseLeaf(path, tree_path)
@@ -129,7 +130,7 @@ def _is_section_node(path: Path) -> bool:
 
 
 def create_material_tree(root_path: Path) -> MaterialTreeNode:
-    empty_tree_path: tuple[str, ...] = tuple()
+    empty_tree_path = TreePath()
     root = _create_node(root_path, empty_tree_path)
     assert root is not None, 'root_path points to an empty tree' # TODO: Make exception
     return root
