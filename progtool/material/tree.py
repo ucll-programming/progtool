@@ -1,9 +1,12 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Optional
+from typing import Literal, Optional
 import logging
 import os
+
+
+NodeType = Literal['exercise'] | Literal['explanations'] | Literal['section']
 
 
 class MaterialTreeNode(ABC):
@@ -34,6 +37,10 @@ class MaterialTreeNode(ABC):
     def __repr__(self) -> str:
         ...
 
+    @abstractmethod
+    def type(self) -> NodeType:
+        ...
+
 
 class MaterialTreeLeaf(MaterialTreeNode):
     pass
@@ -46,6 +53,9 @@ class ExplanationLeaf(MaterialTreeLeaf):
     def __repr__(self) -> str:
         return str(self)
 
+    def type(self) -> NodeType:
+        return 'explanations'
+
 
 class ExerciseLeaf(MaterialTreeLeaf):
     def __str__(self) -> str:
@@ -53,6 +63,9 @@ class ExerciseLeaf(MaterialTreeLeaf):
 
     def __repr__(self) -> str:
         return str(self)
+
+    def type(self) -> NodeType:
+        return 'exercise'
 
 
 class SectionNode(MaterialTreeNode):
@@ -81,6 +94,9 @@ class SectionNode(MaterialTreeNode):
 
     def __repr__(self) -> str:
         return str(self)
+
+    def type(self) -> NodeType:
+        return 'section'
 
 
 def _create_node(path: Path, tree_path: tuple[str, ...]) -> Optional[MaterialTreeNode]:
