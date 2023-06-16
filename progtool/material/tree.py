@@ -15,7 +15,7 @@ class MaterialTreeNode(ABC):
 
     def __init__(self, path: Path, tree_path: tuple[str, ...]):
         self.__path = path
-        self.__tree_path = tuple(tree_path)
+        self.__tree_path = tree_path
 
     @property
     def name(self) -> str:
@@ -68,7 +68,7 @@ class ExerciseLeaf(MaterialTreeLeaf):
         return 'exercise'
 
 
-class SectionNode(MaterialTreeNode):
+class MaterialTreeBranch(MaterialTreeNode):
     __children: Optional[dict[str, MaterialTreeNode]]
 
     def __init__(self, path: Path, tree_path: tuple[str, ...]):
@@ -89,6 +89,8 @@ class SectionNode(MaterialTreeNode):
         nodes = (_create_node(self.path / entry, (*self.tree_path, entry)) for entry in entries) # Can contain None values
         return {node.name: node for node in nodes if node}
 
+
+class SectionNode(MaterialTreeBranch):
     def __str__(self) -> str:
         return f'Section[{self.tree_path}]'
 
@@ -126,6 +128,8 @@ def _is_section_node(path: Path) -> bool:
     return os.path.isfile(path / 'section.yaml')
 
 
-def create_material_tree(root_path: Path) -> Optional[MaterialTreeNode]:
+def create_material_tree(root_path: Path) -> MaterialTreeNode:
     empty_tree_path: tuple[str, ...] = tuple()
-    return _create_node(root_path, empty_tree_path)
+    root = _create_node(root_path, empty_tree_path)
+    assert root is not None, 'root_path points to an empty tree' # TODO: Make exception
+    return root
