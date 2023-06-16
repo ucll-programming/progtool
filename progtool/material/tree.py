@@ -51,6 +51,7 @@ class MaterialTreeNode(ABC):
         ...
 
     @abstractmethod
+    @property
     def type(self) -> NodeType:
         ...
 
@@ -70,6 +71,7 @@ class Explanation(MaterialTreeLeaf):
     def __repr__(self) -> str:
         return str(self)
 
+    @property
     def type(self) -> NodeType:
         return 'explanations'
 
@@ -85,6 +87,7 @@ class Exercise(MaterialTreeLeaf):
     def __repr__(self) -> str:
         return str(self)
 
+    @property
     def type(self) -> NodeType:
         return 'exercise'
 
@@ -126,6 +129,7 @@ class Section(MaterialTreeBranch):
     def __repr__(self) -> str:
         return str(self)
 
+    @property
     def type(self) -> NodeType:
         return 'section'
 
