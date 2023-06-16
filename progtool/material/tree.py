@@ -50,8 +50,8 @@ class MaterialTreeNode(ABC):
     def __repr__(self) -> str:
         ...
 
-    @abstractmethod
     @property
+    @abstractmethod
     def type(self) -> NodeType:
         ...
 
