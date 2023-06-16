@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Literal, Optional
 from progtool.material.treepath import TreePath
-import logging
 import os
 
 
@@ -24,7 +23,6 @@ class MaterialTreeNode(ABC):
             return Explanation(path, tree_path)
         else:
             return None
-
 
     def __init__(self, path: Path, tree_path: TreePath):
         self.__path = path
