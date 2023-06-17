@@ -114,7 +114,7 @@ class MaterialTreeBranch(MaterialTreeNode):
     def __compute_children(self) -> dict[str, MaterialTreeNode]:
         entries = os.listdir(self.path)
         nodes = (MaterialTreeNode.create(self.path / entry, self.tree_path / entry) for entry in entries) # Can contain None values
-        return {node.name: node for node in nodes if node}
+        return {node.tree_path.parts[-1]: node for node in nodes if node}
 
 
 class Section(MaterialTreeBranch):
