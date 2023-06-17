@@ -31,7 +31,11 @@ class MaterialTreeNode(ABC):
 
     @property
     def name(self) -> str:
-        return self.tree_path.parts[-1]
+        parts = self.tree_path.parts
+        if parts:
+            return parts[-1]
+        else:
+            return ''
 
     @property
     def path(self) -> Path:
