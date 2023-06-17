@@ -1,6 +1,8 @@
 import argparse
 import logging
-from progtool.cli import server
+from typing import cast
+from progtool.cli import server, tree
+
 
 
 
@@ -9,7 +11,14 @@ def process_command_line_arguments():
     root_parser.add_argument('-v', '--verbose', action='count', dest='verbosity')
     subparsers = root_parser.add_subparsers()
 
-    server.add_command_line_parser(subparsers)
+    command_modules = [
+        server,
+        tree
+    ]
+
+    for module in command_modules:
+        module.add_command_line_parser(subparsers)
+
     args = root_parser.parse_args()
 
     _set_verbosity_level(args.verbosity)
@@ -21,12 +30,7 @@ def process_command_line_arguments():
 
 
 def _show_help():
-    # print('Help!')
-    from progtool.material.tree import create_material_tree
-    from progtool.repository import find_exercises_root
-    tree = create_material_tree(find_exercises_root())
-    print(tree.children)
-
+    print('Help!')
 
 def _set_verbosity_level(level):
     match level:
