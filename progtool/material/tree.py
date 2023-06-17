@@ -1,8 +1,9 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal, Optional, cast
 from progtool.material.treepath import TreePath
+import yaml
 import os
 
 
@@ -30,7 +31,7 @@ class MaterialTreeNode(ABC):
 
     @property
     def name(self) -> str:
-        return self.__path.name
+        return self.tree_path.parts[-1]
 
     @property
     def path(self) -> Path:
@@ -117,9 +118,17 @@ class MaterialTreeBranch(MaterialTreeNode):
 
 
 class Section(MaterialTreeBranch):
+    __name = Optional[str]
+
+    METADATA_FILENAME = 'section.yaml'
+
+    def __init__(self, path: Path, tree_path: TreePath):
+        super().__init__(path, tree_path)
+        self.__name = None
+
     @staticmethod
     def test(path: Path) -> bool:
-        return os.path.isfile(path / 'section.yaml')
+        return os.path.isfile(path / Section.METADATA_FILENAME)
 
     def __str__(self) -> str:
         return f'Section[{self.tree_path}]'
@@ -130,6 +139,23 @@ class Section(MaterialTreeBranch):
     @property
     def type(self) -> NodeType:
         return 'section'
+
+    @property
+    def name(self) -> str:
+        if self.__name is None:
+            self.__read_metadata()
+        value = self.__name
+        assert value is not None, "Bug: __read_metadata is expected to fill in the field"
+        return cast(str, value)
+
+    @property
+    def __metadata_path(self) -> Path:
+        return self.path / Section.METADATA_FILENAME
+
+    def __read_metadata(self) -> None:
+        with open(self.__metadata_path) as file:
+            metadata = yaml.safe_load(file)
+        self.__name = metadata['Name']
 
 
 def create_material_tree(root_path: Path) -> MaterialTreeNode:
