@@ -118,7 +118,7 @@ class MaterialTreeBranch(MaterialTreeNode):
 
 
 class Section(MaterialTreeBranch):
-    __name = Optional[str]
+    __name: Optional[str]
 
     METADATA_FILENAME = 'section.yaml'
 
@@ -144,9 +144,8 @@ class Section(MaterialTreeBranch):
     def name(self) -> str:
         if self.__name is None:
             self.__read_metadata()
-        value = self.__name
-        assert value is not None, "Bug: __read_metadata is expected to fill in the field"
-        return cast(str, value)
+        assert self.__name is not None, "Bug: __read_metadata is expected to fill in the field"
+        return self.__name
 
     @property
     def __metadata_path(self) -> Path:
