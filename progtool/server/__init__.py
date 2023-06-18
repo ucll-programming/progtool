@@ -1,8 +1,10 @@
+from progtool.material.tree import MaterialTreeBranch, create_material_tree, MaterialTreeNode, Section, Exercise, Explanation
 from typing import Any, cast
+from progtool import repository
 import flask
 import logging
-from progtool import repository
-from progtool.material.tree import MaterialTreeBranch, create_material_tree, MaterialTreeNode, Section, Exercise, Explanation
+import pkg_resources
+import sass
 
 
 app = flask.Flask(__name__)
@@ -52,6 +54,13 @@ def node_page(node_path: str):
 
     print(data)
     return flask.jsonify(data)
+
+
+@app.route('/styles.css')
+def stylesheet():
+    scss = pkg_resources.resource_string('progtool.styles', 'styles.scss')
+    css = sass.compile(string=scss)
+    return flask.Response(css, mimetype='text/css')
 
 
 def run():
