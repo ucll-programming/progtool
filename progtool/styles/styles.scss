@@ -48,6 +48,10 @@
 
   .overview-entry {
     & > .overview-entry-header {
+      display: flex;
+      flex-direction: column;
+      justify-content: start;
+      align-items: stretch;
       margin: 0;
 
       a {
