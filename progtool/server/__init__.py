@@ -35,13 +35,14 @@ def node_page(node_path: str):
     data: dict[str, Any] = {
         'path': str(current.path),
         'tree_path': current.tree_path.parts,
+        'name': current.name,
     }
 
     match current.type:
         case 'section':
             section = cast(Section, current)
             data['type'] = 'section'
-            data['children'] = {child.name: url_for(child) for child in section.children}
+            data['children'] = [child.tree_path.parts[-1] for child in section.children]
         case 'explanations':
             explanations = cast(Explanation, current)
             data['type'] = 'explanations'
