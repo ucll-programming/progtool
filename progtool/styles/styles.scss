@@ -1,3 +1,23 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+#sidebar {
+  height: 100%;
+  width: 160px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-x: hidden;
+}
+
+#main-view {
+  margin-left: 160px;
+}
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -71,11 +91,11 @@
       }
     }
 
-    &.explanations {
-      background: #004;
+    &.explanation {
+      background: #44F;
 
       &.selected {
-        background: #00F;
+        background: #AAF;
       }
     }
 
