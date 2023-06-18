@@ -51,6 +51,7 @@ def node_page(node_path: str):
         case 'exercise':
             exercise = cast(Exercise, current)
             data['type'] = 'exercise'
+            data['markdown'] = exercise.markdown
 
     print(data)
     return flask.jsonify(data)
