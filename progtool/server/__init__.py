@@ -16,7 +16,7 @@ material_tree: MaterialTreeNode = create_material_tree(repository.find_exercises
 @app.route('/nodes/<path:node_path>')
 def root(node_path: str):
     html_path = 'G:/repos/ucll/programming/frontend/dist/index.html'
-    with open(html_path) as file:
+    with open(html_path, encoding='utf-8') as file:
         contents = file.read()
     return contents
 
