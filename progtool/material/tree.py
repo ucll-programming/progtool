@@ -94,6 +94,15 @@ class Exercise(MaterialTreeLeaf):
     def type(self) -> NodeType:
         return 'exercise'
 
+    @property
+    def __markdown_path(self) -> Path:
+        return self.path / 'assignment.md'
+
+    @property
+    def markdown(self) -> str:
+        with open(self.__markdown_path) as file:
+            return file.read()
+
 
 class MaterialTreeBranch(MaterialTreeNode):
     __children_table_value: Optional[dict[str, MaterialTreeNode]]
