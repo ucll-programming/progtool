@@ -1,10 +1,11 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Literal, Optional, cast
+from typing import Any, Literal, Optional, cast
 from progtool.material.treepath import TreePath
-import yaml
+import logging
 import os
+from progtool.material import metadata
 
 
 NodeType = Literal['exercise'] | Literal['explanations'] | Literal['section']
@@ -13,6 +14,24 @@ NodeType = Literal['exercise'] | Literal['explanations'] | Literal['section']
 class MaterialTreeNode(ABC):
     __path: Path
     __tree_path: TreePath
+
+    @staticmethod
+    def contains_metadata(path: Path) -> bool:
+        return os.path.isfile(path / 'metadata.yaml')
+
+    @staticmethod
+    def load_metadata(path: Path) -> Any:
+        return metadata.read(path / "metadata.yaml")
+
+    @staticmethod
+    def contains_node_of_type(path: Path, expected_type: str) -> bool:
+        if MaterialTreeNode.contains_metadata(path):
+            data = MaterialTreeNode.load_metadata(path)
+            result = data['Type'] == expected_type
+            logging.debug(f'{path}.type == ${expected_type} is ${result}')
+            return result
+        else:
+            return False
 
     @staticmethod
     def create(path: Path, tree_path: TreePath) -> Optional[MaterialTreeNode]:
@@ -66,7 +85,7 @@ class MaterialTreeLeaf(MaterialTreeNode):
 class Explanation(MaterialTreeLeaf):
     @staticmethod
     def test(path: Path) -> bool:
-        return os.path.isfile(path / 'explanation.md')
+        return MaterialTreeNode.contains_node_of_type(path, metadata.TYPE_EXPLANATION)
 
     def __str__(self) -> str:
         return f'Explanation[{self.tree_path}]'
@@ -84,6 +103,7 @@ class Explanation(MaterialTreeLeaf):
 
     @property
     def markdown(self) -> str:
+        logging.debug(f'Opening ${self.__markdown_path}')
         with open(self.__markdown_path) as file:
             return file.read()
 
@@ -91,7 +111,7 @@ class Explanation(MaterialTreeLeaf):
 class Exercise(MaterialTreeLeaf):
     @staticmethod
     def test(path: Path) -> bool:
-        return os.path.isfile(path / 'assignment.md')
+        return MaterialTreeNode.contains_node_of_type(path, metadata.TYPE_EXERCISE)
 
     def __str__(self) -> str:
         return f'Exercise[{self.tree_path}]'
@@ -142,15 +162,13 @@ class MaterialTreeBranch(MaterialTreeNode):
 class Section(MaterialTreeBranch):
     __name: Optional[str]
 
-    METADATA_FILENAME = 'section.yaml'
-
     def __init__(self, path: Path, tree_path: TreePath):
         super().__init__(path, tree_path)
         self.__name = None
 
     @staticmethod
     def test(path: Path) -> bool:
-        return os.path.isfile(path / Section.METADATA_FILENAME)
+        return MaterialTreeNode.contains_node_of_type(path, metadata.TYPE_SECTION)
 
     def __str__(self) -> str:
         return f'Section[{self.tree_path}]'
@@ -169,14 +187,9 @@ class Section(MaterialTreeBranch):
         assert self.__name is not None, "Bug: __read_metadata is expected to fill in the field"
         return self.__name
 
-    @property
-    def __metadata_path(self) -> Path:
-        return self.path / Section.METADATA_FILENAME
-
     def __read_metadata(self) -> None:
-        with open(self.__metadata_path) as file:
-            metadata = yaml.safe_load(file)
-        self.__name = metadata['Name']
+        data = MaterialTreeNode.load_metadata(self.path)
+        self.__name = data['Name']
 
 
 def create_material_tree(root_path: Path) -> MaterialTreeNode:
