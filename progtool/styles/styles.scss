@@ -93,9 +93,9 @@ a {
     }
 
     &.section {
-      border-left: white 4px solid;
+      border-left: #daacff 4px solid;
       margin: 2px 0 0 4px;
-      background: #BBB;
+      background: #daacff;
 
       & > .overview-entry-header {
         margin: 0;
@@ -119,7 +119,7 @@ a {
     }
 
     &.explanation {
-      background: #AAC;
+      background: #AAD;
     }
 
     &.exercise {
@@ -129,7 +129,7 @@ a {
 }
 
 .admonition {
-  border-radius: 20px;
+  border-radius: 10px;
   padding: 0.75em 1em;
   width: 80%;
   margin: 1em auto;
@@ -179,6 +179,25 @@ a {
   }
 }
 
+.usage {
+  position: relative;
+  background: black;
+  width: 75%;
+  margin: 1em auto;
+
+  & > header {
+    position: absolute;
+    padding: 0.25em 0.5em;
+    right: 0;
+
+    & > h1 {
+      margin: 0;
+      font-size: 0.75rem;
+      text-align: right;
+      font-weight: 200;
+    }
+  }
+}
 
 pre code.hljs {
   display: block;
