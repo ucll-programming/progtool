@@ -40,19 +40,16 @@ def node_page(node_path: str):
         'name': current.name,
     }
 
-    match current.type:
-        case 'section':
-            section = cast(Section, current)
+    match current:
+        case Section(children=children):
             data['type'] = 'section'
-            data['children'] = [child.tree_path.parts[-1] for child in section.children]
-        case 'explanations':
-            explanation = cast(Explanation, current)
-            data['markdown'] = explanation.markdown
+            data['children'] = [child.tree_path.parts[-1] for child in children]
+        case Explanation(markdown=markdown):
             data['type'] = 'explanation'
-        case 'exercise':
-            exercise = cast(Exercise, current)
+            data['markdown'] = markdown
+        case Exercise(markdown=markdown):
             data['type'] = 'exercise'
-            data['markdown'] = exercise.markdown
+            data['markdown'] = markdown
 
     print(data)
     return flask.jsonify(data)
