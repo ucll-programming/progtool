@@ -1,4 +1,6 @@
 $sidebar-width: 200px;
+$selection-background-color: #FAA;
+$selection-foreground-color: #800;
 
 #root {
   max-width: 1280px;
@@ -36,6 +38,11 @@ $sidebar-width: 200px;
   }
 }
 
+a {
+  text-decoration: none;
+  color: black;
+}
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -66,33 +73,36 @@ $sidebar-width: 200px;
       justify-content: start;
       align-items: stretch;
       margin: 0;
+      text-align: center;
+    }
 
-      a {
-        text-decoration: none;
-        color: black;
+    a {
+      font-weight: 100;
+      font-size: 1rem;
+    }
+
+    &.selected {
+      & > .overview-entry-header {
+        background: $selection-background-color;
+
+        & > a {
+          color: $selection-foreground-color;
+          font-weight: 600;
+        }
       }
     }
 
-
     &.section {
-      border-left: white 2px solid;
-      margin: 2px 0 0 2px;
+      border-left: white 4px solid;
+      margin: 2px 0 0 4px;
+      background: rgb(196, 150, 0);
 
       & > .overview-entry-header {
-        font-size: 1.5rem;
         margin: 0;
-        background: #080;
       }
 
       & .section-children {
         overflow: hidden;
-      }
-
-      &.selected {
-        & > .overview-entry-header {
-          background: #0F0;
-          color: black;
-        }
       }
 
       &.expanded {
@@ -109,27 +119,11 @@ $sidebar-width: 200px;
     }
 
     &.explanation {
-      background: #44F;
-
-      & > .overview-entry-header {
-        font-size: 1rem;
-      }
-
-      &.selected {
-        background: #AAF;
-      }
+      background: #88F;
     }
 
     &.exercise {
-      background: #800;
-
-      & > .overview-entry-header {
-        font-size: 1rem;
-      }
-
-      &.selected {
-        background: #F00;
-      }
+      background: #080;
     }
   }
 }
