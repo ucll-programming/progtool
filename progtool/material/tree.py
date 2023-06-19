@@ -66,7 +66,7 @@ class MaterialTreeLeaf(MaterialTreeNode):
 class Explanation(MaterialTreeLeaf):
     @staticmethod
     def test(path: Path) -> bool:
-        return os.path.isfile(path / 'explanations.md')
+        return os.path.isfile(path / 'explanation.md')
 
     def __str__(self) -> str:
         return f'Explanation[{self.tree_path}]'
@@ -77,6 +77,15 @@ class Explanation(MaterialTreeLeaf):
     @property
     def type(self) -> NodeType:
         return 'explanations'
+
+    @property
+    def __markdown_path(self) -> Path:
+        return self.path / 'explanation.md'
+
+    @property
+    def markdown(self) -> str:
+        with open(self.__markdown_path) as file:
+            return file.read()
 
 
 class Exercise(MaterialTreeLeaf):

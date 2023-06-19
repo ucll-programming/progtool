@@ -46,7 +46,8 @@ def node_page(node_path: str):
             data['type'] = 'section'
             data['children'] = [child.tree_path.parts[-1] for child in section.children]
         case 'explanations':
-            explanations = cast(Explanation, current)
+            explanation = cast(Explanation, current)
+            data['markdown'] = explanation.markdown
             data['type'] = 'explanation'
         case 'exercise':
             exercise = cast(Exercise, current)
