@@ -1,4 +1,7 @@
 from itertools import count
+from rich.console import Console
+from rich.table import Table
+import logging
 import os
 import re
 
@@ -42,19 +45,38 @@ def _create_renumbering_mapping(strings: list[str]) -> dict[str, str]:
     return renumbered_strings
 
 
-def _find_numbered_subdirectories():
+def _find_numbered_subdirectories() -> list[str]:
     return [entry for entry in os.listdir() if _is_numbered_directory(entry)]
 
 
+def _rename(old_path: str, new_path: str) -> None:
+    if old_path != new_path:
+        logging.info(f'Renaming {old_path} to {new_path}')
+        os.rename(old_path, new_path)
+    else:
+        logging.info(f'Skipping {old_path}; it already has the right name')
+    print('Done!')
+
+
 def _renumber(args):
+    console = Console()
     numbered_directories = _find_numbered_subdirectories()
     mapping = _create_renumbering_mapping(numbered_directories)
 
     if args.force:
-        print('Actually doing it')
-    else:
         for original_name, new_name in mapping.items():
-            print(f'{original_name} -> {new_name}')
+            _rename(original_name, new_name)
+    else:
+        table = Table(show_header=True, header_style="blue")
+        table.add_column('original')
+        table.add_column('renumbered')
+
+        for original_name, new_name in mapping.items():
+            table.add_row(original_name, new_name)
+
+        console.print(table)
+        console.print("Use -f option to actually perform renames")
+
 
 
 def add_command_line_parser(subparser) -> None:
