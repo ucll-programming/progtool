@@ -2,9 +2,10 @@ from typing import cast
 from progtool.material.tree import Exercise, Section, Explanation
 from progtool.material.tree import create_material_tree
 from progtool.repository import find_exercises_root
+import click
 
 
-def _print_tree(args):
+def _print_tree(help='Show tree'):
     def recurse(node, indentation):
         match node:
             case Section():
@@ -25,6 +26,7 @@ def _print_tree(args):
     recurse(tree, 0)
 
 
-def add_command_line_parser(subparser) -> None:
-    parser = subparser.add_parser('tree', help='Print overview tree')
-    parser.set_defaults(func=_print_tree)
+@click.command()
+def tree() -> None:
+    _print_tree()
+

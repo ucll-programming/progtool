@@ -1,3 +1,4 @@
+import click
 from itertools import count
 from rich.console import Console
 from rich.table import Table
@@ -57,12 +58,15 @@ def _rename(old_path: str, new_path: str) -> None:
         logging.info(f'[red] Skipping {old_path}; it already has the right name')
 
 
-def _renumber(args):
+
+@click.command(help='Renumber subdirectories')
+@click.option('-f', '--force', is_flag=True, help='Performs renames')
+def renumber(force: bool):
     console = Console()
     numbered_directories = _find_numbered_subdirectories()
     mapping = _create_renumbering_mapping(numbered_directories)
 
-    if args.force:
+    if force:
         for original_name, new_name in mapping.items():
             _rename(original_name, new_name)
         print('Done!')
@@ -76,10 +80,3 @@ def _renumber(args):
 
         console.print(table)
         console.print("Use -f option to actually perform renames")
-
-
-
-def add_command_line_parser(subparser) -> None:
-    parser = subparser.add_parser('renumber', help='Renumber nodes in current directory')
-    parser.add_argument('-f', action='store_true', dest='force', help='Needed to actually perform renames')
-    parser.set_defaults(func=_renumber)
