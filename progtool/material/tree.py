@@ -1,12 +1,18 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Literal, Optional, cast
+from typing import Any, Optional
 from progtool.material.treepath import TreePath
+from enum import Enum
 import logging
 import os
 from progtool.material import metadata
 
+
+class Judgement(Enum):
+    UNKNOWN = 0
+    PASS = 1
+    FAIL = -1
 
 
 class MaterialTreeNode(ABC):
@@ -98,9 +104,15 @@ class Explanation(MaterialTreeLeaf):
 
 
 class Exercise(MaterialTreeLeaf):
+    judgement: Judgement
+
     @staticmethod
     def test(path: Path) -> bool:
         return MaterialTreeNode.contains_node_of_type(path, metadata.TYPE_EXERCISE)
+
+    def __init__(self, path: Path, tree_path: TreePath):
+        super().__init__(path, tree_path)
+        self.judgement = Judgement.UNKNOWN
 
     def __str__(self) -> str:
         return f'Exercise[{self.tree_path}]'
@@ -141,7 +153,7 @@ class MaterialTreeBranch(MaterialTreeNode):
     def __compute_children(self) -> dict[str, MaterialTreeNode]:
         entries = os.listdir(self.path)
         nodes = (MaterialTreeNode.create(self.path / entry, self.tree_path / entry) for entry in entries) # Can contain None values
-        return {node.tree_path.parts[-1]: node for node in nodes if node}
+        return {node.tree_path.parts[-1]: node for node in nodes if node is not None}
 
 
 class Section(MaterialTreeBranch):
