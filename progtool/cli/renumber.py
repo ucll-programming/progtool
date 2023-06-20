@@ -54,8 +54,7 @@ def _rename(old_path: str, new_path: str) -> None:
         logging.info(f'Renaming {old_path} to {new_path}')
         os.rename(old_path, new_path)
     else:
-        logging.info(f'Skipping {old_path}; it already has the right name')
-    print('Done!')
+        logging.info(f'[red] Skipping {old_path}; it already has the right name')
 
 
 def _renumber(args):
@@ -66,6 +65,7 @@ def _renumber(args):
     if args.force:
         for original_name, new_name in mapping.items():
             _rename(original_name, new_name)
+        print('Done!')
     else:
         table = Table(show_header=True, header_style="blue")
         table.add_column('original')
