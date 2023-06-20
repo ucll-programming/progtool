@@ -33,6 +33,17 @@ def test_remove_number(string, expected):
     assert actual == expected
 
 
+@pytest.mark.parametrize("string, expected_number, expected_name", [
+    ("1-abc", 1, "abc"),
+    ("0", 0, ""),
+    ("491-xyz", 491, "xyz"),
+])
+def test_extract_number_and_name(string, expected_number, expected_name):
+    actual_number, actual_name = extract_number_and_name(string)
+    assert actual_number == expected_number
+    assert actual_name == expected_name
+
+
 @pytest.mark.parametrize("string, number, expected", [
     ('', 0, '00'),
     ('', 10, '10'),

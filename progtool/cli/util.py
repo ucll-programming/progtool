@@ -24,6 +24,17 @@ def remove_number(string: str) -> str:
     return re.sub(r'^\d+-?', '', string)
 
 
+def extract_number_and_name(string: str) -> tuple[int, str]:
+    if match := re.fullmatch(r'(\d+)', string):
+        number = int(match.group(1))
+        filename = ''
+    elif match := re.fullmatch(r'(\d+)-(.*)', string):
+        number = int(match.group(1))
+        filename = match.group(2)
+
+    return (number, filename)
+
+
 def add_number(string: str, number: int) -> str:
     number_string = str(number).rjust(2, '0')
 
@@ -44,3 +55,4 @@ def create_renumbering_mapping(strings: list[str]) -> dict[str, str]:
         for index, string in zip(count(start=1), sorted_strings)
     }
     return renumbered_strings
+
