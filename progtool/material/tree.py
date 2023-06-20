@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any, Optional
 from progtool.material.treepath import TreePath
 from enum import Enum
+import asyncio
 import logging
 import os
 from progtool.material import metadata
@@ -76,6 +77,10 @@ class MaterialTreeNode(ABC):
     def __repr__(self) -> str:
         ...
 
+    @abstractmethod
+    def judge_recursively(self) -> None:
+        ...
+
 
 class MaterialTreeLeaf(MaterialTreeNode):
     pass
@@ -101,6 +106,9 @@ class Explanation(MaterialTreeLeaf):
         logging.debug(f'Opening ${self.__markdown_path}')
         with open(self.__markdown_path) as file:
             return file.read()
+
+    def judge_recursively(self) -> None:
+        pass
 
 
 class Exercise(MaterialTreeLeaf):
@@ -129,6 +137,28 @@ class Exercise(MaterialTreeLeaf):
         with open(self.__markdown_path) as file:
             return file.read()
 
+    async def __run_pytest(self) -> bool:
+        path = self.path
+        assert os.path.isfile(path / 'tests.py'), f'expected to find tests.py in {path}'
+        process = await asyncio.create_subprocess_shell('pytest', stdout=asyncio.subprocess.PIPE, cwd=path)
+        stdout, stderr = await process.communicate()
+        logging.debug(stdout.decode())
+        tests_passed = process.returncode == 0
+        return tests_passed
+
+    def judge(self) -> None:
+        async def judge():
+            logging.info(f'Judging exercise {self.tree_path}')
+            tests_passed = await self.__run_pytest()
+            judgement = Judgement.PASS if tests_passed else Judgement.FAIL
+            logging.info(f'Exercise {self.tree_path}: {judgement}')
+            self.judgement = judgement
+        logging.info(f'Enqueueing exercise {self.tree_path}')
+        asyncio.create_task(judge())
+
+    def judge_recursively(self) -> None:
+        self.judge()
+
 
 class MaterialTreeBranch(MaterialTreeNode):
     __children_table_value: Optional[dict[str, MaterialTreeNode]]
@@ -154,6 +184,10 @@ class MaterialTreeBranch(MaterialTreeNode):
         entries = os.listdir(self.path)
         nodes = (MaterialTreeNode.create(self.path / entry, self.tree_path / entry) for entry in entries) # Can contain None values
         return {node.tree_path.parts[-1]: node for node in nodes if node is not None}
+
+    def judge_recursively(self) -> None:
+        for child in self.children:
+            child.judge_recursively()
 
 
 class Section(MaterialTreeBranch):
