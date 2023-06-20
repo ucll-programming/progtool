@@ -1,5 +1,5 @@
 from progtool.material.tree import MaterialTreeBranch, create_material_tree, MaterialTreeNode, Section, Exercise, Explanation
-from typing import Any, cast
+from typing import Any
 from progtool import repository
 import flask
 import logging
@@ -51,7 +51,6 @@ def node_page(node_path: str):
             data['type'] = 'exercise'
             data['markdown'] = markdown
 
-    print(data)
     return flask.jsonify(data)
 
 
