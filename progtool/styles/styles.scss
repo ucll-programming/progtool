@@ -1,5 +1,4 @@
 $sidebar-width: 200px;
-$selection-background-color: #FAA;
 $selection-foreground-color: #800;
 
 #root {
@@ -20,6 +19,11 @@ $selection-foreground-color: #800;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+}
+
+p code {
+  background: rgba(50, 50, 50, 0.5);
+  padding: 2px;
 }
 
 #sidebar {
@@ -89,14 +93,12 @@ a {
       & > .overview-entry-header-symbol {
         position: absolute;
         right: 0;
-        padding: 0.1em;
+        padding: 0.2em;
       }
     }
 
     &.selected {
       & > .overview-entry-header {
-        // background: $selection-background-color;
-
         & > a {
           color: $selection-foreground-color;
           font-weight: 600;
@@ -107,7 +109,7 @@ a {
     &.section {
       border-left: #daacff 4px solid;
       margin: 2px 0 0 4px;
-      background: #daacff;
+      background: #AAF;
 
       & > .overview-entry-header {
         margin: 0;
