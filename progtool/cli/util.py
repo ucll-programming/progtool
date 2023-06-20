@@ -56,3 +56,16 @@ def create_renumbering_mapping(strings: list[str]) -> dict[str, str]:
     }
     return renumbered_strings
 
+
+def find_lowest_unused_number(strings: list[str]) -> int:
+    '''
+    Returns the lowest unused number which is higher than all numbers in use.
+    In other words, this function does not look for gaps in the numbering.
+    '''
+    numbers = [extract_number_and_name(string)[0] for string in strings]
+    highest_number = max(numbers)
+    return highest_number + 1
+
+
+def make_slug(string: str) -> str:
+    return '-'.join(string.lower().split(' '))
