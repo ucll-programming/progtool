@@ -11,7 +11,7 @@ from progtool.server.pods import ExerciseData, ExplanationData, NodeData, Sectio
 
 app = flask.Flask(__name__)
 
-material_tree: MaterialTreeNode = create_material_tree(repository.find_exercises_root())
+material_tree = create_material_tree(repository.find_exercises_root())
 
 
 @app.route('/', defaults={'node_path': ''})
