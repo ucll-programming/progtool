@@ -26,9 +26,6 @@ def root(node_path: str):
 @app.route('/api/v1/nodes/', defaults={'node_path': ''})
 @app.route('/api/v1/nodes/<path:node_path>')
 def node_page(node_path: str):
-    def url_for(node: MaterialTreeNode) -> str:
-        return '/api/v1/nodes/' + '/'.join(node.tree_path.parts)
-
     path_parts = node_path.split('/') if node_path else []
     current = material_tree
     # TODO Error checking
