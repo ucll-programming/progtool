@@ -6,6 +6,8 @@ import logging
 import pkg_resources
 import sass
 
+from progtool.server.pods import ExerciseData, ExplanationData, NodeData, SectionData
+
 
 app = flask.Flask(__name__)
 
@@ -34,24 +36,37 @@ def node_page(node_path: str):
         assert isinstance(current, MaterialTreeBranch) # TODO Raise exception
         current = current[path_part]
 
-    data: dict[str, Any] = {
-        'path': str(current.path),
-        'tree_path': current.tree_path.parts,
-        'name': current.name,
-    }
+    path = str(current.path)
+    tree_path = current.tree_path.parts
+    name = current.name
 
     match current:
         case Section(children=children):
-            data['type'] = 'section'
-            data['children'] = [child.tree_path.parts[-1] for child in children]
+            data: NodeData = SectionData(
+                path=path,
+                type='section',
+                tree_path=tree_path,
+                name=name,
+                children=[child.tree_path.parts[-1] for child in children]
+            )
         case Explanation(markdown=markdown):
-            data['type'] = 'explanation'
-            data['markdown'] = markdown
+            data = ExplanationData(
+                path=path,
+                type='explanation',
+                tree_path=tree_path,
+                name=name,
+                markdown=markdown
+            )
         case Exercise(markdown=markdown):
-            data['type'] = 'exercise'
-            data['markdown'] = markdown
+            data = ExplanationData(
+                path=path,
+                type='exercise',
+                tree_path=tree_path,
+                name=name,
+                markdown=markdown
+            )
 
-    return flask.jsonify(data)
+    return flask.jsonify(data.dict())
 
 
 @app.route('/styles.css')
