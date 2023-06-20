@@ -1,9 +1,11 @@
 import argparse
-import logging
+from progtool import log
 from progtool.cli import server, tree, renumber
 
 
 def process_command_line_arguments():
+
+
     root_parser = argparse.ArgumentParser(description='Programming Assistant Tool')
     root_parser.add_argument('-v', '--verbose', action='count', dest='verbosity', help='Increase verbosity level')
     subparsers = root_parser.add_subparsers()
@@ -18,8 +20,7 @@ def process_command_line_arguments():
         module.add_command_line_parser(subparsers)
 
     args = root_parser.parse_args()
-
-    _set_verbosity_level(args.verbosity)
+    log.configure(args.verbosity)
 
     if 'func' in args:
         args.func(args)
@@ -29,12 +30,3 @@ def process_command_line_arguments():
 
 def _show_help():
     print('Help!')
-
-def _set_verbosity_level(level):
-    match level:
-        case 1:
-            logging.basicConfig(level=logging.INFO, force=True)
-            logging.info('Verbosity set to INFO level')
-        case 2:
-            logging.basicConfig(level=logging.DEBUG, force=True)
-            logging.debug('Verbosity set to DEBUG level')
