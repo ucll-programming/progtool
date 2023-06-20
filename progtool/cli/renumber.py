@@ -1,53 +1,10 @@
-import click
+from progtool.cli.util import find_numbered_subdirectories, create_renumbering_mapping
 from itertools import count
 from rich.console import Console
 from rich.table import Table
 import logging
+import click
 import os
-import re
-
-
-def _is_numbered(string: str) -> bool:
-    """
-    Checks if string starts with a number prefix.
-    """
-    return bool(re.fullmatch(r'\d+(-.+)?', string))
-
-
-def _is_numbered_directory(path: str) -> bool:
-    """
-    Checks if path refers to a directory and its name is numbered.
-    """
-    return _is_numbered(path) and os.path.isdir(path)
-
-
-def _remove_number(string: str) -> str:
-    """
-    Removes the number prefix from the string.
-    """
-    return re.sub(r'^\d+-?', '', string)
-
-
-def _add_number(string: str, number: int) -> str:
-    number_string = str(number).rjust(2, '0')
-
-    if len(string) == 0:
-        return number_string
-    else:
-        return f'{number_string}-{string}'
-
-
-def _create_renumbering_mapping(strings: list[str]) -> dict[str, str]:
-    sorted_strings = sorted(strings)
-    renumbered_strings = {
-        string: _add_number(_remove_number(string), index)
-        for index, string in zip(count(start=1), sorted_strings)
-    }
-    return renumbered_strings
-
-
-def _find_numbered_subdirectories() -> list[str]:
-    return [entry for entry in os.listdir() if _is_numbered_directory(entry)]
 
 
 def _rename(old_path: str, new_path: str) -> None:
@@ -58,13 +15,12 @@ def _rename(old_path: str, new_path: str) -> None:
         logging.info(f'[red] Skipping {old_path}; it already has the right name')
 
 
-
 @click.command(help='Renumber subdirectories')
 @click.option('-f', '--force', is_flag=True, help='Performs renames')
 def renumber(force: bool):
     console = Console()
-    numbered_directories = _find_numbered_subdirectories()
-    mapping = _create_renumbering_mapping(numbered_directories)
+    numbered_directories = find_numbered_subdirectories()
+    mapping = create_renumbering_mapping(numbered_directories)
 
     if force:
         for original_name, new_name in mapping.items():
