@@ -38,6 +38,7 @@ $selection-foreground-color: #800;
   flex-direction: column;
   justify-content: start;
   align-items: center;
+  margin-left: $sidebar-width;
 
   #main-view {
     width: 100%;
