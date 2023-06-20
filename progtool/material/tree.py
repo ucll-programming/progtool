@@ -8,8 +8,6 @@ import os
 from progtool.material import metadata
 
 
-NodeType = Literal['exercise'] | Literal['explanations'] | Literal['section']
-
 
 class MaterialTreeNode(ABC):
     __path: Path
@@ -72,11 +70,6 @@ class MaterialTreeNode(ABC):
     def __repr__(self) -> str:
         ...
 
-    @property
-    @abstractmethod
-    def type(self) -> NodeType:
-        ...
-
 
 class MaterialTreeLeaf(MaterialTreeNode):
     pass
@@ -92,10 +85,6 @@ class Explanation(MaterialTreeLeaf):
 
     def __repr__(self) -> str:
         return str(self)
-
-    @property
-    def type(self) -> NodeType:
-        return 'explanations'
 
     @property
     def __markdown_path(self) -> Path:
@@ -118,10 +107,6 @@ class Exercise(MaterialTreeLeaf):
 
     def __repr__(self) -> str:
         return str(self)
-
-    @property
-    def type(self) -> NodeType:
-        return 'exercise'
 
     @property
     def __markdown_path(self) -> Path:
@@ -175,10 +160,6 @@ class Section(MaterialTreeBranch):
 
     def __repr__(self) -> str:
         return str(self)
-
-    @property
-    def type(self) -> NodeType:
-        return 'section'
 
     @property
     def name(self) -> str:
