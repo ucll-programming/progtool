@@ -1,7 +1,7 @@
 import progtool.server
 
 
-def _run_server():
+def _run_server(args):
     progtool.server.run()
 
 

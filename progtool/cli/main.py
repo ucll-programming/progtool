@@ -5,7 +5,7 @@ from progtool.cli import server, tree
 
 def process_command_line_arguments():
     root_parser = argparse.ArgumentParser(description='Programming Assistant Tool')
-    root_parser.add_argument('-v', '--verbose', action='count', dest='verbosity')
+    root_parser.add_argument('-v', '--verbose', action='count', dest='verbosity', help='Increase verbosity level')
     subparsers = root_parser.add_subparsers()
 
     command_modules = [
@@ -21,7 +21,7 @@ def process_command_line_arguments():
     _set_verbosity_level(args.verbosity)
 
     if 'func' in args:
-        args.func()
+        args.func(args)
     else:
         _show_help()
 

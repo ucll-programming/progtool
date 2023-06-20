@@ -4,7 +4,7 @@ from progtool.material.tree import create_material_tree
 from progtool.repository import find_exercises_root
 
 
-def _print_tree():
+def _print_tree(args):
     def recurse(node, indentation):
         match node:
             case Section():
