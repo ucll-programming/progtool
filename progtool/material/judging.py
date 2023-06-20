@@ -1,5 +1,4 @@
 from typing import cast
-from progtool.workers.manager import TaskManager
 from progtool.material.tree import Exercise, MaterialTreeNode, Section, Judgement
 from pathlib import Path
 import logging
