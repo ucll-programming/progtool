@@ -1,6 +1,6 @@
 import argparse
 import logging
-from progtool.cli import server, tree
+from progtool.cli import server, tree, renumber
 
 
 def process_command_line_arguments():
@@ -10,7 +10,8 @@ def process_command_line_arguments():
 
     command_modules = [
         server,
-        tree
+        tree,
+        renumber
     ]
 
     for module in command_modules:
