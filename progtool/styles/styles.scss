@@ -80,11 +80,22 @@ a {
     a {
       font-weight: 100;
       font-size: 1rem;
+      position: relative;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+
+      & > .overview-entry-header-symbol {
+        position: absolute;
+        right: 0;
+        padding: 0.1em;
+      }
     }
 
     &.selected {
       & > .overview-entry-header {
-        background: $selection-background-color;
+        // background: $selection-background-color;
 
         & > a {
           color: $selection-foreground-color;
@@ -120,11 +131,11 @@ a {
     }
 
     &.explanation {
-      background: #AAD;
+      background: #FAA;
     }
 
     &.exercise {
-      background: #ACA;
+      background: #FAA;
     }
   }
 }
