@@ -31,8 +31,8 @@ class MaterialTreeNode(ABC):
     @staticmethod
     def contains_node_of_type(path: Path, expected_type: str) -> bool:
         if MaterialTreeNode.contains_metadata(path):
-            data = MaterialTreeNode.load_metadata(path)
-            result = data['Type'] == expected_type
+            metadata = MaterialTreeNode.load_metadata(path)
+            result = metadata.type == expected_type
             logging.debug(f'{path}.type == ${expected_type} is ${result}')
             return result
         else:
@@ -215,8 +215,8 @@ class Section(MaterialTreeBranch):
         return self.__name
 
     def __read_metadata(self) -> None:
-        data = MaterialTreeNode.load_metadata(self.path)
-        self.__name = data['Name']
+        metadata = MaterialTreeNode.load_metadata(self.path)
+        self.__name = metadata.name
 
 
 def create_material_tree(root_path: Path) -> MaterialTreeNode:
