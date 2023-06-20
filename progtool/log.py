@@ -3,7 +3,6 @@ from rich.logging import RichHandler
 import logging
 
 
-
 def configure(verbosity_level: Optional[int]) -> None:
     match verbosity_level:
         case None:
