@@ -21,7 +21,7 @@ def remove_number(string: str) -> str:
     """
     Removes the number prefix from the string.
     """
-    return re.sub(r'^\d+-?', '', string)
+    return extract_number_and_name(string)[1]
 
 
 def extract_number_and_name(string: str) -> tuple[int, str]:
