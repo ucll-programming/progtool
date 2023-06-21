@@ -114,6 +114,8 @@ class Explanation(MaterialTreeLeaf):
 class Exercise(MaterialTreeLeaf):
     judgement: Judgement
 
+    __difficulty: Optional[int]
+
     @staticmethod
     def test(path: Path) -> bool:
         return MaterialTreeNode.contains_node_of_type(path, metadata.TYPE_EXERCISE)
@@ -121,12 +123,20 @@ class Exercise(MaterialTreeLeaf):
     def __init__(self, path: Path, tree_path: TreePath):
         super().__init__(path, tree_path)
         self.judgement = Judgement.UNKNOWN
+        self.__difficulty = None
 
     def __str__(self) -> str:
         return f'Exercise[{self.tree_path}]'
 
     def __repr__(self) -> str:
         return str(self)
+
+    @property
+    def difficulty(self) -> int:
+        if self.__difficulty is None:
+            self.__read_metadata()
+        assert self.__difficulty is not None, '__read_metadata is supposed to set __difficulty'
+        return self.__difficulty
 
     @property
     def __markdown_path(self) -> Path:
@@ -158,6 +168,11 @@ class Exercise(MaterialTreeLeaf):
 
     def judge_recursively(self) -> None:
         self.judge()
+
+    def __read_metadata(self) -> None:
+        metadata = MaterialTreeNode.load_metadata(self.path)
+        self.__difficulty = metadata.difficulty
+
 
 
 class MaterialTreeBranch(MaterialTreeNode):

@@ -15,7 +15,7 @@ class SectionMetadata(NodeMetadata):
 
 
 class ExerciseMetadata(NodeMetadata):
-    pass
+    difficulty: int
 
 
 class ExplanationMetadata(NodeMetadata):

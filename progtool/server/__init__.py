@@ -6,7 +6,7 @@ import logging
 import pkg_resources
 import sass
 
-from progtool.server.pods import ExerciseData, ExplanationData, NodeData, SectionData
+from progtool.server.pods import ExerciseData, ExplanationData, NodeData, SectionData, judgement_to_string
 
 
 app = flask.Flask(__name__)
@@ -54,14 +54,18 @@ def node_page(node_path: str):
                 name=name,
                 markdown=markdown
             )
-        case Exercise(markdown=markdown):
-            data = ExplanationData(
+        case Exercise(markdown=markdown, judgement=judgement, difficulty=difficulty):
+            data = ExerciseData(
                 path=path,
                 type='exercise',
                 tree_path=tree_path,
                 name=name,
-                markdown=markdown
+                markdown=markdown,
+                difficulty=difficulty,
+                judgement=judgement_to_string(judgement)
             )
+        case _:
+            raise RuntimeError(f"Unrecognized node type: {current!r}")
 
     return flask.jsonify(data.dict())
 
