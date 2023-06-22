@@ -137,7 +137,17 @@ a {
     }
 
     &.exercise {
-      background: #FAA;
+      &.pass {
+        background: #AFA;
+      }
+
+      &.fail {
+        background: #FAA;
+      }
+
+      &.unknown {
+        background: #AAA;
+      }
     }
   }
 }
