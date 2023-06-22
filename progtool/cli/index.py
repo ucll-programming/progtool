@@ -14,13 +14,20 @@ def index():
 @index.command(help='Reindex subdirectories')
 @click.option('-f', '--force', is_flag=True, help='Performs renames')
 def re(force):
+    def rename(old_path: str, new_path: str) -> None:
+        if old_path != new_path:
+            logging.info(f'Renaming {old_path} to {new_path}')
+            os.rename(old_path, new_path)
+        else:
+            logging.info(f'[red] Skipping {old_path}; it already has the right name')
+
     console = Console()
     indexed_directories = find_indexed_subdirectories()
     mapping = create_reindexing_mapping(indexed_directories)
 
     if force:
         for original_name, new_name in mapping.items():
-            _rename(original_name, new_name)
+            rename(original_name, new_name)
         print('Done!')
     else:
         table = Table(show_header=True, header_style="blue")
@@ -31,12 +38,4 @@ def re(force):
             table.add_row(original_name, new_name)
 
         console.print(table)
-        console.print("Use -f option to actually perform renames")
-
-
-def _rename(old_path: str, new_path: str) -> None:
-    if old_path != new_path:
-        logging.info(f'Renaming {old_path} to {new_path}')
-        os.rename(old_path, new_path)
-    else:
-        logging.info(f'[red] Skipping {old_path}; it already has the right name')
+        console.print("Use -f option to actually perform the renames")
