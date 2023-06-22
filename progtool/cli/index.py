@@ -70,6 +70,9 @@ def add(directory, dry_run):
 @click.option('-d', '--delta', type=int, default=1)
 @click.option('-f', '--force', default=False, is_flag=True)
 def shift(start, delta, force):
+    '''
+    Shift indices by a a certain amount
+    '''
     def rename(old_path: str, new_path: str) -> None:
         if old_path != new_path:
             logging.info(f'Renaming {old_path} to {new_path}')
