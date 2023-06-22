@@ -63,7 +63,7 @@ def parse_metadata(path: Path, data: Any) -> ContentNodeMetadata:
     if node_type == TYPE_EXERCISE:
         return ExerciseMetadata.parse_obj(data)
     elif node_type == TYPE_EXPLANATION:
-        return ExerciseMetadata.parse_obj(data)
+        return ExplanationMetadata.parse_obj(data)
     elif node_type == TYPE_LINK:
         link_metadata = LinkMetadata.parse_obj(data)
         return load_metadata(path / link_metadata.location)
