@@ -29,7 +29,7 @@ def test_is_not_indexed(string):
     ("491-xyz", "xyz"),
 ])
 def test_remove_number(string, expected):
-    actual = remove_index(string)
+    actual = remove_index_from_string(string)
     assert actual == expected
 
 
@@ -52,7 +52,7 @@ def test_extract_number_and_name(string, expected_number, expected_name):
     ('abc', 73, '73-abc'),
 ])
 def test_add_number(string, number, expected):
-    actual = add_index(string, number)
+    actual = add_index_to_string(string, number)
     assert actual == expected
 
 

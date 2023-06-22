@@ -40,7 +40,7 @@ def re(force):
         table.add_column('reindexed')
 
         for original_name, new_name in mapping.items():
-            table.add_row(original_name, new_name)
+            table.add_row(str(original_name), str(new_name))
 
         console.print(table)
         console.print("Use -f option to actually perform the renames")
@@ -61,5 +61,5 @@ def add(directory, dry_run):
 
     next_index = util.find_lowest_unused_index_in_directory()
     old_name = directory
-    new_name = util.add_index(old_name, next_index)
+    new_name = util.add_index_to_string(old_name, next_index)
     rename(old_name, new_name)

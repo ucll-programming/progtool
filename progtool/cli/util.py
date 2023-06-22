@@ -29,11 +29,18 @@ def is_indexed_directory(path: str) -> bool:
     return is_indexed(path) and os.path.isdir(path)
 
 
-def remove_index(string: str) -> str:
+def remove_index_from_string(string: str) -> str:
     """
     Removes the number prefix from the string.
     """
     return extract_index_and_name(string)[1]
+
+
+def remove_index_from_path(path: Path) -> Path:
+    """
+    Removes the number prefix from the path.
+    """
+    return Path(remove_index_from_string(str(path)))
 
 
 def extract_index_and_name(string: str) -> tuple[int, str]:
@@ -47,7 +54,7 @@ def extract_index_and_name(string: str) -> tuple[int, str]:
     return (index, filename)
 
 
-def add_index(string: str, index: int) -> str:
+def add_index_to_string(string: str, index: int) -> str:
     index_string = str(index).rjust(2, '0')
 
     if len(string) == 0:
@@ -56,17 +63,21 @@ def add_index(string: str, index: int) -> str:
         return f'{index_string}-{string}'
 
 
-def find_indexed_subdirectories(path: Optional[Path] = None) -> list[str]:
-    return [entry for entry in os.listdir(path) if is_indexed_directory(entry)]
+def add_index_to_path(path: Path, index: int) -> Path:
+    return Path(add_index_to_string(str(path), index))
 
 
-def create_reindexing_mapping(strings: list[str]) -> dict[str, str]:
-    sorted_strings = sorted(strings)
-    indexed_string = {
-        string: add_index(remove_index(string), index)
-        for index, string in zip(count(start=1), sorted_strings)
+def find_indexed_subdirectories(path: Optional[Path] = None) -> list[Path]:
+    return [Path(entry) for entry in os.listdir(path) if is_indexed_directory(entry)]
+
+
+def create_reindexing_mapping(paths: list[Path]) -> dict[Path, Path]:
+    sorted_paths = sorted(paths)
+    indexed_paths = {
+        path: add_index_to_path(remove_index_from_path(path), index)
+        for index, path in zip(count(start=1), sorted_paths)
     }
-    return indexed_string
+    return indexed_paths
 
 
 def find_lowest_unused_index_in_strings(strings: list[str]) -> int:
@@ -81,7 +92,8 @@ def find_lowest_unused_index_in_strings(strings: list[str]) -> int:
 
 def find_lowest_unused_index_in_directory(path: Optional[Path] = None) -> int:
     indexed_subdirectories = find_indexed_subdirectories(path)
-    return find_lowest_unused_index_in_strings(indexed_subdirectories)
+    indexed_subdirectories_names = [str(subdir) for subdir in indexed_subdirectories]
+    return find_lowest_unused_index_in_strings(indexed_subdirectories_names)
 
 
 def make_slug(string: str) -> str:
