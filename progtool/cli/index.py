@@ -1,5 +1,4 @@
 from progtool.cli.util import find_indexed_subdirectories, create_reindexing_mapping
-from itertools import count
 from rich.console import Console
 from rich.table import Table
 import logging
@@ -7,17 +6,14 @@ import click
 import os
 
 
-def _rename(old_path: str, new_path: str) -> None:
-    if old_path != new_path:
-        logging.info(f'Renaming {old_path} to {new_path}')
-        os.rename(old_path, new_path)
-    else:
-        logging.info(f'[red] Skipping {old_path}; it already has the right name')
+@click.group(help='Assists with indexing directories')
+def index():
+    pass
 
 
-@click.command(help='Reindex subdirectories')
+@index.command(help='Reindex subdirectories')
 @click.option('-f', '--force', is_flag=True, help='Performs renames')
-def reindex(force: bool):
+def re(force):
     console = Console()
     indexed_directories = find_indexed_subdirectories()
     mapping = create_reindexing_mapping(indexed_directories)
@@ -36,3 +32,11 @@ def reindex(force: bool):
 
         console.print(table)
         console.print("Use -f option to actually perform renames")
+
+
+def _rename(old_path: str, new_path: str) -> None:
+    if old_path != new_path:
+        logging.info(f'Renaming {old_path} to {new_path}')
+        os.rename(old_path, new_path)
+    else:
+        logging.info(f'[red] Skipping {old_path}; it already has the right name')

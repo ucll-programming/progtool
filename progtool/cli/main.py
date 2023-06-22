@@ -2,8 +2,8 @@ import click
 from progtool import log
 from progtool.cli.tree import tree
 from progtool.cli.server import server
-from progtool.cli.reindex import reindex
 from progtool.cli.create import create
+from progtool.cli.index import index
 
 
 @click.group()
@@ -16,7 +16,7 @@ def process_command_line_arguments():
     commands = [
         tree,
         server,
-        reindex,
+        index,
         create,
     ]
 
