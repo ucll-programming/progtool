@@ -1,4 +1,4 @@
-from progtool.cli.util import find_numbered_subdirectories, create_renumbering_mapping
+from progtool.cli.util import find_indexed_subdirectories, create_reindexing_mapping
 from itertools import count
 from rich.console import Console
 from rich.table import Table
@@ -15,12 +15,12 @@ def _rename(old_path: str, new_path: str) -> None:
         logging.info(f'[red] Skipping {old_path}; it already has the right name')
 
 
-@click.command(help='Renumber subdirectories')
+@click.command(help='Reindex subdirectories')
 @click.option('-f', '--force', is_flag=True, help='Performs renames')
 def renumber(force: bool):
     console = Console()
-    numbered_directories = find_numbered_subdirectories()
-    mapping = create_renumbering_mapping(numbered_directories)
+    indexed_directories = find_indexed_subdirectories()
+    mapping = create_reindexing_mapping(indexed_directories)
 
     if force:
         for original_name, new_name in mapping.items():
@@ -29,7 +29,7 @@ def renumber(force: bool):
     else:
         table = Table(show_header=True, header_style="blue")
         table.add_column('original')
-        table.add_column('renumbered')
+        table.add_column('reindexed')
 
         for original_name, new_name in mapping.items():
             table.add_row(original_name, new_name)

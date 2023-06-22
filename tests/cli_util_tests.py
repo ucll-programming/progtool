@@ -10,8 +10,8 @@ import pytest
     "192-x",
     "41",
 ])
-def test_is_numbered(string):
-    assert is_numbered(string)
+def test_is_indexed(string):
+    assert is_indexed(string)
 
 
 @pytest.mark.parametrize("string", [
@@ -19,8 +19,8 @@ def test_is_numbered(string):
     "1xyz",
     "14-",
 ])
-def test_is_not_numbered(string):
-    assert not is_numbered(string)
+def test_is_not_indexed(string):
+    assert not is_indexed(string)
 
 
 @pytest.mark.parametrize("string, expected", [
@@ -29,7 +29,7 @@ def test_is_not_numbered(string):
     ("491-xyz", "xyz"),
 ])
 def test_remove_number(string, expected):
-    actual = remove_number(string)
+    actual = remove_index(string)
     assert actual == expected
 
 
@@ -39,7 +39,7 @@ def test_remove_number(string, expected):
     ("491-xyz", 491, "xyz"),
 ])
 def test_extract_number_and_name(string, expected_number, expected_name):
-    actual_number, actual_name = extract_number_and_name(string)
+    actual_number, actual_name = extract_index_and_name(string)
     assert actual_number == expected_number
     assert actual_name == expected_name
 
@@ -52,7 +52,7 @@ def test_extract_number_and_name(string, expected_number, expected_name):
     ('abc', 73, '73-abc'),
 ])
 def test_add_number(string, number, expected):
-    actual = add_number(string, number)
+    actual = add_index(string, number)
     assert actual == expected
 
 
@@ -79,5 +79,5 @@ def test_add_number(string, number, expected):
     ),
 ])
 def test_create_renumbering_mapping(strings, expected):
-    actual = create_renumbering_mapping(strings)
+    actual = create_reindexing_mapping(strings)
     assert actual == expected

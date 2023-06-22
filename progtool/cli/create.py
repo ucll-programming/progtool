@@ -8,20 +8,20 @@ from progtool.material.metadata import SectionMetadata, TYPE_SECTION, TYPE_EXERC
 
 
 @click.group(help="Helps with the creation of new material")
-@click.option('-x', '--unnumbered', help="don't add number prefix", is_flag=True, default=False)
+@click.option('-x', '--unindexed', help="don't add number prefix", is_flag=True, default=False)
 @click.pass_context
-def create(ctx, unnumbered):
+def create(ctx, unindexed):
     ctx.ensure_object(dict)
-    ctx.obj['unnumbered'] = unnumbered
+    ctx.obj['unindexed'] = unindexed
 
 
 @create.command(help='Create new section')
 @click.argument("name", type=str)
 @click.pass_context
 def section(ctx, name):
-    unnumbered = ctx.obj['unnumbered']
+    unindexed = ctx.obj['unindexed']
     slug = util.make_slug(name)
-    dirname = add_number_prefix(string=slug, unnumbered=unnumbered)
+    dirname = add_index(string=slug, unindexed=unindexed)
 
     os.mkdir(dirname)
     with open(dirname / 'metadata.yaml', 'w') as file:
@@ -33,9 +33,9 @@ def section(ctx, name):
 @click.argument("name", type=str)
 @click.pass_context
 def exercise(ctx, name):
-    unnumbered = ctx.obj['unnumbered']
+    unindexed = ctx.obj['unindexed']
     slug = util.make_slug(name)
-    dirname = add_number_prefix(string=slug, unnumbered=unnumbered)
+    dirname = add_index(string=slug, unindexed=unindexed)
 
     os.mkdir(dirname)
     with open(dirname / 'metadata.yaml', 'w') as file:
@@ -49,10 +49,10 @@ def exercise(ctx, name):
         file.write('import pytest\n\nTODO')
 
 
-def add_number_prefix(*, string: str, unnumbered: bool) -> Path:
-    if unnumbered:
+def add_index(*, string: str, unindexed: bool) -> Path:
+    if unindexed:
         dirname = Path(string)
     else:
-        number = util.find_lowest_unused_number(util.find_numbered_subdirectories())
-        dirname = Path(util.add_number(string, number))
+        number = util.find_lowest_unused_index(util.find_indexed_subdirectories())
+        dirname = Path(util.add_index(string, number))
     return dirname

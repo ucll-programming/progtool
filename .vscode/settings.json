@@ -3,6 +3,8 @@
     "python.linting.enabled": true,
     "cSpell.words": [
         "jsonify",
-        "progtool"
+        "progtool",
+        "reindexing",
+        "unindexed"
     ]
 }
