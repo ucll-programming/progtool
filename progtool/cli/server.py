@@ -1,7 +1,10 @@
 import click
 
 
-@click.command(help='Set up server')
+@click.command()
 def server():
+    """
+    Set up server.
+    """
     import progtool.server
     progtool.server.run()
