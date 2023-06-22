@@ -7,7 +7,7 @@ import yaml
 from progtool.material.metadata import SectionMetadata, TYPE_SECTION, TYPE_EXERCISE
 
 
-@click.group()
+@click.group(help="Helps with the creation of new material")
 def create():
     pass
 
