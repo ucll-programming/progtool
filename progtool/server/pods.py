@@ -37,6 +37,6 @@ def judgement_to_string(judgement: tree.Judgement) -> Judgement:
     elif judgement == tree.Judgement.PASS:
         return 'pass'
     elif judgement == tree.Judgement.FAIL:
-        return 'pass'
+        return 'fail'
     else:
         raise RuntimeError(f'Unknown judgement {judgement}')
