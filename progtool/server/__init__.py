@@ -1,4 +1,5 @@
-from progtool.material.tree import MaterialTreeBranch, create_material_tree, MaterialTreeNode, Section, Exercise, Explanation
+from progtool.material.metadata import load_metadata
+from progtool.material.tree import MaterialTreeBranch, build_tree, MaterialTreeNode, Section, Exercise, Explanation
 from progtool.server.pods import ExerciseData, ExplanationData, NodeData, SectionData, judgement_to_string
 from typing import Any, Optional
 from progtool import repository
@@ -10,9 +11,16 @@ import asyncio
 import threading
 
 
+def load_material() -> MaterialTreeNode:
+    root_path = repository.find_exercises_root()
+    metadata = load_metadata(root_path)
+    tree = build_tree(metadata)
+    return tree
+
+
 app = flask.Flask(__name__)
 
-material_tree = create_material_tree(repository.find_exercises_root())
+material_tree = load_material()
 
 
 def start_event_loop_in_separate_thread() -> asyncio.AbstractEventLoop:
@@ -60,14 +68,12 @@ def node_page(node_path: str):
         assert isinstance(current, MaterialTreeBranch) # TODO Raise exception
         current = current[path_part]
 
-    path = str(current.path)
     tree_path = current.tree_path.parts
     name = current.name
 
     match current:
         case Section(children=children):
             data: NodeData = SectionData(
-                path=path,
                 type='section',
                 tree_path=tree_path,
                 name=name,
@@ -75,7 +81,6 @@ def node_page(node_path: str):
             )
         case Explanation(markdown=markdown):
             data = ExplanationData(
-                path=path,
                 type='explanation',
                 tree_path=tree_path,
                 name=name,
@@ -83,7 +88,6 @@ def node_page(node_path: str):
             )
         case Exercise(markdown=markdown, judgement=judgement, difficulty=difficulty):
             data = ExerciseData(
-                path=path,
                 type='exercise',
                 tree_path=tree_path,
                 name=name,

@@ -10,7 +10,6 @@ Judgement = Literal['unknown'] | Literal['pass'] | Literal['fail']
 class NodeData(BaseModel):
     name: str
     type: NodeType
-    path: str
     tree_path: tuple[str, ...]
 
 

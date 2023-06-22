@@ -3,16 +3,6 @@ from typing import Optional
 from itertools import count
 import os
 import re
-import contextlib
-
-
-
-@contextlib.contextmanager
-def in_directory(path: Path):
-    current_directory = path.cwd()
-    os.chdir(path)
-    yield
-    os.chdir(current_directory)
 
 
 def is_indexed(string: str) -> bool:

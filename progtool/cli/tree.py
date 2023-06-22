@@ -1,6 +1,6 @@
 from typing import cast
-from progtool.material.tree import Exercise, Section, Explanation
-from progtool.material.tree import create_material_tree
+from progtool.material.metadata import load_metadata
+from progtool.material.tree import Exercise, Section, Explanation, build_tree
 from progtool.repository import find_exercises_root
 import click
 
@@ -22,11 +22,12 @@ def _print_tree(help='Show tree'):
             case _:
                 assert False, 'Unrecognized node type'
 
-    tree = create_material_tree(find_exercises_root())
+    root_path = find_exercises_root()
+    metadata = load_metadata(root_path)
+    tree = build_tree(metadata)
     recurse(tree, 0)
 
 
 @click.command()
 def tree() -> None:
     _print_tree()
-
