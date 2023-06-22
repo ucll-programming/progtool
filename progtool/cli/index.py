@@ -26,7 +26,6 @@ def re(force):
         else:
             logging.info(f'[red] Skipping {old_path}; it already has the right name')
 
-    console = Console()
     indexed_directories = find_indexed_subdirectories()
     mapping = create_reindexing_mapping(indexed_directories)
 
@@ -35,6 +34,7 @@ def re(force):
             rename(original_name, new_name)
         print('Done!')
     else:
+        console = Console()
         table = Table(show_header=True, header_style="blue")
         table.add_column('original')
         table.add_column('reindexed')
@@ -63,3 +63,39 @@ def add(directory, dry_run):
     old_name = directory
     new_name = util.add_index_to_string(old_name, next_index)
     rename(old_name, new_name)
+
+
+@index.command
+@click.argument('start', type=int)
+@click.option('-d', '--delta', type=int, default=1)
+@click.option('-f', '--force', default=False, is_flag=True)
+def shift(start, delta, force):
+    def rename(old_path: str, new_path: str) -> None:
+        if old_path != new_path:
+            logging.info(f'Renaming {old_path} to {new_path}')
+            os.rename(old_path, new_path)
+        else:
+            logging.info(f'[red] Skipping {old_path}; it already has the right name')
+
+    indexed_subdirs = util.find_indexed_subdirectories()
+    selected_subdirs = [subdir for subdir in indexed_subdirs if util.index_of(subdir) >= start]
+    rename_table = {
+        subdir: util.replace_index_in_path(subdir, util.index_of(subdir) + delta)
+        for subdir in selected_subdirs
+    }
+    if force:
+        for original_name, new_name in rename_table.items():
+            rename(original_name, new_name)
+        print('Done!')
+    else:
+        console = Console()
+
+        table = Table(show_header=True, header_style="blue")
+        table.add_column('original')
+        table.add_column('reindexed')
+
+        for original_name, new_name in rename_table.items():
+            table.add_row(str(original_name), str(new_name))
+
+        console.print(table)
+        console.print("Use -f option to actually perform the renames")

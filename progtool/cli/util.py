@@ -54,6 +54,15 @@ def extract_index_and_name(string: str) -> tuple[int, str]:
     return (index, filename)
 
 
+def index_of(path: str | Path) -> int:
+    if isinstance(path, Path):
+        string = str(path)
+    else:
+        string = path
+
+    return extract_index_and_name(string)[0]
+
+
 def add_index_to_string(string: str, index: int) -> str:
     index_string = str(index).rjust(2, '0')
 
@@ -69,6 +78,11 @@ def add_index_to_path(path: Path, index: int) -> Path:
 
 def find_indexed_subdirectories(path: Optional[Path] = None) -> list[Path]:
     return [Path(entry) for entry in os.listdir(path) if is_indexed_directory(entry)]
+
+
+def replace_index_in_path(path: Path, new_index: int) -> Path:
+    without_index = remove_index_from_path(path)
+    return add_index_to_path(without_index, new_index)
 
 
 def create_reindexing_mapping(paths: list[Path]) -> dict[Path, Path]:
