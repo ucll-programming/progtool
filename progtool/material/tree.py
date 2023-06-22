@@ -78,7 +78,7 @@ class MaterialTreeNode(ABC):
         ...
 
     @abstractmethod
-    def judge_recursively(self) -> None:
+    def judge_recursively(self, loop: asyncio.AbstractEventLoop) -> None:
         ...
 
 
@@ -107,7 +107,7 @@ class Explanation(MaterialTreeLeaf):
         with open(self.__markdown_path) as file:
             return file.read()
 
-    def judge_recursively(self) -> None:
+    def judge_recursively(self, loop: asyncio.AbstractEventLoop) -> None:
         pass
 
 
@@ -152,11 +152,11 @@ class Exercise(MaterialTreeLeaf):
         assert os.path.isfile(path / 'tests.py'), f'expected to find tests.py in {path}'
         process = await asyncio.create_subprocess_shell('pytest', stdout=asyncio.subprocess.PIPE, cwd=path)
         stdout, stderr = await process.communicate()
-        logging.debug(stdout.decode())
+        output = stdout.decode()
         tests_passed = process.returncode == 0
         return tests_passed
 
-    def judge(self) -> None:
+    def judge(self, loop: asyncio.AbstractEventLoop) -> None:
         async def judge():
             logging.info(f'Judging exercise {self.tree_path}')
             tests_passed = await self.__run_pytest()
@@ -164,15 +164,14 @@ class Exercise(MaterialTreeLeaf):
             logging.info(f'Exercise {self.tree_path}: {judgement}')
             self.judgement = judgement
         logging.info(f'Enqueueing exercise {self.tree_path}')
-        asyncio.create_task(judge())
+        loop.create_task(judge())
 
-    def judge_recursively(self) -> None:
-        self.judge()
+    def judge_recursively(self, loop: asyncio.AbstractEventLoop) -> None:
+        self.judge(loop)
 
     def __read_metadata(self) -> None:
         metadata = MaterialTreeNode.load_metadata(self.path)
         self.__difficulty = metadata.difficulty
-
 
 
 class MaterialTreeBranch(MaterialTreeNode):
@@ -200,9 +199,9 @@ class MaterialTreeBranch(MaterialTreeNode):
         nodes = (MaterialTreeNode.create(self.path / entry, self.tree_path / entry) for entry in entries) # Can contain None values
         return {node.tree_path.parts[-1]: node for node in nodes if node is not None}
 
-    def judge_recursively(self) -> None:
+    def judge_recursively(self, loop: asyncio.AbstractEventLoop) -> None:
         for child in self.children:
-            child.judge_recursively()
+            child.judge_recursively(loop)
 
 
 class Section(MaterialTreeBranch):
