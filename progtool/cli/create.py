@@ -4,7 +4,7 @@ from progtool.cli import util
 from pathlib import Path
 import yaml
 
-from progtool.material.metadata import SectionMetadata, TYPE_SECTION, TYPE_EXERCISE
+from progtool.material.metadata import ExerciseMetadata, SectionMetadata, TYPE_SECTION, TYPE_EXERCISE
 
 
 @click.group(help="Helps with the creation of new material")
@@ -31,22 +31,23 @@ def section(ctx, name):
 
 @create.command(help='Create new exercise')
 @click.argument("name", type=str)
+@click.argument("difficulty", type=int)
 @click.pass_context
-def exercise(ctx, name):
+def exercise(ctx, name, difficulty):
     unindexed = ctx.obj['unindexed']
     slug = util.make_slug(name)
     dirname = add_index(string=slug, unindexed=unindexed)
 
     os.mkdir(dirname)
     with open(dirname / 'metadata.yaml', 'w') as file:
-        metadata = SectionMetadata(name=name, type=TYPE_EXERCISE)
+        metadata = ExerciseMetadata(name=name, type=TYPE_EXERCISE, difficulty=difficulty)
         yaml.dump(metadata.dict(), file, default_flow_style=False)
     with open(dirname / 'assignment.md', 'w') as file:
         file.write(f'# {name}\n\nTODO')
     with open(dirname / 'solution.py', 'w') as file:
         file.write('TODO')
     with open(dirname / 'tests.py', 'w') as file:
-        file.write('import pytest\n\nTODO')
+        file.write('import pytest\nimport student\n\n\nTODO')
 
 
 def add_index(*, string: str, unindexed: bool) -> Path:
