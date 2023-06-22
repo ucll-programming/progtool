@@ -17,6 +17,13 @@ class SectionMetadata(NodeMetadata):
 class ExerciseMetadata(NodeMetadata):
     difficulty: int
 
+    @pydantic.validator('difficulty')
+    def check_difficulty_range(cls, value):
+        if not 1 <= value <= 20:
+            raise ValueError()
+        else:
+            return value
+
 
 class ExplanationMetadata(NodeMetadata):
     pass
