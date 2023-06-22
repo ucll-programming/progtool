@@ -2,7 +2,7 @@ import click
 from progtool import log
 from progtool.cli.tree import tree
 from progtool.cli.server import server
-from progtool.cli.renumber import renumber
+from progtool.cli.reindex import reindex
 from progtool.cli.create import create
 
 
@@ -16,7 +16,7 @@ def process_command_line_arguments():
     commands = [
         tree,
         server,
-        renumber,
+        reindex,
         create,
     ]
 

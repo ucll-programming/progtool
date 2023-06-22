@@ -17,7 +17,7 @@ def _rename(old_path: str, new_path: str) -> None:
 
 @click.command(help='Reindex subdirectories')
 @click.option('-f', '--force', is_flag=True, help='Performs renames')
-def renumber(force: bool):
+def reindex(force: bool):
     console = Console()
     indexed_directories = find_indexed_subdirectories()
     mapping = create_reindexing_mapping(indexed_directories)
