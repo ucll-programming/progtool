@@ -8,16 +8,21 @@ from progtool.material.metadata import SectionMetadata, TYPE_SECTION, TYPE_EXERC
 
 
 @click.group(help="Helps with the creation of new material")
-def create():
-    pass
+@click.option('-x', '--unnumbered', help="don't add number prefix", is_flag=True, default=False)
+@click.pass_context
+def create(ctx, unnumbered):
+    ctx.ensure_object(dict)
+    ctx.obj['unnumbered'] = unnumbered
 
 
 @create.command(help='Create new section')
 @click.argument("name", type=str)
-def section(name):
-    number = util.find_lowest_unused_number(util.find_numbered_subdirectories())
+@click.pass_context
+def section(ctx, name):
+    unnumbered = ctx.obj['unnumbered']
     slug = util.make_slug(name)
-    dirname = Path(util.add_number(slug, number))
+    dirname = add_number_prefix(string=slug, unnumbered=unnumbered)
+
     os.mkdir(dirname)
     with open(dirname / 'metadata.yaml', 'w') as file:
         metadata = SectionMetadata(name=name, type=TYPE_SECTION)
@@ -26,10 +31,12 @@ def section(name):
 
 @create.command(help='Create new exercise')
 @click.argument("name", type=str)
-def exercise(name):
-    number = util.find_lowest_unused_number(util.find_numbered_subdirectories())
+@click.pass_context
+def exercise(ctx, name):
+    unnumbered = ctx.obj['unnumbered']
     slug = util.make_slug(name)
-    dirname = Path(util.add_number(slug, number))
+    dirname = add_number_prefix(string=slug, unnumbered=unnumbered)
+
     os.mkdir(dirname)
     with open(dirname / 'metadata.yaml', 'w') as file:
         metadata = SectionMetadata(name=name, type=TYPE_EXERCISE)
@@ -40,3 +47,12 @@ def exercise(name):
         file.write('TODO')
     with open(dirname / 'tests.py', 'w') as file:
         file.write('import pytest\n\nTODO')
+
+
+def add_number_prefix(*, string: str, unnumbered: bool) -> Path:
+    if unnumbered:
+        dirname = Path(string)
+    else:
+        number = util.find_lowest_unused_number(util.find_numbered_subdirectories())
+        dirname = Path(util.add_number(string, number))
+    return dirname
