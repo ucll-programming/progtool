@@ -53,6 +53,6 @@ def add_index(*, string: str, unindexed: bool) -> Path:
     if unindexed:
         dirname = Path(string)
     else:
-        number = util.find_lowest_unused_index(util.find_indexed_subdirectories())
+        number = util.find_lowest_unused_index_in_strings(util.find_indexed_subdirectories())
         dirname = Path(util.add_index(string, number))
     return dirname

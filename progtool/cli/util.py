@@ -1,6 +1,18 @@
+from pathlib import Path
+from typing import Optional
 from itertools import count
 import os
 import re
+import contextlib
+
+
+
+@contextlib.contextmanager
+def in_directory(path: Path):
+    current_directory = path.cwd()
+    os.chdir(path)
+    yield
+    os.chdir(current_directory)
 
 
 def is_indexed(string: str) -> bool:
@@ -35,8 +47,8 @@ def extract_index_and_name(string: str) -> tuple[int, str]:
     return (index, filename)
 
 
-def add_index(string: str, number: int) -> str:
-    index_string = str(number).rjust(2, '0')
+def add_index(string: str, index: int) -> str:
+    index_string = str(index).rjust(2, '0')
 
     if len(string) == 0:
         return index_string
@@ -44,8 +56,8 @@ def add_index(string: str, number: int) -> str:
         return f'{index_string}-{string}'
 
 
-def find_indexed_subdirectories() -> list[str]:
-    return [entry for entry in os.listdir() if is_indexed_directory(entry)]
+def find_indexed_subdirectories(path: Optional[Path] = None) -> list[str]:
+    return [entry for entry in os.listdir(path) if is_indexed_directory(entry)]
 
 
 def create_reindexing_mapping(strings: list[str]) -> dict[str, str]:
@@ -57,7 +69,7 @@ def create_reindexing_mapping(strings: list[str]) -> dict[str, str]:
     return indexed_string
 
 
-def find_lowest_unused_index(strings: list[str]) -> int:
+def find_lowest_unused_index_in_strings(strings: list[str]) -> int:
     '''
     Returns the lowest unused index which is higher than all indices in use.
     In other words, this function does not look for gaps in the indexing.
@@ -65,6 +77,11 @@ def find_lowest_unused_index(strings: list[str]) -> int:
     indices = [extract_index_and_name(string)[0] for string in strings]
     highest_index = max(indices)
     return highest_index + 1
+
+
+def find_lowest_unused_index_in_directory(path: Optional[Path] = None) -> int:
+    indexed_subdirectories = find_indexed_subdirectories(path)
+    return find_lowest_unused_index_in_strings(indexed_subdirectories)
 
 
 def make_slug(string: str) -> str:
