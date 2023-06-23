@@ -27,7 +27,7 @@ class SectionMetadata(ContentNodeMetadata):
 
 class ExerciseMetadata(ContentNodeMetadata):
     difficulty: int
-    file: str
+    documentation: dict[str, str]
     judge: JudgeMetadata
 
     @pydantic.validator('difficulty')

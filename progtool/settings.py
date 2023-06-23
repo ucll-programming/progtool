@@ -1,2 +1,2 @@
-language_priority = ['nl', 'en']
+language_priority = ['en', 'nl']
 

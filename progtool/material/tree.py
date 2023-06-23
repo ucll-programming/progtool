@@ -189,14 +189,14 @@ def build_tree(metadata: ContentNodeMetadata) -> MaterialTreeNode:
                     name=name,
                     file=path / get_documentation_in_language(documentation),
                 )
-            case ExerciseMetadata(path=path, name=name, difficulty=difficulty, file=file, judge=judge_metadata):
+            case ExerciseMetadata(path=path, name=name, difficulty=difficulty, documentation=documentation, judge=judge_metadata):
                 judge = create_judge(path, judge_metadata)
 
                 return Exercise(
                     tree_path=tree_path,
                     name=name,
                     difficulty=difficulty,
-                    assignment_file=path / file,
+                    assignment_file=path / get_documentation_in_language(documentation),
                     judge=judge,
                 )
             case SectionMetadata(path=path, name=name, contents=contents):
