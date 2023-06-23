@@ -76,13 +76,6 @@ p code {
     color: black;
   }
 
-  .overview-section-children-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-  }
-
   .overview-entry {
     & > .overview-entry-header {
       display: flex;
@@ -126,6 +119,10 @@ p code {
 
       & > .overview-entry-header {
         margin: 0;
+
+        &:hover {
+          background-color: $section-background * 1.33;
+        }
       }
 
       & .section-children {
@@ -147,19 +144,35 @@ p code {
 
     &.explanation {
       background: $explanation-background;
+
+      &:hover {
+        background: $explanation-background * 1.33;
+      }
     }
 
     &.exercise {
       &.pass {
         background: $exercise-pass-background;
+
+        &:hover {
+          background: $exercise-pass-background * 1.33;
+        }
       }
 
       &.fail {
         background: $exercise-fail-background;
+
+        &:hover {
+          background: $exercise-fail-background * 1.33;
+        }
       }
 
       &.unknown {
         background: $exercise-unknown-background;
+
+        &:hover {
+          background: $exercise-unknown-background * 1.33;
+        }
       }
     }
   }
