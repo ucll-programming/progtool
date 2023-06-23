@@ -56,10 +56,17 @@ class MaterialTreeNode(ABC):
     def preorder_traversal(self) -> Iterable[MaterialTreeNode]:
         ...
 
+    @abstractmethod
+    def build_parent_mapping(self, mapping: dict[MaterialTreeNode, MaterialTreeBranch]) -> None:
+        ...
+
 
 class MaterialTreeLeaf(MaterialTreeNode):
     def preorder_traversal(self) -> Iterable[MaterialTreeNode]:
         yield self
+
+    def build_parent_mapping(self, mapping: dict[MaterialTreeNode, MaterialTreeBranch]) -> None:
+        pass
 
 
 class Explanation(MaterialTreeLeaf):
@@ -170,6 +177,11 @@ class MaterialTreeBranch(MaterialTreeNode):
         yield self
         for child in self.children:
             yield from child.preorder_traversal()
+
+    def build_parent_mapping(self, mapping: dict[MaterialTreeNode, MaterialTreeBranch]) -> None:
+        for child in self.children:
+            mapping[child] = self
+            child.build_parent_mapping(mapping)
 
 
 class Section(MaterialTreeBranch):

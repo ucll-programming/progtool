@@ -107,7 +107,7 @@ def node_page(node_path: str):
     name = current.name
     successor_tree_path = to_tree_path(material.navigator.find_successor_leaf(current))
     predecessor_tree_path = to_tree_path(material.navigator.find_predecessor_leaf(current))
-    parent_tree_path = to_tree_path(material.navigator.find_predecessor_branch(current))
+    parent_tree_path = to_tree_path(material.navigator.find_parent(current))
 
     match current:
         case Section(children=children):

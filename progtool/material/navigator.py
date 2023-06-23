@@ -8,9 +8,13 @@ class MaterialNavigator:
 
     __node_index_map: dict[MaterialTreeNode, int]
 
+    __parent_mapping: dict[MaterialTreeNode, MaterialTreeBranch]
+
     def __init__(self, root: MaterialTreeNode):
         self.__nodes = list(root.preorder_traversal())
         self.__node_index_map = {node: index for index, node in enumerate(self.__nodes)}
+        self.__parent_mapping = {}
+        root.build_parent_mapping(self.__parent_mapping)
 
     def find_successor_leaf(self, node: MaterialTreeNode) -> Optional[MaterialTreeNode]:
         """
@@ -36,18 +40,8 @@ class MaterialNavigator:
             lambda node: isinstance(node, MaterialTreeLeaf)
         )
 
-    def find_predecessor_branch(self, node: MaterialTreeNode) -> Optional[MaterialTreeNode]:
-        """
-        Given any node, find the first *branch* that appears before it in preorder traversal.
-        This is equivalent with looking for the parent branch node.
-        """
-        assert node in self.__node_index_map, "BUG: All nodes should occur in __node_index_map"
-        start_index = self.__node_index_map[node] - 1
-        return self.__search_preorder_traversal(
-            start_index,
-            -1,
-            lambda node: isinstance(node, MaterialTreeBranch)
-        )
+    def find_parent(self, node: MaterialTreeNode) -> Optional[MaterialTreeNode]:
+        return self.__parent_mapping.get(node, None)
 
     def __search_preorder_traversal(self, start_index: int, direction: Literal[-1, 1], predicate: Callable[[MaterialTreeNode], bool]) -> Optional[MaterialTreeNode]:
         index = start_index
