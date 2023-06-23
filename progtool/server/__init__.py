@@ -1,6 +1,7 @@
 from progtool.material.metadata import load_metadata
+from progtool.material.navigator import MaterialNavigator
 from progtool.material.tree import MaterialTreeBranch, build_tree, MaterialTreeNode, Section, Exercise, Explanation
-from progtool.server.pods import ExerciseData, ExplanationData, NodeData, SectionData, judgement_to_string
+from progtool.server.restdata import ExerciseRestData, ExplanationRestData, NodeRestData, SectionRestData, judgement_to_string
 from typing import Any, Optional
 from progtool import repository
 import flask
@@ -11,16 +12,43 @@ import asyncio
 import threading
 
 
-def load_material() -> MaterialTreeNode:
+class Material:
+    __root: MaterialTreeNode
+    __navigator: MaterialNavigator
+
+    def __init__(self, root: MaterialTreeNode, navigator: MaterialNavigator):
+        self.__root = root
+        self.__navigator = navigator
+
+    @property
+    def root(self) -> MaterialTreeNode:
+        return self.__root
+
+    @property
+    def navigator(self) -> MaterialNavigator:
+        return self.__navigator
+
+
+def load_material() -> Material:
+    logging.info("Loading material...")
     root_path = repository.find_exercises_root()
+
+    logging.info("Loading metadata")
     metadata = load_metadata(root_path)
+
+    logging.info("Building tree")
     tree = build_tree(metadata)
-    return tree
+
+    logging.info("Building navigator")
+    navigator = MaterialNavigator(tree)
+
+    logging.info("Done reading material")
+    return Material(tree, navigator)
 
 
 app = flask.Flask(__name__)
 
-material_tree = load_material()
+material = load_material()
 
 
 def start_event_loop_in_separate_thread() -> asyncio.AbstractEventLoop:
@@ -61,39 +89,58 @@ def root(node_path: str):
 @app.route('/api/v1/nodes/', defaults={'node_path': ''})
 @app.route('/api/v1/nodes/<path:node_path>')
 def node_page(node_path: str):
+    def to_tree_path(node: Optional[MaterialTreeNode]) -> Optional[tuple[str, ...]]:
+        if node:
+            return node.tree_path.parts
+        else:
+            return None
+
     path_parts = node_path.split('/') if node_path else []
-    current = material_tree
+    current = material.root
     # TODO Error checking
     for path_part in path_parts:
-        assert isinstance(current, MaterialTreeBranch) # TODO Raise exception
-        current = current[path_part]
+        if not isinstance(current, MaterialTreeBranch):
+            return 'Invalid path', 404
+        current = current[path_part] # TODO Catch exception here and return 404
 
     tree_path = current.tree_path.parts
     name = current.name
+    successor_tree_path = to_tree_path(material.navigator.find_successor_leaf(current))
+    predecessor_tree_path = to_tree_path(material.navigator.find_predecessor_leaf(current))
+    parent_tree_path = to_tree_path(material.navigator.find_predecessor_branch(current))
 
     match current:
         case Section(children=children):
-            data: NodeData = SectionData(
+            data: NodeRestData = SectionRestData(
                 type='section',
                 tree_path=tree_path,
                 name=name,
-                children=[child.tree_path.parts[-1] for child in children]
+                children=[child.tree_path.parts[-1] for child in children],
+                successor_tree_path=successor_tree_path,
+                predecessor_tree_path=predecessor_tree_path,
+                parent_tree_path=parent_tree_path,
             )
         case Explanation(markdown=markdown):
-            data = ExplanationData(
+            data = ExplanationRestData(
                 type='explanation',
                 tree_path=tree_path,
                 name=name,
-                markdown=markdown
+                markdown=markdown,
+                successor_tree_path=successor_tree_path,
+                predecessor_tree_path=predecessor_tree_path,
+                parent_tree_path=parent_tree_path,
             )
         case Exercise(markdown=markdown, judgement=judgement, difficulty=difficulty):
-            data = ExerciseData(
+            data = ExerciseRestData(
                 type='exercise',
                 tree_path=tree_path,
                 name=name,
                 markdown=markdown,
                 difficulty=difficulty,
-                judgement=judgement_to_string(judgement)
+                judgement=judgement_to_string(judgement),
+                successor_tree_path=successor_tree_path,
+                predecessor_tree_path=predecessor_tree_path,
+                parent_tree_path=parent_tree_path,
             )
         case _:
             raise RuntimeError(f"Unrecognized node type: {current!r}")
@@ -115,7 +162,7 @@ def run():
     event_loop = start_event_loop_in_separate_thread()
 
     logging.info('Judging exercises in background')
-    event_loop.call_soon_threadsafe(lambda: material_tree.judge_recursively(event_loop))
+    event_loop.call_soon_threadsafe(lambda: material.root.judge_recursively(event_loop))
 
     # TODO Turn off debug mode
     logging.info('Starting up Flask')

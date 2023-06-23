@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 from pydantic import BaseModel
 from progtool.material import tree
 
@@ -7,25 +7,28 @@ NodeType = Literal['section'] | Literal['exercise'] | Literal['explanation']
 
 Judgement = Literal['unknown'] | Literal['pass'] | Literal['fail']
 
-class NodeData(BaseModel):
+class NodeRestData(BaseModel):
     name: str
     type: NodeType
     tree_path: tuple[str, ...]
+    successor_tree_path: Optional[tuple[str, ...]]
+    predecessor_tree_path: Optional[tuple[str, ...]]
+    parent_tree_path: Optional[tuple[str, ...]]
 
 
-class SectionData(NodeData):
+class SectionRestData(NodeRestData):
     children: list[str]
 
 
-class LeafData(NodeData):
+class LeafRestData(NodeRestData):
     markdown: str
 
 
-class ExplanationData(LeafData):
+class ExplanationRestData(LeafRestData):
     pass
 
 
-class ExerciseData(LeafData):
+class ExerciseRestData(LeafRestData):
     judgement: Literal['unknown'] | Literal['pass'] | Literal['fail']
     difficulty: int
 

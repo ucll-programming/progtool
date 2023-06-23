@@ -1,6 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from pathlib import Path
+from typing import Iterable
 from progtool.judging import Judge, create_judge
 from progtool.material.treepath import TreePath
 from progtool.material.metadata import ContentNodeMetadata, SectionMetadata, ExerciseMetadata, ExplanationMetadata
@@ -36,6 +37,9 @@ class MaterialTreeNode(ABC):
     def tree_path(self) -> TreePath:
         return self.__tree_path
 
+    def __hash__(self) -> int:
+        return hash(self.__tree_path)
+
     @abstractmethod
     def __str__(self) -> str:
         ...
@@ -48,9 +52,14 @@ class MaterialTreeNode(ABC):
     def judge_recursively(self, loop: asyncio.AbstractEventLoop) -> None:
         ...
 
+    @abstractmethod
+    def preorder_traversal(self) -> Iterable[MaterialTreeNode]:
+        ...
+
 
 class MaterialTreeLeaf(MaterialTreeNode):
-    pass
+    def preorder_traversal(self) -> Iterable[MaterialTreeNode]:
+        yield self
 
 
 class Explanation(MaterialTreeLeaf):
@@ -156,6 +165,11 @@ class MaterialTreeBranch(MaterialTreeNode):
     def judge_recursively(self, loop: asyncio.AbstractEventLoop) -> None:
         for child in self.children:
             child.judge_recursively(loop)
+
+    def preorder_traversal(self) -> Iterable[MaterialTreeNode]:
+        yield self
+        for child in self.children:
+            yield from child.preorder_traversal()
 
 
 class Section(MaterialTreeBranch):
