@@ -58,12 +58,12 @@ p code {
   }
 }
 
-a {
-  text-decoration: none;
-  color: black;
-}
-
 .overview-root-container {
+  a {
+    text-decoration: none;
+    color: black;
+  }
+
   .overview-section-children-container {
     display: flex;
     flex-direction: column;
