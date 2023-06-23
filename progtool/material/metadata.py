@@ -27,7 +27,10 @@ class SectionMetadata(ContentNodeMetadata):
 
 class ExerciseMetadata(ContentNodeMetadata):
     difficulty: int
+
+    # Maps languages to files, e.g. { 'en' => 'assignment.en.md', 'nl' => 'assignment.nl.md' }
     documentation: dict[str, str]
+
     judge: JudgeMetadata
 
     @pydantic.validator('difficulty')
