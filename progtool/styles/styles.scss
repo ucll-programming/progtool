@@ -32,6 +32,12 @@ p code {
   padding: 2px;
 }
 
+.centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;;
+}
+
 #sidebar {
   height: 100%;
   width: $sidebar-width;
@@ -226,6 +232,7 @@ p code {
       font-size: 0.75rem;
       text-align: right;
       font-weight: 200;
+      opacity: 50%;
     }
   }
 }
