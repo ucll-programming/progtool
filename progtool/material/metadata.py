@@ -39,7 +39,7 @@ class ExerciseMetadata(ContentNodeMetadata):
 
 
 class ExplanationMetadata(ContentNodeMetadata):
-    file: str
+    documentation: dict[str, str]
 
 
 TYPE_EXPLANATION: Literal['explanation'] = 'explanation'

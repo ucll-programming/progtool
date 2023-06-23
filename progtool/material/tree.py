@@ -4,6 +4,7 @@ from pathlib import Path
 from progtool.judging import Judge, create_judge
 from progtool.material.treepath import TreePath
 from progtool.material.metadata import ContentNodeMetadata, SectionMetadata, ExerciseMetadata, ExplanationMetadata
+from progtool import settings
 from enum import Enum
 import asyncio
 import logging
@@ -172,15 +173,21 @@ class Section(MaterialTreeBranch):
         return str(self)
 
 
+def get_documentation_in_language(documentation: dict[str, str]):
+    for language in settings.language_priority:
+        if language in documentation:
+            return documentation[language]
+    raise MaterialError(f'Could not find material in right language')
+
 
 def build_tree(metadata: ContentNodeMetadata) -> MaterialTreeNode:
     def recurse(metadata: ContentNodeMetadata, tree_path: TreePath):
         match metadata:
-            case ExplanationMetadata(path=path, name=name, file=file):
+            case ExplanationMetadata(path=path, name=name, documentation=documentation):
                 return Explanation(
                     tree_path=tree_path,
                     name=name,
-                    file=path / file,
+                    file=path / get_documentation_in_language(documentation),
                 )
             case ExerciseMetadata(path=path, name=name, difficulty=difficulty, file=file, judge=judge_metadata):
                 judge = create_judge(path, judge_metadata)
