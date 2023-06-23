@@ -1,5 +1,11 @@
 $sidebar-width: 200px;
 $selection-foreground-color: #800;
+$section-background: #888;
+$explanation-background: #AAF;
+$exercise-pass-background:  #AFA;
+$exercise-fail-background: #FAA;
+$exercise-unknown-background: #AAA;
+
 
 #root {
   max-width: 1280px;
@@ -94,6 +100,7 @@ p code {
         position: absolute;
         right: 0;
         padding: 0.2em;
+        opacity: 75%;
       }
     }
 
@@ -109,7 +116,7 @@ p code {
     &.section {
       border-left: #44a 4px solid;
       margin: 2px 0 0 4px;
-      background: #888;
+      background: $section-background;
 
       & > .overview-entry-header {
         margin: 0;
@@ -133,20 +140,20 @@ p code {
     }
 
     &.explanation {
-      background: #AAF;
+      background: $explanation-background;
     }
 
     &.exercise {
       &.pass {
-        background: #AFA;
+        background: $exercise-pass-background;
       }
 
       &.fail {
-        background: #FAA;
+        background: $exercise-fail-background;
       }
 
       &.unknown {
-        background: #AAA;
+        background: $exercise-unknown-background;
       }
     }
   }
@@ -273,5 +280,124 @@ pre code.hljs {
 
   .hljs-strong {
     font-weight: 700;
+  }
+}
+
+#main-view {
+  .viewer {
+    &.section {
+      a {
+        color: black;
+        text-decoration: none;
+        user-select: none;
+      }
+
+      .tile-container {
+        display: flex;
+        flex-direction: row;
+        flex-flow: row wrap;
+        justify-content: start;
+        align-items: center;
+
+        .tile {
+          width: 150px;
+          height: 150px;
+          margin: 2px;
+          position: relative;
+          color: black;
+          padding: 5px;
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+
+          .symbol {
+            svg {
+              width: 80%;
+              height: 80%;
+            }
+
+            .difficulty {
+              font-size: 5em;
+            }
+
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            transform-origin: center;
+            opacity: 12.5%;
+            user-select: none;
+            pointer-events: none;
+          }
+
+          .caption-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .caption {
+              font-size: 1.2rem;
+              text-align: center;
+            }
+          }
+
+          &.section {
+            background-color: $section-background;
+
+            &:hover {
+              background-color: $section-background * 1.33;
+            }
+          }
+
+          &.exercise {
+            &.pass {
+              background-color: $exercise-pass-background;
+
+              &:hover {
+                background-color: $exercise-pass-background * 1.33;
+              }
+            }
+
+            &.fail {
+              background-color: $exercise-fail-background;
+
+              &:hover {
+                background-color: $exercise-fail-background * 1.33;
+              }
+            }
+
+            &.unknown {
+              background-color: $exercise-unknown-background;
+
+              &:hover {
+                background-color: $exercise-unknown-background * 1.33;
+              }
+            }
+          }
+
+          &.explanation {
+            background-color: $explanation-background;
+
+            &:hover {
+              background-color: $explanation-background * 1.33;
+            }
+          }
+        }
+      }
+    }
+
+    &.explanation {
+
+    }
+
+    &.exercise {
+
+    }
   }
 }
