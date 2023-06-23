@@ -1,7 +1,6 @@
 from pathlib import Path
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 import yaml
-import logging
 import pydantic
 
 from progtool.judging.judge import JudgeMetadata
