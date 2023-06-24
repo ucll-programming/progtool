@@ -4,6 +4,7 @@ from progtool.cli.tree import tree
 from progtool.cli.server import server
 from progtool.cli.create import create
 from progtool.cli.index import index
+from progtool.cli.check import check
 
 
 @click.group()
@@ -18,6 +19,7 @@ def process_command_line_arguments():
         server,
         index,
         create,
+        check,
     ]
 
     for command in commands:
