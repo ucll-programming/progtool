@@ -6,7 +6,8 @@ import pydantic
 from progtool.judging.judge import JudgeMetadata
 
 
-class ConstraintsMetadata(pydantic.BaseModel):
+class TopicsMetadata(pydantic.BaseModel):
+    introduces: Optional[list[str]] = pydantic.Field(default_factory=lambda: [])
     before: Optional[list[str]] = pydantic.Field(default_factory=lambda: [])
     after: Optional[list[str]] = pydantic.Field(default_factory=lambda: [])
 
@@ -22,7 +23,7 @@ class ContentNodeMetadata(NodeMetadata):
     id: str
     name: str
     type: Literal['exercise', 'explanation', 'section']
-    constraints: Optional[ConstraintsMetadata] = pydantic.Field(default_factory=lambda: ConstraintsMetadata())
+    topics: Optional[TopicsMetadata] = pydantic.Field(default_factory=lambda: TopicsMetadata())
 
 
 class SectionMetadata(ContentNodeMetadata):
