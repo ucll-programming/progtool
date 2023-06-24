@@ -27,6 +27,10 @@ $exercise-unknown-background: #AAA;
   -webkit-text-size-adjust: 100%;
 }
 
+p {
+  text-align: justify;
+}
+
 p code {
   background: rgba(50, 50, 50, 0.5);
   padding: 2px;
@@ -65,6 +69,7 @@ p code {
       height: 50px;
       background: #AAA;
       color: black;
+      border-radius: 25px;
 
       svg {
         transform: scale(2);
@@ -457,7 +462,19 @@ pre code.hljs {
     }
 
     &.exercise {
+      & > h1, h2, h3, h4 {
+        background: black;
+        text-align: center;
+        border-radius: 2px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 0.5em;
+        width: 90%;
 
+        &:not(:first-child) {
+          margin-top: 2em;
+        }
+      }
     }
   }
 }
