@@ -1,11 +1,14 @@
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, Optional
 import yaml
 import pydantic
 
 from progtool.judging.judge import JudgeMetadata
 
 
+class ConstraintsMetadata(pydantic.BaseModel):
+    before: Optional[list[str]] = pydantic.Field(default_factory=lambda: [])
+    after: Optional[list[str]] = pydantic.Field(default_factory=lambda: [])
 
 class NodeMetadata(pydantic.BaseModel):
     path: Path
@@ -19,6 +22,7 @@ class ContentNodeMetadata(NodeMetadata):
     id: str
     name: str
     type: Literal['exercise', 'explanation', 'section']
+    constraints: Optional[ConstraintsMetadata] = pydantic.Field(default_factory=lambda: ConstraintsMetadata())
 
 
 class SectionMetadata(ContentNodeMetadata):
