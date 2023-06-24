@@ -1,8 +1,7 @@
 from pathlib import Path
-from progtool.material.metadata import load_metadata, ContentNodeMetadata
+from progtool.material.metadata import load_metadata, ContentNodeMetadata, ExerciseMetadata, ExplanationMetadata, SectionMetadata
 from progtool.material.navigator import MaterialNavigator
 from progtool.material.tree import MaterialTreeBranch, build_tree, MaterialTreeNode, Section, Exercise, Explanation
-from progtool.server.restdata import ExerciseRestData, ExplanationRestData, NodeRestData, SectionRestData, judgement_to_string
 from progtool import repository
 from rich.console import Console
 from rich.table import Table
@@ -31,8 +30,12 @@ class Checker:
 
     def check(self):
         self.__check_topics_order()
+        self.__check_files()
 
     def __check_topics_order(self):
+        """
+        Checks the constraints on topic order
+        """
         logging.info('Checking topics')
         current = self.__tree
         accumulated_topics = set()
@@ -51,3 +54,26 @@ class Checker:
                 accumulated_topics.add(topic)
 
             current = next
+
+    def __check_files(self):
+        """
+        Checks that all files exist.
+        """
+        logging.info('Checking files')
+        self.__check_files_recursively(self.__metadata)
+
+    def __check_files_recursively(self, node: ContentNodeMetadata):
+        match node:
+            case SectionMetadata(contents=children):
+                for child in children:
+                    self.__check_files_recursively(child)
+            case ExplanationMetadata(documentation=documentation, path=path):
+                for file in documentation.values():
+                    expected_file = path / file
+                    if not expected_file.is_file():
+                        self.__console.print(f"[red]Error[/red] File {expected_file} does not exist")
+            case ExerciseMetadata(documentation=documentation, path=path):
+                for file in documentation.values():
+                    expected_file = path / file
+                    if not expected_file.is_file():
+                        self.__console.print(f"[red]Error[/red] File {expected_file} does not exist")
