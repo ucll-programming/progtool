@@ -16,7 +16,7 @@ class TreePath:
         return self.__parts
 
     def __str__(self):
-        return ",".join(self.__parts)
+        return "/".join(self.__parts)
 
     def __repr__(self):
         argument_string = ", ".join(map(repr, self.__parts))
