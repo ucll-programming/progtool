@@ -16,7 +16,7 @@ class TopicsMetadata(pydantic.BaseModel):
 
 
 class NodeMetadata(pydantic.BaseModel):
-    path: Path
+    path: Path # Location (note: multiple nodes can share a single location). Used as base location for relative paths inside the node.
     type: Literal['exercise', 'explanation', 'section', 'link']
 
 
