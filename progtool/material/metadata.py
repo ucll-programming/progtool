@@ -7,27 +7,37 @@ from progtool.judging.judge import JudgeMetadata
 
 
 class TopicsMetadata(pydantic.BaseModel):
-    introduces: Optional[list[str]] = pydantic.Field(default_factory=lambda: [])
-    before: Optional[list[str]] = pydantic.Field(default_factory=lambda: [])
-    after: Optional[list[str]] = pydantic.Field(default_factory=lambda: [])
+    introduces: list[str] = pydantic.Field(default_factory=lambda: [])
+    must_come_before: list[str] = pydantic.Field(default_factory=lambda: [])
+    must_come_after: list[str] = pydantic.Field(default_factory=lambda: [])
+
+    class Config:
+        extra=pydantic.Extra.forbid
+
 
 class NodeMetadata(pydantic.BaseModel):
     path: Path
+    type: Literal['exercise', 'explanation', 'section', 'link']
 
 
 class LinkMetadata(NodeMetadata):
     location: Path
 
+    class Config:
+        extra=pydantic.Extra.forbid
+
 
 class ContentNodeMetadata(NodeMetadata):
     id: str
     name: str
-    type: Literal['exercise', 'explanation', 'section']
-    topics: Optional[TopicsMetadata] = pydantic.Field(default_factory=lambda: TopicsMetadata())
+    topics: TopicsMetadata = pydantic.Field(default_factory=lambda: TopicsMetadata())
 
 
 class SectionMetadata(ContentNodeMetadata):
     contents: list[ContentNodeMetadata]
+
+    class Config:
+        extra=pydantic.Extra.forbid
 
 
 class ExerciseMetadata(ContentNodeMetadata):
@@ -45,9 +55,15 @@ class ExerciseMetadata(ContentNodeMetadata):
         else:
             return value
 
+    class Config:
+        extra=pydantic.Extra.forbid
+
 
 class ExplanationMetadata(ContentNodeMetadata):
     documentation: dict[str, str]
+
+    class Config:
+        extra=pydantic.Extra.forbid
 
 
 TYPE_EXPLANATION: Literal['explanation'] = 'explanation'
