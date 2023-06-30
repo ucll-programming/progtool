@@ -45,6 +45,7 @@ p code {
 .code-container {
   margin: 0.5em auto;
   width: 80%;
+  opacity: 80%;
 
   .code-container-header {
     position: relative;
@@ -136,6 +137,32 @@ p code {
       margin: 0;
       background: #000;
       padding: 0.25em;
+    }
+  }
+
+  table {
+    td {
+      padding: 5px;
+    }
+  }
+
+  .horizontal-table {
+    table {
+      td {
+        &:first-child {
+          font-weight: bold;
+        }
+      }
+    }
+  }
+
+  .inner-borders {
+    table {
+      border-collapse: collapse;
+
+      td {
+        border: 1px solid white;
+      }
     }
   }
 }
@@ -275,7 +302,7 @@ p code {
   }
 
   &.warning {
-    background: #F44;
+    background: #A44;
   }
 
   &.hint {
