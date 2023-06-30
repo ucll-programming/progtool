@@ -8,8 +8,9 @@ from progtool.material.treepath import TreePath
 from progtool.material.metadata import ContentNodeMetadata, SectionMetadata, ExerciseMetadata, ExplanationMetadata, TopicsMetadata
 from progtool import settings
 from enum import Enum
-import asyncio
 import logging
+import asyncio
+import os
 
 
 class MaterialError(Exception):
@@ -110,6 +111,9 @@ class Explanation(MaterialTreeLeaf):
 
     @property
     def markdown(self) -> str:
+        if not os.path.isfile(self.__file):
+            logging.error(f'File {self.__file} not found!')
+            return 'Error'
         with open(self.__file) as file:
             return file.read()
 
