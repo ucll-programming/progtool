@@ -28,5 +28,5 @@ class PytestJudge(Judge):
             tests_passed = process.returncode == 0
             return tests_passed
         except Exception as e:
-            logging.error(f"Error occurred: {e}")
+            logging.error(f"Error occurred while judging {self.__tests_path}: {e}")
             return False
