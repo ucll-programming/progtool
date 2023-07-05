@@ -80,7 +80,13 @@ def start_event_loop_in_separate_thread() -> asyncio.AbstractEventLoop:
 @app.route('/', defaults={'node_path': ''})
 @app.route('/nodes/<path:node_path>')
 def root(node_path: str):
-    html_path = 'G:/repos/ucll/programming/frontend/dist/index.html'
+    import os
+    computer_name = os.environ['COMPUTERNAME']
+
+    if computer_name == 'LT2180298':
+        html_path = 'C:/repos/ucll/programming/frontend/dist/index.html'
+    else:
+        html_path = 'G:/repos/ucll/programming/frontend/dist/index.html'
     with open(html_path, encoding='utf-8') as file:
         contents = file.read()
     return contents
