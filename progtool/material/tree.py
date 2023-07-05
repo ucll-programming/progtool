@@ -22,6 +22,9 @@ class Judgement(Enum):
     PASS = 1
     FAIL = -1
 
+    def __str__(self):
+        return self.name
+
 
 class Topics(NamedTuple):
     must_come_before: list[str]
@@ -161,7 +164,7 @@ class Exercise(MaterialTreeLeaf):
             logging.info(f'Judging exercise {self.tree_path}')
             tests_passed = await self.__judge.judge()
             judgement = Judgement.PASS if tests_passed else Judgement.FAIL
-            logging.info(f'Exercise {self.tree_path}: {judgement}')
+            logging.info(f'Judged exercise {self.tree_path}: {judgement}')
             self.judgement = judgement
         logging.info(f'Enqueueing exercise {self.tree_path}')
         loop.create_task(judge())
