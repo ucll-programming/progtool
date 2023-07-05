@@ -9,7 +9,7 @@ from progtool.cli.check import check
 from rich.logging import RichHandler
 
 
-def configure_logging(*, verbosity_level: Optional[int], log_file: Optional[str]) -> None:
+def _configure_verbosity(verbosity_level: Optional[int]) -> None:
     match verbosity_level:
         case 1:
             level = logging.INFO
@@ -24,6 +24,8 @@ def configure_logging(*, verbosity_level: Optional[int], log_file: Optional[str]
         force=True,
     )
 
+
+def _configure_log_file(log_file: Optional[str]) -> None:
     if log_file:
         formatter = logging.Formatter(
             "%(asctime)s [%(levelname)5s] [%(threadName)12s]: %(message)s",
@@ -35,12 +37,16 @@ def configure_logging(*, verbosity_level: Optional[int], log_file: Optional[str]
 
 
 
+def _configure_logging(*, verbosity_level: Optional[int], log_file: Optional[str]) -> None:
+    _configure_verbosity(verbosity_level)
+    _configure_log_file(log_file)
+
 
 @click.group()
 @click.option('-v', '--verbose', count=True)
 @click.option('--log-file', default=None)
 def cli(verbose, log_file):
-    configure_logging(verbosity_level=verbose, log_file=log_file)
+    _configure_logging(verbosity_level=verbose, log_file=log_file)
 
 
 def process_command_line_arguments():
