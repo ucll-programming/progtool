@@ -19,7 +19,10 @@ def configure(*, verbosity_level: Optional[int], log_file: Optional[str]) -> Non
     )
 
     if log_file:
-        formatter = logging.Formatter("%(asctime)s [%(levelname)5s] [%(threadName)12s]: %(message)s")
+        formatter = logging.Formatter(
+            "%(asctime)s [%(levelname)5s] [%(threadName)12s]: %(message)s",
+            "%Y-%m-%d %H:%M:%S"
+        )
         file_handler = logging.FileHandler(log_file)
         file_handler.setFormatter(formatter)
         logging.getLogger().addHandler(file_handler)
