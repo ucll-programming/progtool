@@ -9,8 +9,9 @@ from progtool.cli.check import check
 
 @click.group()
 @click.option('-v', '--verbose', count=True)
-def cli(verbose):
-    log.configure(verbose)
+@click.option('--log-file', default=None)
+def cli(verbose, log_file):
+    log.configure(verbosity_level=verbose, log_file=log_file)
 
 
 def process_command_line_arguments():

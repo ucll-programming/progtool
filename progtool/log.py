@@ -3,7 +3,7 @@ from rich.logging import RichHandler
 import logging
 
 
-def configure(verbosity_level: Optional[int]) -> None:
+def configure(*, verbosity_level: Optional[int], log_file: Optional[str]) -> None:
     match verbosity_level:
         case 1:
             level = logging.INFO
@@ -17,3 +17,9 @@ def configure(verbosity_level: Optional[int]) -> None:
         level=level,
         force=True,
     )
+
+    if log_file:
+        formatter = logging.Formatter("%(asctime)s [%(levelname)5s] [%(threadName)12s]: %(message)s")
+        file_handler = logging.FileHandler(log_file)
+        file_handler.setFormatter(formatter)
+        logging.getLogger().addHandler(file_handler)
