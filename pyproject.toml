@@ -6,7 +6,7 @@ authors = ["Frederic Vogels <frederic.vogels@ucll.be>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 flask = "^2.3.2"
 gitpython = "^3.1.31"
 pyyaml = "^6.0"
