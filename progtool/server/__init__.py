@@ -68,7 +68,7 @@ def start_event_loop_in_separate_thread() -> asyncio.AbstractEventLoop:
     event_loop: Optional[asyncio.AbstractEventLoop] = None
     event = threading.Event()
 
-    thread = threading.Thread(target=thread_proc, daemon=True)
+    thread = threading.Thread(target=thread_proc, daemon=True, name="BGThread")
     thread.start()
 
     event.wait()
