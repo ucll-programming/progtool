@@ -2,7 +2,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from collections import namedtuple
 from pathlib import Path
-from typing import Iterable, NamedTuple
+from typing import Callable, Iterable, NamedTuple
 from progtool.judging import Judge, create_judge
 from progtool.material.treepath import TreePath
 from progtool.material.metadata import ContentNodeMetadata, SectionMetadata, ExerciseMetadata, ExplanationMetadata, TopicsMetadata
@@ -248,7 +248,10 @@ def get_documentation_in_language(documentation: dict[str, str]):
     raise MaterialError(f'Could not find material in right language')
 
 
-def build_tree(metadata: ContentNodeMetadata) -> MaterialTreeNode:
+NodePredicate = Callable[[ContentNodeMetadata], bool]
+
+
+def build_tree(metadata: ContentNodeMetadata, *, predicate: NodePredicate = None) -> MaterialTreeNode:
     def recurse(metadata: ContentNodeMetadata, tree_path: TreePath):
         match metadata:
             case ExplanationMetadata(path=path, name=name, documentation=documentation, topics=topics_metadata):
@@ -257,7 +260,7 @@ def build_tree(metadata: ContentNodeMetadata) -> MaterialTreeNode:
                     name=name,
                     file=path / get_documentation_in_language(documentation),
                     topics=Topics.from_metadata(topics_metadata),
-                    tags=set(metadata.tags or []),
+                    tags=metadata.tags,
                 )
             case ExerciseMetadata(path=path, name=name, difficulty=difficulty, documentation=documentation, judge=judge_metadata, topics=topics_metadata):
                 judge = create_judge(path, judge_metadata)
@@ -269,12 +272,13 @@ def build_tree(metadata: ContentNodeMetadata) -> MaterialTreeNode:
                     assignment_file=path / get_documentation_in_language(documentation),
                     judge=judge,
                     topics=Topics.from_metadata(topics_metadata),
-                    tags=set(metadata.tags or []),
+                    tags=metadata.tags,
                 )
             case SectionMetadata(path=path, name=name, contents=contents, topics=topics_metadata):
                 children = [
                     recurse(child, tree_path / child.id)
                     for child in contents
+                    if predicate(child)
                 ]
 
                 return Section(
@@ -282,9 +286,26 @@ def build_tree(metadata: ContentNodeMetadata) -> MaterialTreeNode:
                     tree_path=tree_path,
                     children=children,
                     topics=Topics.from_metadata(topics_metadata),
-                    tags=set(metadata.tags or []),
+                    tags=metadata.tags,
                 )
             case _:
                 raise MaterialError('Unknown metadata {metadata!r}')
 
+    if predicate is None:
+        predicate = all_nodes
     return recurse(metadata, TreePath())
+
+
+def all_nodes(node: ContentNodeMetadata) -> bool:
+    return True
+
+
+def filter_by_tags(tags: set[str]) -> NodePredicate:
+    def predicate(node: ContentNodeMetadata) -> bool:
+        logging.debug(f"Checking node {node.name}: {node.tags} & {tags}")
+        if tags:
+            return bool(node.tags & tags)
+        else:
+            return node.available_by_default
+
+    return predicate
