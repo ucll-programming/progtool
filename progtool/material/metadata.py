@@ -1,7 +1,8 @@
 from pathlib import Path
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 import yaml
 import pydantic
+import logging
 
 from progtool.judging.judge import JudgeMetadata
 
@@ -18,7 +19,6 @@ class TopicsMetadata(pydantic.BaseModel):
 class NodeMetadata(pydantic.BaseModel):
     path: Path # Location (note: multiple nodes can share a single location). Used as base location for relative paths inside the node.
     type: Literal['exercise', 'explanation', 'section', 'link']
-    tags: Optional[list[str]]
 
 
 class LinkMetadata(NodeMetadata):
@@ -32,6 +32,8 @@ class ContentNodeMetadata(NodeMetadata):
     id: str
     name: str
     topics: TopicsMetadata = pydantic.Field(default_factory=lambda: TopicsMetadata())
+    tags: set[str] = pydantic.Field(default_factory=lambda: set())
+    available_by_default: bool = True
 
 
 class SectionMetadata(ContentNodeMetadata):
@@ -92,20 +94,22 @@ def parse_metadata(path: Path, data: Any) -> ContentNodeMetadata:
         link_metadata = LinkMetadata.parse_obj(data)
         return load_metadata(path / link_metadata.location)
     elif node_type == TYPE_SECTION:
+        identifier = data['id']
+        name = data['name']
+        tags = data.get('tags', set())
+        available_by_default = data.get('available_by_default', True)
         children_objects = data['contents']
-        tags = data.get('tags', [])
         if not isinstance(children_objects, list):
             raise MetadataError("A section's content should be a list")
-        if not isinstance(tags, list):
-            raise MetadataError("Tags should be a list of strings")
         children = [parse_metadata(path, child) for child in children_objects]
         return SectionMetadata(
-            id=data['id'],
-            name=data['name'],
+            id=identifier,
+            name=name,
             type=TYPE_SECTION,
             contents=children,
             path=path,
             tags=tags,
+            available_by_default=available_by_default,
         )
     else:
         raise MetadataError(f'Unrecognized node type {node_type}')
