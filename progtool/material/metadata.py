@@ -18,6 +18,7 @@ class TopicsMetadata(pydantic.BaseModel):
 class NodeMetadata(pydantic.BaseModel):
     path: Path # Location (note: multiple nodes can share a single location). Used as base location for relative paths inside the node.
     type: Literal['exercise', 'explanation', 'section', 'link']
+    tags: Optional[list[str]]
 
 
 class LinkMetadata(NodeMetadata):
@@ -92,8 +93,11 @@ def parse_metadata(path: Path, data: Any) -> ContentNodeMetadata:
         return load_metadata(path / link_metadata.location)
     elif node_type == TYPE_SECTION:
         children_objects = data['contents']
+        tags = data.get('tags', [])
         if not isinstance(children_objects, list):
             raise MetadataError("A section's content should be a list")
+        if not isinstance(tags, list):
+            raise MetadataError("Tags should be a list of strings")
         children = [parse_metadata(path, child) for child in children_objects]
         return SectionMetadata(
             id=data['id'],
@@ -101,6 +105,7 @@ def parse_metadata(path: Path, data: Any) -> ContentNodeMetadata:
             type=TYPE_SECTION,
             contents=children,
             path=path,
+            tags=tags,
         )
     else:
         raise MetadataError(f'Unrecognized node type {node_type}')

@@ -44,11 +44,17 @@ class MaterialTreeNode(ABC):
     __tree_path: TreePath
     __name: str
     __topics: Topics
+    __tags: set[str]
 
-    def __init__(self, *, tree_path: TreePath, name: str, topics: Topics):
+    def __init__(self, *, tree_path: TreePath, name: str, topics: Topics, tags: set[str]):
         self.__tree_path = tree_path
         self.__name = name
         self.__topics = topics
+        self.__tags = tags
+
+    @property
+    def tags(self) -> set[str]:
+        return self.__tags
 
     @property
     def topics(self) -> Topics:
@@ -97,11 +103,12 @@ class MaterialTreeLeaf(MaterialTreeNode):
 class Explanation(MaterialTreeLeaf):
     __file: Path
 
-    def __init__(self, *, tree_path: TreePath, name: str, file: Path, topics: Topics):
+    def __init__(self, *, tree_path: TreePath, name: str, file: Path, topics: Topics, tags: set[str]):
         super().__init__(
             tree_path=tree_path,
             name=name,
-            topics=topics
+            topics=topics,
+            tags=tags,
         )
         self.__file = file
 
@@ -133,11 +140,12 @@ class Exercise(MaterialTreeLeaf):
 
     __judge: Judge
 
-    def __init__(self, *, tree_path: TreePath, name: str, difficulty: int, assignment_file: Path, judge: Judge, topics: Topics):
+    def __init__(self, *, tree_path: TreePath, name: str, difficulty: int, assignment_file: Path, judge: Judge, topics: Topics, tags: set[str]):
         super().__init__(
             tree_path=tree_path,
             name=name,
             topics=topics,
+            tags=tags,
         )
         self.judgement = Judgement.UNKNOWN
         self.__difficulty = difficulty
@@ -176,11 +184,12 @@ class Exercise(MaterialTreeLeaf):
 class MaterialTreeBranch(MaterialTreeNode):
     __children_table_value: dict[str, MaterialTreeNode]
 
-    def __init__(self, *, name: str, tree_path: TreePath, children: list[MaterialTreeNode], topics: Topics):
+    def __init__(self, *, name: str, tree_path: TreePath, children: list[MaterialTreeNode], topics: Topics, tags: set[str]):
         super().__init__(
             tree_path=tree_path,
             name=name,
             topics=topics,
+            tags=tags,
         )
         self.__children_table_value = {
             child.tree_path.parts[-1]: child
@@ -216,12 +225,13 @@ class MaterialTreeBranch(MaterialTreeNode):
 
 
 class Section(MaterialTreeBranch):
-    def __init__(self, *, name: str, tree_path: TreePath, children: list[MaterialTreeNode], topics: Topics):
+    def __init__(self, *, name: str, tree_path: TreePath, children: list[MaterialTreeNode], topics: Topics, tags: set[str]):
         super().__init__(
             name=name,
             tree_path=tree_path,
             children=children,
             topics=topics,
+            tags=tags,
         )
 
     def __str__(self) -> str:
@@ -247,6 +257,7 @@ def build_tree(metadata: ContentNodeMetadata) -> MaterialTreeNode:
                     name=name,
                     file=path / get_documentation_in_language(documentation),
                     topics=Topics.from_metadata(topics_metadata),
+                    tags=set(metadata.tags or []),
                 )
             case ExerciseMetadata(path=path, name=name, difficulty=difficulty, documentation=documentation, judge=judge_metadata, topics=topics_metadata):
                 judge = create_judge(path, judge_metadata)
@@ -258,6 +269,7 @@ def build_tree(metadata: ContentNodeMetadata) -> MaterialTreeNode:
                     assignment_file=path / get_documentation_in_language(documentation),
                     judge=judge,
                     topics=Topics.from_metadata(topics_metadata),
+                    tags=set(metadata.tags or []),
                 )
             case SectionMetadata(path=path, name=name, contents=contents, topics=topics_metadata):
                 children = [
@@ -270,6 +282,7 @@ def build_tree(metadata: ContentNodeMetadata) -> MaterialTreeNode:
                     tree_path=tree_path,
                     children=children,
                     topics=Topics.from_metadata(topics_metadata),
+                    tags=set(metadata.tags or []),
                 )
             case _:
                 raise MaterialError('Unknown metadata {metadata!r}')
