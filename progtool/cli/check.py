@@ -1,10 +1,9 @@
 from pathlib import Path
 from progtool.material.metadata import load_metadata, ContentNodeMetadata, ExerciseMetadata, ExplanationMetadata, SectionMetadata
 from progtool.material.navigator import MaterialNavigator
-from progtool.material.tree import MaterialTreeBranch, build_tree, MaterialTreeNode, Section, Exercise, Explanation
+from progtool.material.tree import build_tree, MaterialTreeNode
 from progtool import repository
 from rich.console import Console
-from rich.table import Table
 import logging
 import click
 
