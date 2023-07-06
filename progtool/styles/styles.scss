@@ -302,7 +302,11 @@ p code {
   }
 
   &.warning {
-    background: #A44;
+    background: #F00;
+  }
+
+  &.important {
+    background: peru;
   }
 
   &.hint {
@@ -314,7 +318,7 @@ p code {
   }
 
   &.question {
-    background: peru;
+    background: maroon;
   }
 
   &.task {
