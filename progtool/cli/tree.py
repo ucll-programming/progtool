@@ -1,6 +1,6 @@
 from typing import cast
 from progtool.material.metadata import load_metadata
-from progtool.material.tree import Exercise, MaterialTreeNode, Section, Explanation, build_tree
+from progtool.material.tree import Exercise, MaterialTreeNode, Section, Explanation, build_tree, filter_by_tags
 from progtool.repository import find_exercises_root
 import click
 from rich.tree import Tree
@@ -8,7 +8,8 @@ from rich.console import Console
 
 
 @click.command()
-def tree() -> None:
+@click.option("--tags", multiple=True, default=[])
+def tree(tags) -> None:
     def recurse(node: MaterialTreeNode, tree: Tree):
         match node:
             case Section():
@@ -29,6 +30,6 @@ def tree() -> None:
     tree = Tree('root')
     root_path = find_exercises_root()
     metadata = load_metadata(root_path)
-    root = build_tree(metadata)
+    root = build_tree(metadata, predicate=filter_by_tags(set(tags)))
     recurse(root, tree)
     console.print(tree)
