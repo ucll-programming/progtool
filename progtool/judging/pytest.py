@@ -21,7 +21,8 @@ class PytestJudge(Judge):
             parent_directory = tests_path.parent
             filename = tests_path.name
 
-            command = f'pytest {filename}'
+            # -x flag interrupts tests after first failure
+            command = f'pytest -x {filename}'
             process = await asyncio.create_subprocess_shell(command, stdout=asyncio.subprocess.PIPE, cwd=parent_directory)
             stdout, stderr = await process.communicate() # TODO Would process.wait() work?
             output = stdout.decode()
