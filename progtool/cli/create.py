@@ -7,7 +7,7 @@ import yaml
 from progtool.content.metadata import ExerciseMetadata, SectionMetadata, TYPE_SECTION, TYPE_EXERCISE
 
 
-@click.group(help="Helps with the creation of new material")
+@click.group(help="Helps with the creation of new content")
 @click.option('-x', '--unindexed', help="don't add number prefix", is_flag=True, default=False)
 @click.pass_context
 def create(ctx, unindexed):
