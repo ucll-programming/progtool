@@ -4,8 +4,8 @@ from collections import namedtuple
 from pathlib import Path
 from typing import Callable, Iterable, NamedTuple
 from progtool.judging import Judge, create_judge
-from progtool.material.treepath import TreePath
-from progtool.material.metadata import ContentNodeMetadata, SectionMetadata, ExerciseMetadata, ExplanationMetadata, TopicsMetadata
+from progtool.content.treepath import TreePath
+from progtool.content.metadata import ContentNodeMetadata, SectionMetadata, ExerciseMetadata, ExplanationMetadata, TopicsMetadata
 from progtool import settings
 from enum import Enum
 import logging

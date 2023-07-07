@@ -1,7 +1,7 @@
 from pathlib import Path
-from progtool.material.metadata import load_everything, load_metadata, ContentNodeMetadata, ExerciseMetadata, ExplanationMetadata, SectionMetadata
-from progtool.material.navigator import MaterialNavigator
-from progtool.material.tree import build_tree, MaterialTreeNode
+from progtool.content.metadata import load_everything, load_metadata, ContentNodeMetadata, ExerciseMetadata, ExplanationMetadata, SectionMetadata
+from progtool.content.navigator import MaterialNavigator
+from progtool.content.tree import build_tree, MaterialTreeNode
 from progtool import repository
 from rich.console import Console
 import logging

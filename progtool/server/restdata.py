@@ -1,6 +1,6 @@
 from typing import Literal, Optional
 from pydantic import BaseModel
-from progtool.material import tree
+from progtool.content import tree
 
 
 NodeType = Literal['section'] | Literal['exercise'] | Literal['explanation']

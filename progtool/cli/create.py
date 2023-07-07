@@ -4,7 +4,7 @@ from progtool.cli import util
 from pathlib import Path
 import yaml
 
-from progtool.material.metadata import ExerciseMetadata, SectionMetadata, TYPE_SECTION, TYPE_EXERCISE
+from progtool.content.metadata import ExerciseMetadata, SectionMetadata, TYPE_SECTION, TYPE_EXERCISE
 
 
 @click.group(help="Helps with the creation of new material")

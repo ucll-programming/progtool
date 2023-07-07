@@ -1,6 +1,6 @@
 from typing import cast
-from progtool.material.metadata import filter_by_tags, load_everything, load_metadata
-from progtool.material.tree import Exercise, MaterialTreeNode, Section, Explanation, build_tree
+from progtool.content.metadata import filter_by_tags, load_everything, load_metadata
+from progtool.content.tree import Exercise, MaterialTreeNode, Section, Explanation, build_tree
 from progtool.repository import find_exercises_root
 import click
 import logging

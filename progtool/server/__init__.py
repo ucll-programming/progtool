@@ -1,6 +1,6 @@
-from progtool.material.metadata import load_everything, load_metadata
-from progtool.material.navigator import MaterialNavigator
-from progtool.material.tree import MaterialTreeBranch, build_tree, MaterialTreeNode, Section, Exercise, Explanation
+from progtool.content.metadata import load_everything, load_metadata
+from progtool.content.navigator import MaterialNavigator
+from progtool.content.tree import MaterialTreeBranch, build_tree, MaterialTreeNode, Section, Exercise, Explanation
 from progtool.server.restdata import ExerciseRestData, ExplanationRestData, NodeRestData, SectionRestData, judgement_to_string
 from typing import Any, Optional
 from progtool import repository

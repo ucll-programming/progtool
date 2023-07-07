@@ -1,5 +1,5 @@
 from typing import Callable, Iterator, Literal, Optional
-from progtool.material.tree import MaterialTreeBranch, MaterialTreeLeaf, MaterialTreeNode, Section, Exercise, Explanation
+from progtool.content.tree import MaterialTreeBranch, MaterialTreeLeaf, MaterialTreeNode, Section, Exercise, Explanation
 import logging
 
 
