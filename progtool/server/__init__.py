@@ -1,4 +1,4 @@
-from progtool.material.metadata import load_metadata
+from progtool.material.metadata import load_everything, load_metadata
 from progtool.material.navigator import MaterialNavigator
 from progtool.material.tree import MaterialTreeBranch, build_tree, MaterialTreeNode, Section, Exercise, Explanation
 from progtool.server.restdata import ExerciseRestData, ExplanationRestData, NodeRestData, SectionRestData, judgement_to_string
@@ -10,6 +10,10 @@ import pkg_resources
 import sass
 import asyncio
 import threading
+
+
+class ServerError(Exception):
+    pass
 
 
 class Material:
@@ -34,7 +38,11 @@ def load_material() -> Material:
     root_path = repository.find_exercises_root()
 
     logging.info("Loading metadata")
-    metadata = load_metadata(root_path)
+    # TODO Add tag filtering functionality
+    metadata = load_metadata(root_path, link_predicate=load_everything(force_all=True))
+
+    if metadata is None:
+        raise ServerError("No content found!")
 
     logging.info("Building tree")
     tree = build_tree(metadata)
