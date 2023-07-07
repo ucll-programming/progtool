@@ -82,7 +82,7 @@ class ContentTreeNode(ABC):
         ...
 
     @abstractmethod
-    def build_parent_mapping(self, mapping: dict[ContentTreeNode, MaterialTreeBranch]) -> None:
+    def build_parent_mapping(self, mapping: dict[ContentTreeNode, ContentTreeBranch]) -> None:
         ...
 
 
@@ -90,7 +90,7 @@ class MaterialTreeLeaf(ContentTreeNode):
     def preorder_traversal(self) -> Iterable[ContentTreeNode]:
         yield self
 
-    def build_parent_mapping(self, mapping: dict[ContentTreeNode, MaterialTreeBranch]) -> None:
+    def build_parent_mapping(self, mapping: dict[ContentTreeNode, ContentTreeBranch]) -> None:
         pass
 
 
@@ -173,7 +173,7 @@ class Exercise(MaterialTreeLeaf):
         self.judge(loop)
 
 
-class MaterialTreeBranch(ContentTreeNode):
+class ContentTreeBranch(ContentTreeNode):
     __children_table_value: dict[str, ContentTreeNode]
 
     def __init__(self, *, name: str, tree_path: TreePath, children: list[ContentTreeNode], topics: Topics):
@@ -209,13 +209,13 @@ class MaterialTreeBranch(ContentTreeNode):
         for child in self.children:
             yield from child.preorder_traversal()
 
-    def build_parent_mapping(self, mapping: dict[ContentTreeNode, MaterialTreeBranch]) -> None:
+    def build_parent_mapping(self, mapping: dict[ContentTreeNode, ContentTreeBranch]) -> None:
         for child in self.children:
             mapping[child] = self
             child.build_parent_mapping(mapping)
 
 
-class Section(MaterialTreeBranch):
+class Section(ContentTreeBranch):
     def __init__(self, *, name: str, tree_path: TreePath, children: list[ContentTreeNode], topics: Topics):
         super().__init__(
             name=name,

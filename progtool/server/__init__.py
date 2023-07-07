@@ -1,6 +1,6 @@
 from progtool.content.metadata import load_everything, load_metadata
 from progtool.content.navigator import ContentNavigator
-from progtool.content.tree import MaterialTreeBranch, build_tree, ContentTreeNode, Section, Exercise, Explanation
+from progtool.content.tree import ContentTreeBranch, build_tree, ContentTreeNode, Section, Exercise, Explanation
 from progtool.server.restdata import ExerciseRestData, ExplanationRestData, NodeRestData, SectionRestData, judgement_to_string
 from typing import Any, Optional
 from progtool import repository
@@ -113,7 +113,7 @@ def node_page(node_path: str):
     current = material.root
     # TODO Error checking
     for path_part in path_parts:
-        if not isinstance(current, MaterialTreeBranch):
+        if not isinstance(current, ContentTreeBranch):
             return 'Invalid path', 404
         current = current[path_part] # TODO Catch exception here and return 404
 

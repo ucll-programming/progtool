@@ -1,5 +1,5 @@
 from typing import Callable, Iterator, Literal, Optional
-from progtool.content.tree import MaterialTreeBranch, MaterialTreeLeaf, ContentTreeNode, Section, Exercise, Explanation
+from progtool.content.tree import ContentTreeBranch, MaterialTreeLeaf, ContentTreeNode, Section, Exercise, Explanation
 import logging
 
 
@@ -8,7 +8,7 @@ class ContentNavigator:
 
     __node_index_map: dict[ContentTreeNode, int]
 
-    __parent_mapping: dict[ContentTreeNode, MaterialTreeBranch]
+    __parent_mapping: dict[ContentTreeNode, ContentTreeBranch]
 
     def __init__(self, root: ContentTreeNode):
         self.__nodes = list(root.preorder_traversal())
