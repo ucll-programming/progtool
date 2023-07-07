@@ -1,6 +1,6 @@
 from pathlib import Path
 from progtool.content.metadata import load_everything, load_metadata, ContentNodeMetadata, ExerciseMetadata, ExplanationMetadata, SectionMetadata
-from progtool.content.navigator import MaterialNavigator
+from progtool.content.navigator import ContentNavigator
 from progtool.content.tree import build_tree, MaterialTreeNode
 from progtool import repository
 from rich.console import Console
@@ -40,7 +40,7 @@ class Checker:
     __root_path: Path
     __metadata: ContentNodeMetadata
     __tree: MaterialTreeNode
-    __navigator: MaterialNavigator
+    __navigator: ContentNavigator
     __console: Console
     __error_count: int
 
@@ -51,7 +51,7 @@ class Checker:
             raise CheckerError("No nodes loaded")
         self.__metadata = metadata
         self.__tree = build_tree(self.__metadata)
-        self.__navigator = MaterialNavigator(self.__tree)
+        self.__navigator = ContentNavigator(self.__tree)
         self.__console = Console()
         self.__error_count = 0
 

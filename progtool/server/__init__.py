@@ -1,5 +1,5 @@
 from progtool.content.metadata import load_everything, load_metadata
-from progtool.content.navigator import MaterialNavigator
+from progtool.content.navigator import ContentNavigator
 from progtool.content.tree import MaterialTreeBranch, build_tree, MaterialTreeNode, Section, Exercise, Explanation
 from progtool.server.restdata import ExerciseRestData, ExplanationRestData, NodeRestData, SectionRestData, judgement_to_string
 from typing import Any, Optional
@@ -18,9 +18,9 @@ class ServerError(Exception):
 
 class Material:
     __root: MaterialTreeNode
-    __navigator: MaterialNavigator
+    __navigator: ContentNavigator
 
-    def __init__(self, root: MaterialTreeNode, navigator: MaterialNavigator):
+    def __init__(self, root: MaterialTreeNode, navigator: ContentNavigator):
         self.__root = root
         self.__navigator = navigator
 
@@ -29,7 +29,7 @@ class Material:
         return self.__root
 
     @property
-    def navigator(self) -> MaterialNavigator:
+    def navigator(self) -> ContentNavigator:
         return self.__navigator
 
 
@@ -48,7 +48,7 @@ def load_material() -> Material:
     tree = build_tree(metadata)
 
     logging.info("Building navigator")
-    navigator = MaterialNavigator(tree)
+    navigator = ContentNavigator(tree)
 
     logging.info("Done reading material")
     return Material(tree, navigator)

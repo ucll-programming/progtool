@@ -3,7 +3,7 @@ from progtool.content.tree import MaterialTreeBranch, MaterialTreeLeaf, Material
 import logging
 
 
-class MaterialNavigator:
+class ContentNavigator:
     __nodes: list[MaterialTreeNode]
 
     __node_index_map: dict[MaterialTreeNode, int]
