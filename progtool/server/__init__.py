@@ -16,7 +16,7 @@ class ServerError(Exception):
     pass
 
 
-class Material:
+class Content:
     __root: ContentTreeNode
     __navigator: ContentNavigator
 
@@ -33,7 +33,7 @@ class Material:
         return self.__navigator
 
 
-def load_content() -> Material:
+def load_content() -> Content:
     logging.info("Loading material...")
     root_path = repository.find_exercises_root()
 
@@ -51,7 +51,7 @@ def load_content() -> Material:
     navigator = ContentNavigator(tree)
 
     logging.info("Done reading material")
-    return Material(tree, navigator)
+    return Content(tree, navigator)
 
 
 app = flask.Flask(__name__)
