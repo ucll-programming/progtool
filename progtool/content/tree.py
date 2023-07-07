@@ -13,7 +13,7 @@ import asyncio
 import os
 
 
-class MaterialError(Exception):
+class ContentError(Exception):
     pass
 
 
@@ -189,7 +189,7 @@ class ContentTreeBranch(ContentTreeNode):
 
     def __getitem__(self, key: str) -> ContentTreeNode:
         if key not in self.__children_table:
-            raise MaterialError(f'{self.tree_path} has no child named "{key}"')
+            raise ContentError(f'{self.tree_path} has no child named "{key}"')
         return self.__children_table[key]
 
     @property
@@ -235,7 +235,7 @@ def get_documentation_in_language(documentation: dict[str, str]):
     for language in settings.language_priority:
         if language in documentation:
             return documentation[language]
-    raise MaterialError(f'Could not find material in right language')
+    raise ContentError(f'Could not find material in right language')
 
 
 def build_tree(metadata: ContentNodeMetadata) -> ContentTreeNode:
@@ -272,6 +272,6 @@ def build_tree(metadata: ContentNodeMetadata) -> ContentTreeNode:
                     topics=Topics.from_metadata(topics_metadata),
                 )
             case _:
-                raise MaterialError('Unknown metadata {metadata!r}')
+                raise ContentError('Unknown metadata {metadata!r}')
 
     return recurse(metadata, TreePath())
