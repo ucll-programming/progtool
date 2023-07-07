@@ -86,7 +86,7 @@ class ContentTreeNode(ABC):
         ...
 
 
-class MaterialTreeLeaf(ContentTreeNode):
+class ContentTreeLeaf(ContentTreeNode):
     def preorder_traversal(self) -> Iterable[ContentTreeNode]:
         yield self
 
@@ -94,7 +94,7 @@ class MaterialTreeLeaf(ContentTreeNode):
         pass
 
 
-class Explanation(MaterialTreeLeaf):
+class Explanation(ContentTreeLeaf):
     __file: Path
 
     def __init__(self, *, tree_path: TreePath, name: str, file: Path, topics: Topics):
@@ -124,7 +124,7 @@ class Explanation(MaterialTreeLeaf):
         pass
 
 
-class Exercise(MaterialTreeLeaf):
+class Exercise(ContentTreeLeaf):
     judgement: Judgement
 
     __difficulty: int

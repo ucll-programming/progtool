@@ -1,5 +1,5 @@
 from typing import Callable, Iterator, Literal, Optional
-from progtool.content.tree import ContentTreeBranch, MaterialTreeLeaf, ContentTreeNode, Section, Exercise, Explanation
+from progtool.content.tree import ContentTreeBranch, ContentTreeLeaf, ContentTreeNode, Section, Exercise, Explanation
 import logging
 
 
@@ -25,7 +25,7 @@ class ContentNavigator:
         return self.__search_preorder_traversal(
             start_index,
             1,
-            lambda node: isinstance(node, MaterialTreeLeaf)
+            lambda node: isinstance(node, ContentTreeLeaf)
         )
 
     def find_predecessor_leaf(self, node: ContentTreeNode) -> Optional[ContentTreeNode]:
@@ -37,7 +37,7 @@ class ContentNavigator:
         return self.__search_preorder_traversal(
             start_index,
             -1,
-            lambda node: isinstance(node, MaterialTreeLeaf)
+            lambda node: isinstance(node, ContentTreeLeaf)
         )
 
     def find_parent(self, node: ContentTreeNode) -> Optional[ContentTreeNode]:
