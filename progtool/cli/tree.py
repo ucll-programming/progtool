@@ -1,15 +1,17 @@
 from typing import cast
-from progtool.material.metadata import load_metadata
+from progtool.material.metadata import filter_by_tags, load_everything, load_metadata
 from progtool.material.tree import Exercise, MaterialTreeNode, Section, Explanation, build_tree
 from progtool.repository import find_exercises_root
 import click
+import logging
 from rich.tree import Tree
 from rich.console import Console
 
 
 @click.command()
-@click.option("--tags", multiple=True, default=[])
-def tree(tags) -> None:
+@click.option("--tags", multiple=True, help="Show only nodes with specified tags")
+@click.option("--all", "show_all", default=False, is_flag=True, help="Show all nodes, even those unavailable by default")
+def tree(tags, show_all) -> None:
     def recurse(node: MaterialTreeNode, tree: Tree):
         match node:
             case Section():
@@ -26,10 +28,21 @@ def tree(tags) -> None:
             case _:
                 assert False, 'Unrecognized node type'
 
+    def create_link_predicate():
+        if not tags:
+            return load_everything(force_all=show_all)
+        else:
+            return filter_by_tags(tags)
+
     console = Console()
     tree = Tree('root')
     root_path = find_exercises_root()
-    metadata = load_metadata(root_path)
-    root = build_tree(metadata)
-    recurse(root, tree)
-    console.print(tree)
+    link_predicate = create_link_predicate()
+    metadata = load_metadata(root_path, link_predicate=link_predicate)
+
+    if metadata is None:
+        console.print("[red]ERROR[/red] No nodes satisfy tags")
+    else:
+        root = build_tree(metadata)
+        recurse(root, tree)
+        console.print(tree)
