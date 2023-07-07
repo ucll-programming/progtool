@@ -235,7 +235,7 @@ def get_documentation_in_language(documentation: dict[str, str]):
     for language in settings.language_priority:
         if language in documentation:
             return documentation[language]
-    raise ContentError(f'Could not find material in right language')
+    raise ContentError(f'Could not find content in right language')
 
 
 def build_tree(metadata: ContentNodeMetadata) -> ContentTreeNode:

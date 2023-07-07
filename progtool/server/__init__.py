@@ -56,7 +56,7 @@ def load_content() -> Content:
 
 app = flask.Flask(__name__)
 
-material = load_content()
+content = load_content()
 
 
 def start_event_loop_in_separate_thread() -> asyncio.AbstractEventLoop:
@@ -110,7 +110,7 @@ def node_page(node_path: str):
             return None
 
     path_parts = node_path.split('/') if node_path else []
-    current = material.root
+    current = content.root
     # TODO Error checking
     for path_part in path_parts:
         if not isinstance(current, ContentTreeBranch):
@@ -119,9 +119,9 @@ def node_page(node_path: str):
 
     tree_path = current.tree_path.parts
     name = current.name
-    successor_tree_path = to_tree_path(material.navigator.find_successor_leaf(current))
-    predecessor_tree_path = to_tree_path(material.navigator.find_predecessor_leaf(current))
-    parent_tree_path = to_tree_path(material.navigator.find_parent(current))
+    successor_tree_path = to_tree_path(content.navigator.find_successor_leaf(current))
+    predecessor_tree_path = to_tree_path(content.navigator.find_predecessor_leaf(current))
+    parent_tree_path = to_tree_path(content.navigator.find_parent(current))
 
     match current:
         case Section(children=children):
@@ -176,7 +176,7 @@ def run():
     event_loop = start_event_loop_in_separate_thread()
 
     logging.info('Judging exercises in background')
-    event_loop.call_soon_threadsafe(lambda: material.root.judge_recursively(event_loop))
+    event_loop.call_soon_threadsafe(lambda: content.root.judge_recursively(event_loop))
 
     # TODO Turn off debug mode
     logging.info('Starting up Flask')
