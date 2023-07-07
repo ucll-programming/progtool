@@ -1,5 +1,5 @@
 from pathlib import Path
-from progtool.material.metadata import load_metadata, ContentNodeMetadata, ExerciseMetadata, ExplanationMetadata, SectionMetadata
+from progtool.material.metadata import load_everything, load_metadata, ContentNodeMetadata, ExerciseMetadata, ExplanationMetadata, SectionMetadata
 from progtool.material.navigator import MaterialNavigator
 from progtool.material.tree import build_tree, MaterialTreeNode
 from progtool import repository
@@ -30,6 +30,12 @@ def all() -> None:
     error_count = Checker().check_everything()
     print(f"{error_count} error(s) found")
 
+
+
+class CheckerError(Exception):
+    pass
+
+
 class Checker:
     __root_path: Path
     __metadata: ContentNodeMetadata
@@ -40,7 +46,10 @@ class Checker:
 
     def __init__(self):
         self.__root_path = repository.find_exercises_root()
-        self.__metadata = load_metadata(self.__root_path)
+        metadata = load_metadata(self.__root_path, link_predicate=load_everything(force_all=True))
+        if metadata is None:
+            raise CheckerError("No nodes loaded")
+        self.__metadata = metadata
         self.__tree = build_tree(self.__metadata)
         self.__navigator = MaterialNavigator(self.__tree)
         self.__console = Console()
