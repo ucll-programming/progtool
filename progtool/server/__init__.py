@@ -34,7 +34,7 @@ class Content:
 
 
 def load_content() -> Content:
-    logging.info("Loading material...")
+    logging.info("Loading content...")
     root_path = repository.find_exercises_root()
 
     logging.info("Loading metadata")
@@ -50,7 +50,7 @@ def load_content() -> Content:
     logging.info("Building navigator")
     navigator = ContentNavigator(tree)
 
-    logging.info("Done reading material")
+    logging.info("Done reading content")
     return Content(tree, navigator)
 
 
