@@ -33,7 +33,7 @@ class Material:
         return self.__navigator
 
 
-def load_material() -> Material:
+def load_content() -> Material:
     logging.info("Loading material...")
     root_path = repository.find_exercises_root()
 
@@ -56,7 +56,7 @@ def load_material() -> Material:
 
 app = flask.Flask(__name__)
 
-material = load_material()
+material = load_content()
 
 
 def start_event_loop_in_separate_thread() -> asyncio.AbstractEventLoop:
