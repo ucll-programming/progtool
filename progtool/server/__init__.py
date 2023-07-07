@@ -1,6 +1,6 @@
 from progtool.content.metadata import load_everything, load_metadata
 from progtool.content.navigator import ContentNavigator
-from progtool.content.tree import MaterialTreeBranch, build_tree, MaterialTreeNode, Section, Exercise, Explanation
+from progtool.content.tree import MaterialTreeBranch, build_tree, ContentTreeNode, Section, Exercise, Explanation
 from progtool.server.restdata import ExerciseRestData, ExplanationRestData, NodeRestData, SectionRestData, judgement_to_string
 from typing import Any, Optional
 from progtool import repository
@@ -17,15 +17,15 @@ class ServerError(Exception):
 
 
 class Material:
-    __root: MaterialTreeNode
+    __root: ContentTreeNode
     __navigator: ContentNavigator
 
-    def __init__(self, root: MaterialTreeNode, navigator: ContentNavigator):
+    def __init__(self, root: ContentTreeNode, navigator: ContentNavigator):
         self.__root = root
         self.__navigator = navigator
 
     @property
-    def root(self) -> MaterialTreeNode:
+    def root(self) -> ContentTreeNode:
         return self.__root
 
     @property
@@ -103,7 +103,7 @@ def root(node_path: str):
 @app.route('/api/v1/nodes/', defaults={'node_path': ''})
 @app.route('/api/v1/nodes/<path:node_path>')
 def node_page(node_path: str):
-    def to_tree_path(node: Optional[MaterialTreeNode]) -> Optional[tuple[str, ...]]:
+    def to_tree_path(node: Optional[ContentTreeNode]) -> Optional[tuple[str, ...]]:
         if node:
             return node.tree_path.parts
         else:
