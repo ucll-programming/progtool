@@ -96,8 +96,6 @@ def parse_metadata(path: Path, data: Any) -> ContentNodeMetadata:
     elif node_type == TYPE_SECTION:
         identifier = data['id']
         name = data['name']
-        tags = data.get('tags', set())
-        available_by_default = data.get('available_by_default', True)
         children_objects = data['contents']
         if not isinstance(children_objects, list):
             raise MetadataError("A section's content should be a list")
