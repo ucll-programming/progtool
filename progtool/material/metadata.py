@@ -23,6 +23,8 @@ class NodeMetadata(pydantic.BaseModel):
 
 class LinkMetadata(NodeMetadata):
     location: Path
+    tags: set[str] = pydantic.Field(default_factory=lambda: set())
+    available_by_default: bool = True
 
     class Config:
         extra=pydantic.Extra.forbid
@@ -32,8 +34,6 @@ class ContentNodeMetadata(NodeMetadata):
     id: str
     name: str
     topics: TopicsMetadata = pydantic.Field(default_factory=lambda: TopicsMetadata())
-    tags: set[str] = pydantic.Field(default_factory=lambda: set())
-    available_by_default: bool = True
 
 
 class SectionMetadata(ContentNodeMetadata):
@@ -108,8 +108,6 @@ def parse_metadata(path: Path, data: Any) -> ContentNodeMetadata:
             type=TYPE_SECTION,
             contents=children,
             path=path,
-            tags=tags,
-            available_by_default=available_by_default,
         )
     else:
         raise MetadataError(f'Unrecognized node type {node_type}')

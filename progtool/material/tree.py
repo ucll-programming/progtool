@@ -44,17 +44,11 @@ class MaterialTreeNode(ABC):
     __tree_path: TreePath
     __name: str
     __topics: Topics
-    __tags: set[str]
 
-    def __init__(self, *, tree_path: TreePath, name: str, topics: Topics, tags: set[str]):
+    def __init__(self, *, tree_path: TreePath, name: str, topics: Topics):
         self.__tree_path = tree_path
         self.__name = name
         self.__topics = topics
-        self.__tags = tags
-
-    @property
-    def tags(self) -> set[str]:
-        return self.__tags
 
     @property
     def topics(self) -> Topics:
@@ -103,12 +97,11 @@ class MaterialTreeLeaf(MaterialTreeNode):
 class Explanation(MaterialTreeLeaf):
     __file: Path
 
-    def __init__(self, *, tree_path: TreePath, name: str, file: Path, topics: Topics, tags: set[str]):
+    def __init__(self, *, tree_path: TreePath, name: str, file: Path, topics: Topics):
         super().__init__(
             tree_path=tree_path,
             name=name,
             topics=topics,
-            tags=tags,
         )
         self.__file = file
 
@@ -140,12 +133,11 @@ class Exercise(MaterialTreeLeaf):
 
     __judge: Judge
 
-    def __init__(self, *, tree_path: TreePath, name: str, difficulty: int, assignment_file: Path, judge: Judge, topics: Topics, tags: set[str]):
+    def __init__(self, *, tree_path: TreePath, name: str, difficulty: int, assignment_file: Path, judge: Judge, topics: Topics):
         super().__init__(
             tree_path=tree_path,
             name=name,
             topics=topics,
-            tags=tags,
         )
         self.judgement = Judgement.UNKNOWN
         self.__difficulty = difficulty
@@ -184,12 +176,11 @@ class Exercise(MaterialTreeLeaf):
 class MaterialTreeBranch(MaterialTreeNode):
     __children_table_value: dict[str, MaterialTreeNode]
 
-    def __init__(self, *, name: str, tree_path: TreePath, children: list[MaterialTreeNode], topics: Topics, tags: set[str]):
+    def __init__(self, *, name: str, tree_path: TreePath, children: list[MaterialTreeNode], topics: Topics):
         super().__init__(
             tree_path=tree_path,
             name=name,
             topics=topics,
-            tags=tags,
         )
         self.__children_table_value = {
             child.tree_path.parts[-1]: child
@@ -225,13 +216,12 @@ class MaterialTreeBranch(MaterialTreeNode):
 
 
 class Section(MaterialTreeBranch):
-    def __init__(self, *, name: str, tree_path: TreePath, children: list[MaterialTreeNode], topics: Topics, tags: set[str]):
+    def __init__(self, *, name: str, tree_path: TreePath, children: list[MaterialTreeNode], topics: Topics):
         super().__init__(
             name=name,
             tree_path=tree_path,
             children=children,
             topics=topics,
-            tags=tags,
         )
 
     def __str__(self) -> str:
@@ -248,10 +238,7 @@ def get_documentation_in_language(documentation: dict[str, str]):
     raise MaterialError(f'Could not find material in right language')
 
 
-NodePredicate = Callable[[ContentNodeMetadata], bool]
-
-
-def build_tree(metadata: ContentNodeMetadata, *, predicate: NodePredicate = None) -> MaterialTreeNode:
+def build_tree(metadata: ContentNodeMetadata) -> MaterialTreeNode:
     def recurse(metadata: ContentNodeMetadata, tree_path: TreePath):
         match metadata:
             case ExplanationMetadata(path=path, name=name, documentation=documentation, topics=topics_metadata):
@@ -260,7 +247,6 @@ def build_tree(metadata: ContentNodeMetadata, *, predicate: NodePredicate = None
                     name=name,
                     file=path / get_documentation_in_language(documentation),
                     topics=Topics.from_metadata(topics_metadata),
-                    tags=metadata.tags,
                 )
             case ExerciseMetadata(path=path, name=name, difficulty=difficulty, documentation=documentation, judge=judge_metadata, topics=topics_metadata):
                 judge = create_judge(path, judge_metadata)
@@ -272,13 +258,11 @@ def build_tree(metadata: ContentNodeMetadata, *, predicate: NodePredicate = None
                     assignment_file=path / get_documentation_in_language(documentation),
                     judge=judge,
                     topics=Topics.from_metadata(topics_metadata),
-                    tags=metadata.tags,
                 )
             case SectionMetadata(path=path, name=name, contents=contents, topics=topics_metadata):
                 children = [
                     recurse(child, tree_path / child.id)
                     for child in contents
-                    if predicate(child)
                 ]
 
                 return Section(
@@ -286,26 +270,8 @@ def build_tree(metadata: ContentNodeMetadata, *, predicate: NodePredicate = None
                     tree_path=tree_path,
                     children=children,
                     topics=Topics.from_metadata(topics_metadata),
-                    tags=metadata.tags,
                 )
             case _:
                 raise MaterialError('Unknown metadata {metadata!r}')
 
-    if predicate is None:
-        predicate = all_nodes
     return recurse(metadata, TreePath())
-
-
-def all_nodes(node: ContentNodeMetadata) -> bool:
-    return True
-
-
-def filter_by_tags(tags: set[str]) -> NodePredicate:
-    def predicate(node: ContentNodeMetadata) -> bool:
-        logging.debug(f"Checking node {node.name}: {node.tags} & {tags}")
-        if tags:
-            return bool(node.tags & tags)
-        else:
-            return node.available_by_default
-
-    return predicate
