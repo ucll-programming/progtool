@@ -1,6 +1,7 @@
 from progtool.content.metadata import load_everything, load_metadata
 from progtool.content.navigator import ContentNavigator
 from progtool.content.tree import ContentTreeBranch, build_tree, ContentTreeNode, Section, Exercise, Explanation
+from progtool.content.treepath import TreePath
 from progtool.server.restdata import ExerciseRestData, ExplanationRestData, NodeRestData, SectionRestData, judgement_to_string
 from typing import Any, Optional
 from progtool import repository
@@ -10,7 +11,7 @@ import pkg_resources
 import sass
 import asyncio
 import threading
-
+import graphviz
 
 class ServerError(Exception):
     pass
@@ -94,9 +95,87 @@ def start_event_loop_in_separate_thread() -> asyncio.AbstractEventLoop:
     return event_loop
 
 
-@app.route('/', defaults={'node_path': ''})
+@app.route('/')
+def root():
+    return serve_html()
+
+
 @app.route('/nodes/<path:node_path>')
-def root(node_path: str):
+def node_page(node_path: str):
+    if node_path.endswith(".gv"):
+        parts = node_path.split('/')
+        tree_path = TreePath(*parts[:-1])
+        content_node = find_node(tree_path)
+        filename = parts[-1]
+        return serve_graphviz(content_node, filename)
+    else:
+        return serve_html()
+
+
+@app.route('/api/v1/nodes/', defaults={'node_path': ''})
+@app.route('/api/v1/nodes/<path:node_path>')
+def node_rest_data(node_path: str):
+    def to_tree_path(node: Optional[ContentTreeNode]) -> Optional[tuple[str, ...]]:
+        if node:
+            return node.tree_path.parts
+        else:
+            return None
+
+    content = get_content()
+    tree_path = TreePath.parse(node_path)
+    content_node = find_node(tree_path) # TODO Catch exception
+
+    successor_tree_path = to_tree_path(content.navigator.find_successor_leaf(content_node))
+    predecessor_tree_path = to_tree_path(content.navigator.find_predecessor_leaf(content_node))
+    parent_tree_path = to_tree_path(content.navigator.find_parent(content_node))
+
+    match content_node:
+        case Section(children=children):
+            data: NodeRestData = SectionRestData(
+                type='section',
+                tree_path=tree_path.parts,
+                name=content_node.name,
+                children=[child.tree_path.parts[-1] for child in children],
+                successor_tree_path=successor_tree_path,
+                predecessor_tree_path=predecessor_tree_path,
+                parent_tree_path=parent_tree_path,
+            )
+        case Explanation(markdown=markdown):
+            data = ExplanationRestData(
+                type='explanation',
+                tree_path=tree_path.parts,
+                name=content_node.name,
+                markdown=markdown,
+                successor_tree_path=successor_tree_path,
+                predecessor_tree_path=predecessor_tree_path,
+                parent_tree_path=parent_tree_path,
+            )
+        case Exercise(markdown=markdown, judgement=judgement, difficulty=difficulty):
+            data = ExerciseRestData(
+                type='exercise',
+                tree_path=tree_path.parts,
+                name=content_node.name,
+                markdown=markdown,
+                difficulty=difficulty,
+                judgement=judgement_to_string(judgement),
+                successor_tree_path=successor_tree_path,
+                predecessor_tree_path=predecessor_tree_path,
+                parent_tree_path=parent_tree_path,
+            )
+        case _:
+            raise RuntimeError(f"Unrecognized node type: {content_node!r}")
+
+    return flask.jsonify(data.dict())
+
+
+@app.route('/styles.css')
+def stylesheet():
+    scss = pkg_resources.resource_string('progtool.styles', 'styles.scss')
+    css = sass.compile(string=scss)
+    return flask.Response(css, mimetype='text/css')
+
+
+def serve_html() -> str:
     import os
     computer_name = os.environ['COMPUTERNAME']
 
@@ -110,74 +189,20 @@ def root(node_path: str):
     return html_contents
 
 
-@app.route('/api/v1/nodes/', defaults={'node_path': ''})
-@app.route('/api/v1/nodes/<path:node_path>')
-def node_page(node_path: str):
-    def to_tree_path(node: Optional[ContentTreeNode]) -> Optional[tuple[str, ...]]:
-        if node:
-            return node.tree_path.parts
-        else:
-            return None
+def serve_graphviz(node: ContentTreeNode, filename: str) -> flask.Response:
+    # graphviz.Source.from_file()
+    data = ""
+    return flask.Response(data, mimetype="image/svg+xml")
 
-    path_parts = node_path.split('/') if node_path else []
-    content = get_content()
-    current = content.root
-    # TODO Error checking
-    for path_part in path_parts:
+
+def find_node(tree_path: TreePath) -> ContentTreeNode:
+    current = get_content().root
+    logging.critical(f'tree_path={tree_path}')
+    for part in tree_path.parts:
         if not isinstance(current, ContentTreeBranch):
-            return 'Invalid path', 404
-        current = current[path_part] # TODO Catch exception here and return 404
-
-    tree_path = current.tree_path.parts
-    name = current.name
-    successor_tree_path = to_tree_path(content.navigator.find_successor_leaf(current))
-    predecessor_tree_path = to_tree_path(content.navigator.find_predecessor_leaf(current))
-    parent_tree_path = to_tree_path(content.navigator.find_parent(current))
-
-    match current:
-        case Section(children=children):
-            data: NodeRestData = SectionRestData(
-                type='section',
-                tree_path=tree_path,
-                name=name,
-                children=[child.tree_path.parts[-1] for child in children],
-                successor_tree_path=successor_tree_path,
-                predecessor_tree_path=predecessor_tree_path,
-                parent_tree_path=parent_tree_path,
-            )
-        case Explanation(markdown=markdown):
-            data = ExplanationRestData(
-                type='explanation',
-                tree_path=tree_path,
-                name=name,
-                markdown=markdown,
-                successor_tree_path=successor_tree_path,
-                predecessor_tree_path=predecessor_tree_path,
-                parent_tree_path=parent_tree_path,
-            )
-        case Exercise(markdown=markdown, judgement=judgement, difficulty=difficulty):
-            data = ExerciseRestData(
-                type='exercise',
-                tree_path=tree_path,
-                name=name,
-                markdown=markdown,
-                difficulty=difficulty,
-                judgement=judgement_to_string(judgement),
-                successor_tree_path=successor_tree_path,
-                predecessor_tree_path=predecessor_tree_path,
-                parent_tree_path=parent_tree_path,
-            )
-        case _:
-            raise RuntimeError(f"Unrecognized node type: {current!r}")
-
-    return flask.jsonify(data.dict())
-
-
-@app.route('/styles.css')
-def stylesheet():
-    scss = pkg_resources.resource_string('progtool.styles', 'styles.scss')
-    css = sass.compile(string=scss)
-    return flask.Response(css, mimetype='text/css')
+            raise ServerError("Invalid content path")
+        current = current[part]
+    return current
 
 
 def run():
