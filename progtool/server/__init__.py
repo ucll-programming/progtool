@@ -3,7 +3,8 @@ from progtool.content.navigator import ContentNavigator
 from progtool.content.tree import ContentTreeBranch, build_tree, ContentNode, Section, Exercise, Explanation
 from progtool.content.treepath import TreePath
 from progtool.server.restdata import ExerciseRestData, ExplanationRestData, NodeRestData, SectionRestData, judgement_to_string
-from typing import Any, Optional
+from progtool.server.protocols import find_protocol
+from typing import Optional
 from progtool import repository
 import flask
 import logging
@@ -11,7 +12,7 @@ import pkg_resources
 import sass
 import asyncio
 import threading
-import graphviz
+import re
 
 class ServerError(Exception):
     pass
@@ -55,11 +56,10 @@ def load_content() -> Content:
     return Content(tree, navigator)
 
 
+
 app = flask.Flask(__name__)
 
-
 _content: Optional[Content] = None
-
 
 def get_content() -> Content:
     global _content
@@ -102,12 +102,17 @@ def root():
 
 @app.route('/nodes/<path:node_path>')
 def node_page(node_path: str):
-    if node_path.endswith(".gv"):
+    regex = f'\.([a-zA-Z]+)$'
+    if match := re.search(regex, node_path):
+        extension = match.group(1)
+        protocol = find_protocol(extension)
+        if protocol is None:
+            return flask.Response(f"Unsupported format {extension}", 400)
         parts = node_path.split('/')
         tree_path = TreePath(*parts[:-1])
         content_node = find_node(tree_path)
         filename = parts[-1]
-        return serve_graphviz(content_node, filename)
+        return protocol.serve(content_node, filename)
     else:
         return serve_html()
 
@@ -188,17 +193,6 @@ def serve_html() -> str:
 
     return html_contents
 
-
-def serve_graphviz(content_node: ContentNode, filename: str) -> flask.Response:
-    path = content_node.local_path / filename
-
-    if not path.is_file():
-        logging.error(f"Node {content_node.tree_path} refers to nonexistent file {filename}")
-        return flask.Response(f"File {filename} not found in {content_node.local_path}", status=404)
-
-    source = graphviz.Source.from_file(path)
-    svg = source.pipe(format='svg', encoding='utf-8')
-    return flask.Response(svg, mimetype="image/svg+xml")
 
 
 def find_node(tree_path: TreePath) -> ContentNode:
