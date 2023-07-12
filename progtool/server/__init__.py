@@ -197,7 +197,6 @@ def serve_graphviz(node: ContentNode, filename: str) -> flask.Response:
 
 def find_node(tree_path: TreePath) -> ContentNode:
     current = get_content().root
-    logging.critical(f'tree_path={tree_path}')
     for part in tree_path.parts:
         if not isinstance(current, ContentTreeBranch):
             raise ServerError("Invalid content path")
