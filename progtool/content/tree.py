@@ -60,6 +60,10 @@ class ContentNode(ABC):
         self.__topics = topics
 
     @property
+    def local_path(self) -> Path:
+        return self.__local_path
+
+    @property
     def topics(self) -> Topics:
         return self.__topics
 
