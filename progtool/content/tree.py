@@ -41,12 +41,21 @@ class Topics(NamedTuple):
 
 
 class ContentNode(ABC):
+    # Path within tree
     __tree_path: TreePath
+
+    # Directory corresponding to node; multiple nodes can share a directory
+    __local_path: Path
+
+    # Name of the node
     __name: str
+
+    # Topics
     __topics: Topics
 
-    def __init__(self, *, tree_path: TreePath, name: str, topics: Topics):
+    def __init__(self, *, tree_path: TreePath, local_path: Path, name: str, topics: Topics):
         self.__tree_path = tree_path
+        self.__local_path = local_path
         self.__name = name
         self.__topics = topics
 
@@ -97,9 +106,10 @@ class ContentTreeLeaf(ContentNode):
 class Explanation(ContentTreeLeaf):
     __file: Path
 
-    def __init__(self, *, tree_path: TreePath, name: str, file: Path, topics: Topics):
+    def __init__(self, *, tree_path: TreePath, local_path: Path, name: str, file: Path, topics: Topics):
         super().__init__(
             tree_path=tree_path,
+            local_path=local_path,
             name=name,
             topics=topics,
         )
@@ -133,9 +143,10 @@ class Exercise(ContentTreeLeaf):
 
     __judge: Judge
 
-    def __init__(self, *, tree_path: TreePath, name: str, difficulty: int, assignment_file: Path, judge: Judge, topics: Topics):
+    def __init__(self, *, tree_path: TreePath, local_path: Path, name: str, difficulty: int, assignment_file: Path, judge: Judge, topics: Topics):
         super().__init__(
             tree_path=tree_path,
+            local_path=local_path,
             name=name,
             topics=topics,
         )
@@ -176,9 +187,10 @@ class Exercise(ContentTreeLeaf):
 class ContentTreeBranch(ContentNode):
     __children_table_value: dict[str, ContentNode]
 
-    def __init__(self, *, name: str, tree_path: TreePath, children: list[ContentNode], topics: Topics):
+    def __init__(self, *, name: str, tree_path: TreePath, local_path: Path, children: list[ContentNode], topics: Topics):
         super().__init__(
             tree_path=tree_path,
+            local_path=local_path,
             name=name,
             topics=topics,
         )
@@ -216,10 +228,11 @@ class ContentTreeBranch(ContentNode):
 
 
 class Section(ContentTreeBranch):
-    def __init__(self, *, name: str, tree_path: TreePath, children: list[ContentNode], topics: Topics):
+    def __init__(self, *, name: str, tree_path: TreePath, local_path: Path, children: list[ContentNode], topics: Topics):
         super().__init__(
             name=name,
             tree_path=tree_path,
+            local_path=local_path,
             children=children,
             topics=topics,
         )
@@ -244,6 +257,7 @@ def build_tree(metadata: ContentNodeMetadata) -> ContentNode:
             case ExplanationMetadata(path=path, name=name, documentation=documentation, topics=topics_metadata):
                 return Explanation(
                     tree_path=tree_path,
+                    local_path=path,
                     name=name,
                     file=path / get_documentation_in_language(documentation),
                     topics=Topics.from_metadata(topics_metadata),
@@ -253,6 +267,7 @@ def build_tree(metadata: ContentNodeMetadata) -> ContentNode:
 
                 return Exercise(
                     tree_path=tree_path,
+                    local_path=path,
                     name=name,
                     difficulty=difficulty,
                     assignment_file=path / get_documentation_in_language(documentation),
@@ -266,8 +281,9 @@ def build_tree(metadata: ContentNodeMetadata) -> ContentNode:
                 ]
 
                 return Section(
-                    name=name,
                     tree_path=tree_path,
+                    local_path=path,
+                    name=name,
                     children=children,
                     topics=Topics.from_metadata(topics_metadata),
                 )
