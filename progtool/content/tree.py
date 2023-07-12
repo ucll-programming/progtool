@@ -40,7 +40,7 @@ class Topics(NamedTuple):
         )
 
 
-class ContentTreeNode(ABC):
+class ContentNode(ABC):
     __tree_path: TreePath
     __name: str
     __topics: Topics
@@ -78,19 +78,19 @@ class ContentTreeNode(ABC):
         ...
 
     @abstractmethod
-    def preorder_traversal(self) -> Iterable[ContentTreeNode]:
+    def preorder_traversal(self) -> Iterable[ContentNode]:
         ...
 
     @abstractmethod
-    def build_parent_mapping(self, mapping: dict[ContentTreeNode, ContentTreeBranch]) -> None:
+    def build_parent_mapping(self, mapping: dict[ContentNode, ContentTreeBranch]) -> None:
         ...
 
 
-class ContentTreeLeaf(ContentTreeNode):
-    def preorder_traversal(self) -> Iterable[ContentTreeNode]:
+class ContentTreeLeaf(ContentNode):
+    def preorder_traversal(self) -> Iterable[ContentNode]:
         yield self
 
-    def build_parent_mapping(self, mapping: dict[ContentTreeNode, ContentTreeBranch]) -> None:
+    def build_parent_mapping(self, mapping: dict[ContentNode, ContentTreeBranch]) -> None:
         pass
 
 
@@ -173,10 +173,10 @@ class Exercise(ContentTreeLeaf):
         self.judge(loop)
 
 
-class ContentTreeBranch(ContentTreeNode):
-    __children_table_value: dict[str, ContentTreeNode]
+class ContentTreeBranch(ContentNode):
+    __children_table_value: dict[str, ContentNode]
 
-    def __init__(self, *, name: str, tree_path: TreePath, children: list[ContentTreeNode], topics: Topics):
+    def __init__(self, *, name: str, tree_path: TreePath, children: list[ContentNode], topics: Topics):
         super().__init__(
             tree_path=tree_path,
             name=name,
@@ -187,36 +187,36 @@ class ContentTreeBranch(ContentTreeNode):
             for child in children
         }
 
-    def __getitem__(self, key: str) -> ContentTreeNode:
+    def __getitem__(self, key: str) -> ContentNode:
         if key not in self.__children_table:
             raise ContentError(f'{self.tree_path} has no child named "{key}"')
         return self.__children_table[key]
 
     @property
-    def children(self) -> list[ContentTreeNode]:
+    def children(self) -> list[ContentNode]:
         return list(self.__children_table.values())
 
     @property
-    def __children_table(self) -> dict[str, ContentTreeNode]:
+    def __children_table(self) -> dict[str, ContentNode]:
         return self.__children_table_value
 
     def judge_recursively(self, loop: asyncio.AbstractEventLoop) -> None:
         for child in self.children:
             child.judge_recursively(loop)
 
-    def preorder_traversal(self) -> Iterable[ContentTreeNode]:
+    def preorder_traversal(self) -> Iterable[ContentNode]:
         yield self
         for child in self.children:
             yield from child.preorder_traversal()
 
-    def build_parent_mapping(self, mapping: dict[ContentTreeNode, ContentTreeBranch]) -> None:
+    def build_parent_mapping(self, mapping: dict[ContentNode, ContentTreeBranch]) -> None:
         for child in self.children:
             mapping[child] = self
             child.build_parent_mapping(mapping)
 
 
 class Section(ContentTreeBranch):
-    def __init__(self, *, name: str, tree_path: TreePath, children: list[ContentTreeNode], topics: Topics):
+    def __init__(self, *, name: str, tree_path: TreePath, children: list[ContentNode], topics: Topics):
         super().__init__(
             name=name,
             tree_path=tree_path,
@@ -238,7 +238,7 @@ def get_documentation_in_language(documentation: dict[str, str]):
     raise ContentError(f'Could not find content in right language')
 
 
-def build_tree(metadata: ContentNodeMetadata) -> ContentTreeNode:
+def build_tree(metadata: ContentNodeMetadata) -> ContentNode:
     def recurse(metadata: ContentNodeMetadata, tree_path: TreePath):
         match metadata:
             case ExplanationMetadata(path=path, name=name, documentation=documentation, topics=topics_metadata):

@@ -1,6 +1,6 @@
 from typing import cast
 from progtool.content.metadata import filter_by_tags, load_everything, load_metadata
-from progtool.content.tree import Exercise, ContentTreeNode, Section, Explanation, build_tree
+from progtool.content.tree import Exercise, ContentNode, Section, Explanation, build_tree
 from progtool.repository import find_exercises_root
 import click
 import logging
@@ -12,7 +12,7 @@ from rich.console import Console
 @click.option("--tags", multiple=True, help="Show only nodes with specified tags")
 @click.option("--all", "show_all", default=False, is_flag=True, help="Show all nodes, even those unavailable by default")
 def tree(tags, show_all) -> None:
-    def recurse(node: ContentTreeNode, tree: Tree):
+    def recurse(node: ContentNode, tree: Tree):
         match node:
             case Section():
                 section = cast(Section, node)

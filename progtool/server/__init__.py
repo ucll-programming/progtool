@@ -1,6 +1,6 @@
 from progtool.content.metadata import load_everything, load_metadata
 from progtool.content.navigator import ContentNavigator
-from progtool.content.tree import ContentTreeBranch, build_tree, ContentTreeNode, Section, Exercise, Explanation
+from progtool.content.tree import ContentTreeBranch, build_tree, ContentNode, Section, Exercise, Explanation
 from progtool.content.treepath import TreePath
 from progtool.server.restdata import ExerciseRestData, ExplanationRestData, NodeRestData, SectionRestData, judgement_to_string
 from typing import Any, Optional
@@ -18,15 +18,15 @@ class ServerError(Exception):
 
 
 class Content:
-    __root: ContentTreeNode
+    __root: ContentNode
     __navigator: ContentNavigator
 
-    def __init__(self, root: ContentTreeNode, navigator: ContentNavigator):
+    def __init__(self, root: ContentNode, navigator: ContentNavigator):
         self.__root = root
         self.__navigator = navigator
 
     @property
-    def root(self) -> ContentTreeNode:
+    def root(self) -> ContentNode:
         return self.__root
 
     @property
@@ -115,7 +115,7 @@ def node_page(node_path: str):
 @app.route('/api/v1/nodes/', defaults={'node_path': ''})
 @app.route('/api/v1/nodes/<path:node_path>')
 def node_rest_data(node_path: str):
-    def to_tree_path(node: Optional[ContentTreeNode]) -> Optional[tuple[str, ...]]:
+    def to_tree_path(node: Optional[ContentNode]) -> Optional[tuple[str, ...]]:
         if node:
             return node.tree_path.parts
         else:
@@ -189,13 +189,13 @@ def serve_html() -> str:
     return html_contents
 
 
-def serve_graphviz(node: ContentTreeNode, filename: str) -> flask.Response:
+def serve_graphviz(node: ContentNode, filename: str) -> flask.Response:
     # graphviz.Source.from_file()
     data = ""
     return flask.Response(data, mimetype="image/svg+xml")
 
 
-def find_node(tree_path: TreePath) -> ContentTreeNode:
+def find_node(tree_path: TreePath) -> ContentNode:
     current = get_content().root
     logging.critical(f'tree_path={tree_path}')
     for part in tree_path.parts:

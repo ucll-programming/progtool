@@ -1,7 +1,7 @@
 from pathlib import Path
 from progtool.content.metadata import load_everything, load_metadata, ContentNodeMetadata, ExerciseMetadata, ExplanationMetadata, SectionMetadata
 from progtool.content.navigator import ContentNavigator
-from progtool.content.tree import build_tree, ContentTreeNode
+from progtool.content.tree import build_tree, ContentNode
 from progtool import repository
 from rich.console import Console
 import logging
@@ -39,7 +39,7 @@ class CheckerError(Exception):
 class Checker:
     __root_path: Path
     __metadata: ContentNodeMetadata
-    __tree: ContentTreeNode
+    __tree: ContentNode
     __navigator: ContentNavigator
     __console: Console
     __error_count: int
