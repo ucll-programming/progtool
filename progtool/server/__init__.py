@@ -189,10 +189,16 @@ def serve_html() -> str:
     return html_contents
 
 
-def serve_graphviz(node: ContentNode, filename: str) -> flask.Response:
-    # graphviz.Source.from_file()
-    data = ""
-    return flask.Response(data, mimetype="image/svg+xml")
+def serve_graphviz(content_node: ContentNode, filename: str) -> flask.Response:
+    path = content_node.local_path / filename
+
+    if not path.is_file():
+        logging.error(f"Node {content_node.tree_path} refers to nonexistent file {filename}")
+        return flask.Response(f"File {filename} not found in {content_node.local_path}", status=404)
+
+    source = graphviz.Source.from_file(path)
+    svg = source.pipe(format='svg', encoding='utf-8')
+    return flask.Response(svg, mimetype="image/svg+xml")
 
 
 def find_node(tree_path: TreePath) -> ContentNode:
