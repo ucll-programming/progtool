@@ -2,6 +2,7 @@
     "python.linting.mypyEnabled": true,
     "python.linting.enabled": true,
     "cSpell.words": [
+        "graphviz",
         "jsonify",
         "preorder",
         "progtool",
