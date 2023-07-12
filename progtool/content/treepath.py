@@ -5,6 +5,14 @@ from typing import Any
 class TreePath:
     __parts: tuple[str, ...]
 
+    @staticmethod
+    def parse(string: str) -> TreePath:
+        if string:
+            parts = string.split('/')
+        else:
+            parts = []
+        return TreePath(*parts)
+
     def __init__(self, *parts: str):
         self.__parts = parts
 
