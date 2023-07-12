@@ -56,7 +56,16 @@ def load_content() -> Content:
 
 app = flask.Flask(__name__)
 
-content = load_content()
+
+_content: Optional[Content] = None
+
+
+def get_content() -> Content:
+    global _content
+    if _content is None:
+        raise ServerError("Content not yet loaded")
+    else:
+        return _content
 
 
 def start_event_loop_in_separate_thread() -> asyncio.AbstractEventLoop:
@@ -96,8 +105,9 @@ def root(node_path: str):
     else:
         html_path = 'G:/repos/ucll/programming/frontend/dist/index.html'
     with open(html_path, encoding='utf-8') as file:
-        contents = file.read()
-    return contents
+        html_contents = file.read()
+
+    return html_contents
 
 
 @app.route('/api/v1/nodes/', defaults={'node_path': ''})
@@ -110,6 +120,7 @@ def node_page(node_path: str):
             return None
 
     path_parts = node_path.split('/') if node_path else []
+    content = get_content()
     current = content.root
     # TODO Error checking
     for path_part in path_parts:
@@ -170,13 +181,15 @@ def stylesheet():
 
 
 def run():
-    logging.info('Setting up server...')
+    logging.info("Loading content")
+    global _content
+    _content = load_content()
 
     logging.info('Setting up background thread')
     event_loop = start_event_loop_in_separate_thread()
 
     logging.info('Judging exercises in background')
-    event_loop.call_soon_threadsafe(lambda: content.root.judge_recursively(event_loop))
+    event_loop.call_soon_threadsafe(lambda: _content.root.judge_recursively(event_loop))
 
     # TODO Turn off debug mode
     logging.info('Starting up Flask')
