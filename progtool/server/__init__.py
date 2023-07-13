@@ -4,8 +4,9 @@ from progtool.content.tree import ContentTreeBranch, build_tree, ContentNode, Se
 from progtool.content.treepath import TreePath
 from progtool.server.restdata import ExerciseRestData, ExplanationRestData, NodeRestData, SectionRestData, judgement_to_string
 from progtool.server.protocols import find_protocol
-from typing import Optional
 from progtool import repository
+from progtool.server import rest
+from typing import Optional
 import flask
 import logging
 import pkg_resources
@@ -23,6 +24,7 @@ class Content:
     __navigator: ContentNavigator
 
     def __init__(self, root: ContentNode, navigator: ContentNavigator):
+        assert isinstance(root, ContentNode)
         self.__root = root
         self.__navigator = navigator
 
@@ -115,6 +117,14 @@ def node_page(node_path: str):
         return protocol.serve(content_node, filename)
     else:
         return serve_html()
+
+
+@app.route('/api/v1/overview')
+def rest_overview():
+    content = get_content()
+    root = content.root
+    data = rest.convert_tree(root)
+    return flask.jsonify(data.dict())
 
 
 @app.route('/api/v1/nodes/', defaults={'node_path': ''})
