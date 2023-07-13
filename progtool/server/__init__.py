@@ -145,62 +145,6 @@ def rest_judgement(node_path: str):
     return ''
 
 
-@app.route('/api/v1/nodes/', defaults={'node_path': ''})
-@app.route('/api/v1/nodes/<path:node_path>')
-def node_rest_data(node_path: str):
-    def to_tree_path(node: Optional[ContentNode]) -> Optional[tuple[str, ...]]:
-        if node:
-            return node.tree_path.parts
-        else:
-            return None
-
-    content = get_content()
-    tree_path = TreePath.parse(node_path)
-    content_node = find_node(tree_path) # TODO Catch exception
-
-    successor_tree_path = to_tree_path(content.navigator.find_successor_leaf(content_node))
-    predecessor_tree_path = to_tree_path(content.navigator.find_predecessor_leaf(content_node))
-    parent_tree_path = to_tree_path(content.navigator.find_parent(content_node))
-
-    match content_node:
-        case Section(children=children):
-            data: NodeRestData = SectionRestData(
-                type='section',
-                tree_path=tree_path.parts,
-                name=content_node.name,
-                children=[child.tree_path.parts[-1] for child in children],
-                successor_tree_path=successor_tree_path,
-                predecessor_tree_path=predecessor_tree_path,
-                parent_tree_path=parent_tree_path,
-            )
-        case Explanation(markdown=markdown):
-            data = ExplanationRestData(
-                type='explanation',
-                tree_path=tree_path.parts,
-                name=content_node.name,
-                markdown=markdown,
-                successor_tree_path=successor_tree_path,
-                predecessor_tree_path=predecessor_tree_path,
-                parent_tree_path=parent_tree_path,
-            )
-        case Exercise(markdown=markdown, judgement=judgement, difficulty=difficulty):
-            data = ExerciseRestData(
-                type='exercise',
-                tree_path=tree_path.parts,
-                name=content_node.name,
-                markdown=markdown,
-                difficulty=difficulty,
-                judgement=judgement_to_string(judgement),
-                successor_tree_path=successor_tree_path,
-                predecessor_tree_path=predecessor_tree_path,
-                parent_tree_path=parent_tree_path,
-            )
-        case _:
-            raise RuntimeError(f"Unrecognized node type: {content_node!r}")
-
-    return flask.jsonify(data.dict())
-
-
 @app.route('/styles.css')
 def stylesheet():
     scss = pkg_resources.resource_string('progtool.styles', 'styles.scss')
