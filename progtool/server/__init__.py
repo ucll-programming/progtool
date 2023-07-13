@@ -1,6 +1,6 @@
 from progtool.content.metadata import load_everything, load_metadata
 from progtool.content.navigator import ContentNavigator
-from progtool.content.tree import ContentTreeBranch, build_tree, ContentNode, Section, Exercise, Explanation
+from progtool.content.tree import ContentTreeBranch, ContentTreeLeaf, build_tree, ContentNode, Section, Exercise, Explanation
 from progtool.content.treepath import TreePath
 from progtool.server.restdata import ExerciseRestData, ExplanationRestData, NodeRestData, SectionRestData, judgement_to_string
 from progtool.server.protocols import find_protocol
@@ -127,6 +127,24 @@ def rest_overview():
     return flask.jsonify(data.dict())
 
 
+@app.route('/api/v1/markdown/', defaults={'node_path': ''})
+@app.route('/api/v1/markdown/<path:node_path>')
+def rest_markup(node_path: str):
+    content_node = find_node(TreePath.parse(node_path))
+    match content_node:
+        case ContentTreeLeaf(markdown=markdown):
+            return flask.Response(markdown, mimetype='text/markdown')
+        case _:
+            return 'error', 400
+
+
+@app.route('/api/v1/judgement/', defaults={'node_path': ''})
+@app.route('/api/v1/judgement/<path:node_path>')
+def rest_judgement(node_path: str):
+    # TODO
+    return ''
+
+
 @app.route('/api/v1/nodes/', defaults={'node_path': ''})
 @app.route('/api/v1/nodes/<path:node_path>')
 def node_rest_data(node_path: str):
@@ -202,7 +220,6 @@ def serve_html() -> str:
         html_contents = file.read()
 
     return html_contents
-
 
 
 def find_node(tree_path: TreePath) -> ContentNode:

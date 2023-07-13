@@ -100,6 +100,24 @@ class ContentNode(ABC):
 
 
 class ContentTreeLeaf(ContentNode):
+    __markup_path: Path
+
+    def __init__(self, *, tree_path: TreePath, local_path: Path, name: str, topics: Topics, markup_path: Path):
+        super().__init__(
+            tree_path=tree_path,
+            local_path=local_path,
+            name=name,
+            topics=topics,
+        )
+        self.__markup_path = markup_path
+
+    @property
+    def markdown(self) -> str:
+        if not self.__markup_path.is_file():
+            logging.error(f'File {self.__markup_path} not found!')
+            return 'Error'
+        return self.__markup_path.read_text(encoding='utf-8')
+
     def preorder_traversal(self) -> Iterable[ContentNode]:
         yield self
 
@@ -116,23 +134,14 @@ class Explanation(ContentTreeLeaf):
             local_path=local_path,
             name=name,
             topics=topics,
+            markup_path=file,
         )
-        self.__file = file
-
 
     def __str__(self) -> str:
         return f'Explanation[{self.tree_path}]'
 
     def __repr__(self) -> str:
         return str(self)
-
-    @property
-    def markdown(self) -> str:
-        if not os.path.isfile(self.__file):
-            logging.error(f'File {self.__file} not found!')
-            return 'Error'
-        with open(self.__file) as file:
-            return file.read()
 
     def judge_recursively(self, loop: asyncio.AbstractEventLoop) -> None:
         pass
@@ -153,10 +162,10 @@ class Exercise(ContentTreeLeaf):
             local_path=local_path,
             name=name,
             topics=topics,
+            markup_path=assignment_file,
         )
         self.judgement = Judgement.UNKNOWN
         self.__difficulty = difficulty
-        self.__assignment_file = assignment_file
         self.__judge = judge
 
     def __str__(self) -> str:
@@ -168,11 +177,6 @@ class Exercise(ContentTreeLeaf):
     @property
     def difficulty(self) -> int:
         return self.__difficulty
-
-    @property
-    def markdown(self) -> str:
-        with open(self.__assignment_file) as file:
-            return file.read()
 
     def judge(self, loop: asyncio.AbstractEventLoop) -> None:
         async def judge():
