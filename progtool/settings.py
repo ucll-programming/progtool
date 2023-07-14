@@ -1,2 +1,2 @@
-language_priority = ['en', 'nl']
-
+def language_priorities():
+    return ['en', 'nl']

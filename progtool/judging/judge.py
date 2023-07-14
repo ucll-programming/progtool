@@ -17,4 +17,3 @@ class JudgeMetadata(pydantic.BaseModel):
 
 class JudgeError(Exception):
     pass
-

@@ -253,7 +253,7 @@ class Section(ContentTreeBranch):
 
 
 def get_documentation_in_language(documentation: dict[str, str]):
-    for language in settings.language_priority:
+    for language in settings.language_priorities():
         if language in documentation:
             return documentation[language]
     raise ContentError(f'Could not find content in right language')
