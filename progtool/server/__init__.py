@@ -2,7 +2,6 @@ from progtool.content.metadata import load_everything, load_metadata
 from progtool.content.navigator import ContentNavigator
 from progtool.content.tree import ContentTreeBranch, ContentTreeLeaf, build_tree, ContentNode, Section, Exercise, Explanation
 from progtool.content.treepath import TreePath
-from progtool.server.restdata import ExerciseRestData, ExplanationRestData, NodeRestData, SectionRestData, judgement_to_string
 from progtool.server.protocols import find_protocol
 from progtool import repository
 from progtool.server import rest
