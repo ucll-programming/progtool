@@ -6,13 +6,15 @@ from progtool.server.restdata import ExerciseRestData, ExplanationRestData, Node
 from progtool.server.protocols import find_protocol
 from progtool import repository
 from progtool.server import rest
-from typing import Optional
+from typing import Literal, Optional
+import pydantic
 import flask
 import logging
 import pkg_resources
 import sass
 import asyncio
 import threading
+import json
 import re
 
 class ServerError(Exception):
@@ -138,11 +140,26 @@ def rest_markup(node_path: str):
             return 'error', 400
 
 
+class JudgementSuccess(pydantic.BaseModel):
+    status: Literal['ok'] = pydantic.Field(default = 'ok')
+    judgement: str
+
+
+class JudgementFailure(pydantic.BaseModel):
+    status: Literal['fail'] = pydantic.Field(default = 'fail')
+
+
 @app.route('/api/v1/judgement/', defaults={'node_path': ''})
 @app.route('/api/v1/judgement/<path:node_path>')
 def rest_judgement(node_path: str):
-    # TODO
-    return ''
+    content_node = find_node(TreePath.parse(node_path))
+    match content_node:
+        case Exercise(judgement=judgement):
+            success = JudgementSuccess(judgement=str(judgement).lower())
+            return flask.jsonify(success.dict())
+        case _:
+            failure = JudgementFailure()
+            return flask.Response(failure.json(), status=404)
 
 
 @app.route('/styles.css')

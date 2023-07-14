@@ -1,8 +1,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from collections import namedtuple
 from pathlib import Path
-from typing import Callable, Iterable, NamedTuple
+from typing import Iterable, NamedTuple
 from progtool.judging import Judge, create_judge
 from progtool.content.treepath import TreePath
 from progtool.content.metadata import ContentNodeMetadata, SectionMetadata, ExerciseMetadata, ExplanationMetadata, TopicsMetadata
@@ -10,7 +9,6 @@ from progtool import settings
 from enum import Enum
 import logging
 import asyncio
-import os
 
 
 class ContentError(Exception):
@@ -151,8 +149,6 @@ class Exercise(ContentTreeLeaf):
     judgement: Judgement
 
     __difficulty: int
-
-    __assignment_file: Path
 
     __judge: Judge
 
