@@ -1,8 +1,8 @@
-from pathlib import Path
-from typing import Optional
-from itertools import count
 import os
 import re
+from itertools import count
+from pathlib import Path
+from typing import Optional
 
 
 def is_indexed(string: str) -> bool:

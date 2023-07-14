@@ -1,9 +1,9 @@
-import contextlib
-from pathlib import Path
-from typing import Callable, Optional
-import flask
 import abc
 import logging
+from pathlib import Path
+from typing import Callable, Optional
+
+import flask
 
 from progtool.content.tree import ContentNode
 

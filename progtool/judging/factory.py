@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from progtool.judging.judge import Judge, JudgeError, JudgeMetadata
 from progtool.judging.pytest import PytestJudge
 

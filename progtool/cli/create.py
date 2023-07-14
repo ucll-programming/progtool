@@ -1,10 +1,12 @@
-import click
 import os
-from progtool.cli import util
 from pathlib import Path
+
+import click
 import yaml
 
-from progtool.content.metadata import ExerciseMetadata, SectionMetadata, TYPE_SECTION, TYPE_EXERCISE
+from progtool.cli import util
+from progtool.content.metadata import (TYPE_EXERCISE, TYPE_SECTION,
+                                       ExerciseMetadata, SectionMetadata)
 
 
 @click.group(help="Helps with the creation of new content")

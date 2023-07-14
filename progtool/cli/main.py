@@ -1,12 +1,14 @@
-import click
 import logging
 from typing import Optional
-from progtool.cli.tree import tree
-from progtool.cli.server import server
+
+import click
+from rich.logging import RichHandler
+
+from progtool.cli.check import check
 from progtool.cli.create import create
 from progtool.cli.index import index
-from progtool.cli.check import check
-from rich.logging import RichHandler
+from progtool.cli.server import server
+from progtool.cli.tree import tree
 
 
 def _configure_verbosity(verbosity_level: Optional[int]) -> None:

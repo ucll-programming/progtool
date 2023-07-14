@@ -1,8 +1,9 @@
-from progtool.judging.judge import Judge
-from pathlib import Path
-import logging
 import asyncio
+import logging
 import os
+from pathlib import Path
+
+from progtool.judging.judge import Judge
 
 
 class PytestJudge(Judge):

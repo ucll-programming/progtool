@@ -1,11 +1,13 @@
-from progtool.cli.util import find_indexed_subdirectories, create_reindexing_mapping
+import logging
+import os
+
+import click
 from rich.console import Console
 from rich.table import Table
+
 from progtool.cli import util
-import logging
-import click
-import sys
-import os
+from progtool.cli.util import (create_reindexing_mapping,
+                               find_indexed_subdirectories)
 
 
 @click.group(help='Assists with indexing directories')

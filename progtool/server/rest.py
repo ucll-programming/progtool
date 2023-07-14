@@ -1,9 +1,9 @@
-import logging
 from typing import Literal, Optional
+
 from pydantic import BaseModel
+
 from progtool.content import tree as content
 from progtool.content.navigator import ContentNavigator
-
 
 RestTreePath = tuple[str, ...]
 

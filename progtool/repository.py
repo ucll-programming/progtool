@@ -1,5 +1,4 @@
 from pathlib import Path
-import git
 
 
 def find_repository_root() -> Path:
@@ -7,7 +6,7 @@ def find_repository_root() -> Path:
     # root = repo.working_tree_dir
     # return Path(root).resolve()
 
-    # TODO 
+    # TODO
     import os
     computer_name = os.environ['COMPUTERNAME']
 

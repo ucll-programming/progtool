@@ -1,6 +1,7 @@
-from typing import Callable, Iterator, Literal, Optional
-from progtool.content.tree import ContentTreeBranch, ContentTreeLeaf, ContentNode, Section, Exercise, Explanation
-import logging
+from typing import Callable, Literal, Optional
+
+from progtool.content.tree import (ContentNode, ContentTreeBranch,
+                                   ContentTreeLeaf)
 
 
 class ContentNavigator:

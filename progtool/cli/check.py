@@ -1,11 +1,15 @@
-from pathlib import Path
-from progtool.content.metadata import load_everything, load_metadata, ContentNodeMetadata, ExerciseMetadata, ExplanationMetadata, SectionMetadata
-from progtool.content.navigator import ContentNavigator
-from progtool.content.tree import build_tree, ContentNode
-from progtool import repository
-from rich.console import Console
 import logging
+from pathlib import Path
+
 import click
+from rich.console import Console
+
+from progtool import repository
+from progtool.content.metadata import (ContentNodeMetadata, ExerciseMetadata,
+                                       ExplanationMetadata, SectionMetadata,
+                                       load_everything, load_metadata)
+from progtool.content.navigator import ContentNavigator
+from progtool.content.tree import ContentNode, build_tree
 
 
 @click.group(help="Checks content for mistakes")

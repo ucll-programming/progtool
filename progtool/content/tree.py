@@ -1,14 +1,18 @@
 from __future__ import annotations
+
+import asyncio
+import logging
 from abc import ABC, abstractmethod
+from enum import Enum
 from pathlib import Path
 from typing import Iterable, NamedTuple
-from progtool.judging import Judge, create_judge
-from progtool.content.treepath import TreePath
-from progtool.content.metadata import ContentNodeMetadata, SectionMetadata, ExerciseMetadata, ExplanationMetadata, TopicsMetadata
+
 from progtool import settings
-from enum import Enum
-import logging
-import asyncio
+from progtool.content.metadata import (ContentNodeMetadata, ExerciseMetadata,
+                                       ExplanationMetadata, SectionMetadata,
+                                       TopicsMetadata)
+from progtool.content.treepath import TreePath
+from progtool.judging import Judge, create_judge
 
 
 class ContentError(Exception):

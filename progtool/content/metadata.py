@@ -1,8 +1,8 @@
 from pathlib import Path
-from typing import Any, Iterable, Literal, Optional, Callable
-import yaml
+from typing import Callable, Iterable, Literal, Optional
+
 import pydantic
-import logging
+import yaml
 
 from progtool.judging.judge import JudgeMetadata
 

@@ -13,7 +13,6 @@ import pkg_resources
 import sass
 import asyncio
 import threading
-import json
 import re
 
 class ServerError(Exception):

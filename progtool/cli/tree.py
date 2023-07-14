@@ -1,11 +1,14 @@
 from typing import cast
-from progtool.content.metadata import filter_by_tags, load_everything, load_metadata
-from progtool.content.tree import Exercise, ContentNode, Section, Explanation, build_tree
-from progtool.repository import find_exercises_root
+
 import click
-import logging
-from rich.tree import Tree
 from rich.console import Console
+from rich.tree import Tree
+
+from progtool.content.metadata import (filter_by_tags, load_everything,
+                                       load_metadata)
+from progtool.content.tree import (ContentNode, Exercise, Explanation, Section,
+                                   build_tree)
+from progtool.repository import find_exercises_root
 
 
 @click.command()
