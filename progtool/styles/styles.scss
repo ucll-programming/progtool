@@ -10,6 +10,7 @@ $exercise-unknown-background: #AAA;
 #root {
   max-width: 1280px;
   margin: 0 auto;
+  height: 100%;
 }
 
 :root {
@@ -25,6 +26,10 @@ $exercise-unknown-background: #AAA;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+}
+
+html, body {
+  height: 100%;
 }
 
 p {
@@ -218,7 +223,7 @@ p code {
         margin: 0;
 
         &:hover {
-          background-color: $section-background * 1.33;
+          background-color: lighten($section-background, 33%);
         }
       }
 
@@ -243,7 +248,7 @@ p code {
       background: $explanation-background;
 
       &:hover {
-        background: $explanation-background * 1.33;
+        background: lighten($explanation-background, 33%);
       }
     }
 
@@ -252,7 +257,7 @@ p code {
         background: $exercise-pass-background;
 
         &:hover {
-          background: $exercise-pass-background * 1.33;
+          background: lighten($exercise-pass-background, 33%);
         }
       }
 
@@ -260,7 +265,7 @@ p code {
         background: $exercise-fail-background;
 
         &:hover {
-          background: $exercise-fail-background * 1.33;
+          background: lighten($exercise-fail-background, 33%);
         }
       }
 
@@ -268,7 +273,7 @@ p code {
         background: $exercise-unknown-background;
 
         &:hover {
-          background: $exercise-unknown-background * 1.33;
+          background: lighten($exercise-unknown-background, 33%);
         }
       }
     }
@@ -490,7 +495,7 @@ pre code.hljs {
             background-color: $section-background;
 
             &:hover {
-              background-color: $section-background * 1.33;
+              background-color: lighten($section-background, 33%);
             }
           }
 
@@ -499,7 +504,7 @@ pre code.hljs {
               background-color: $exercise-pass-background;
 
               &:hover {
-                background-color: $exercise-pass-background * 1.33;
+                background-color: lighten($exercise-pass-background, 33%);
               }
             }
 
@@ -507,7 +512,7 @@ pre code.hljs {
               background-color: $exercise-fail-background;
 
               &:hover {
-                background-color: $exercise-fail-background * 1.33;
+                background-color: lighten($exercise-fail-background, 33%);
               }
             }
 
@@ -515,7 +520,7 @@ pre code.hljs {
               background-color: $exercise-unknown-background;
 
               &:hover {
-                background-color: $exercise-unknown-background * 1.33;
+                background-color: lighten($exercise-unknown-background, 1.33);
               }
             }
           }
@@ -524,7 +529,7 @@ pre code.hljs {
             background-color: $explanation-background;
 
             &:hover {
-              background-color: $explanation-background * 1.33;
+              background-color: lighten($explanation-background, 33%);
             }
           }
         }
