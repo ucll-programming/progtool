@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from progtool import settings
+
 
 def find_repository_root() -> Path:
     # repo = git.Repo('.', search_parent_directories=True)
@@ -7,13 +9,7 @@ def find_repository_root() -> Path:
     # return Path(root).resolve()
 
     # TODO
-    import os
-    computer_name = os.environ['COMPUTERNAME']
-
-    if computer_name == 'LT2180298':
-        return Path('C:/repos/ucll/programming/course-material')
-    else:
-        return Path('G:/repos/ucll/programming/course-material')
+    return settings.repository_root()
 
 
 def find_exercises_root() -> Path:
