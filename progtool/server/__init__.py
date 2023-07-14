@@ -1,19 +1,23 @@
+import asyncio
+import logging
+import re
+import threading
+from typing import Literal, Optional
+
+import flask
+import pkg_resources
+import pydantic
+import sass
+
+from progtool import repository, settings
 from progtool.content.metadata import load_everything, load_metadata
 from progtool.content.navigator import ContentNavigator
-from progtool.content.tree import ContentTreeBranch, ContentTreeLeaf, build_tree, ContentNode, Section, Exercise, Explanation
+from progtool.content.tree import (ContentNode, ContentTreeBranch,
+                                   ContentTreeLeaf, Exercise, build_tree)
 from progtool.content.treepath import TreePath
-from progtool.server.protocols import find_protocol
-from progtool import repository
 from progtool.server import rest
-from typing import Literal, Optional
-import pydantic
-import flask
-import logging
-import pkg_resources
-import sass
-import asyncio
-import threading
-import re
+from progtool.server.protocols import find_protocol
+
 
 class ServerError(Exception):
     pass
@@ -168,14 +172,7 @@ def stylesheet():
 
 
 def serve_html() -> str:
-    import os
-    computer_name = os.environ['COMPUTERNAME']
-
-    if computer_name == 'LT2180298':
-        html_path = 'C:/repos/ucll/programming/frontend/dist/index.html'
-    else:
-        html_path = 'G:/repos/ucll/programming/frontend/dist/index.html'
-    with open(html_path, encoding='utf-8') as file:
+    with open(settings.html_path(), encoding='utf-8') as file:
         html_contents = file.read()
 
     return html_contents

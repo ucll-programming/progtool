@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Callable, Iterable, Literal, Optional
+from typing import Any, Callable, Iterable, Literal, Optional
 
 import pydantic
 import yaml
