@@ -6,13 +6,13 @@ def language_priorities():
     return ['en', 'nl']
 
 
-def html_path():
+def html_path() -> Path:
     computer_name = os.environ['COMPUTERNAME']
 
     if computer_name == 'LT2180298':
-        return 'C:/repos/ucll/programming/frontend/dist/index.html'
+        return Path('C:/repos/ucll/programming/frontend/dist/index.html')
     else:
-        return 'G:/repos/ucll/programming/frontend/dist/index.html'
+        return Path('G:/repos/ucll/programming/frontend/dist/index.html')
 
 
 def repository_root() -> Path:

@@ -172,7 +172,7 @@ def stylesheet():
 
 
 def serve_html() -> str:
-    with open(settings.html_path(), encoding='utf-8') as file:
+    with settings.html_path().open(encoding='utf-8') as file:
         html_contents = file.read()
 
     return html_contents
