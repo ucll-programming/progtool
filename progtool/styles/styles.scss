@@ -385,9 +385,13 @@ p code {
       }
 
       .card-back {
+        display: flex;
         transform: rotateY(180deg) translate(100%, 0);
         background-color: mediumpurple;
-        padding: 1em;
+
+        .card-back-contents {
+          padding: 0 1em 0 1em;
+        }
       }
     }
   }
