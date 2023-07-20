@@ -32,7 +32,7 @@ class Explanation(Leaf):
 
 
 class Exercise(Leaf):
-    judgement_url: str
+    judgment_url: str
     difficulty: int
 
 
@@ -47,8 +47,8 @@ def convert_tree(root: content.ContentNode) -> Node:
     def markdown_url(tree_path: content.TreePath) -> str:
         return f'/api/v1/markdown/{"/".join(tree_path.parts)}'
 
-    def judgement_url(tree_path: content.TreePath) -> str:
-        return f'/api/v1/judgement/{"/".join(tree_path.parts)}'
+    def judgment_url(tree_path: content.TreePath) -> str:
+        return f'/api/v1/judgment/{"/".join(tree_path.parts)}'
 
     def convert(content_node: content.ContentNode) -> Node:
         predecessor = navigator.find_predecessor_leaf(content_node)
@@ -86,7 +86,7 @@ def convert_tree(root: content.ContentNode) -> Node:
                     successor=format_tree_path_of(successor),
                     predecessor=format_tree_path_of(predecessor),
                     parent=format_tree_path_of(parent),
-                    judgement_url=judgement_url(content_node.tree_path),
+                    judgment_url=judgment_url(content_node.tree_path),
                 )
             case _:
                 raise RuntimeError(f"Unrecognized node type: {type(content_node)}")
