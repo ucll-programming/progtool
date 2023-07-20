@@ -147,6 +147,23 @@ def rest_judgment(node_path: str):
             return flask.Response(failure.json(), status=404)
 
 
+class RejudgeResponse(pydantic.BaseModel):
+    status: Literal['ok'] | Literal['fail']
+
+
+@app.route('/api/v1/judgment/', defaults={'node_path': ''}, methods=['POST'])
+@app.route('/api/v1/judgment/<path:node_path>', methods=['POST'])
+def rest_rejudge(node_path: str):
+    try:
+        content_node = find_node(TreePath.parse(node_path))
+        get_judging_service().judge_recursively(content_node)
+        response = RejudgeResponse(status='ok')
+    except:
+        response = RejudgeResponse(status='fail')
+
+    return flask.jsonify(response.dict())
+
+
 @app.route('/styles.css')
 def stylesheet():
     scss = pkg_resources.resource_string('progtool.styles', 'styles.scss')
