@@ -175,6 +175,15 @@ p,li {
   }
 }
 
+#control-panel {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 100px;
+  height: 100px;
+  background: black;
+}
+
 .overview-root-container {
   a {
     text-decoration: none;
@@ -184,28 +193,29 @@ p,li {
   .overview-entry {
     & > .overview-entry-header {
       display: flex;
-      flex-direction: column;
-      justify-content: start;
-      align-items: stretch;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
       margin: 0;
       text-align: center;
+
+      & > .overview-entry-header-symbol {
+        float: right;
+        padding: 0.2em;
+        opacity: 75%;
+        color: black;
+        font-size: 1rem;
+      }
     }
 
     a {
+      width: 100%;
       font-weight: 100;
       font-size: 1rem;
-      position: relative;
       display: flex;
       flex-direction: row;
       justify-content: center;
       align-items: center;
-
-      & > .overview-entry-header-symbol {
-        position: absolute;
-        right: 0;
-        padding: 0.2em;
-        opacity: 75%;
-      }
     }
 
     &.selected {
