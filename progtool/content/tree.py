@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-import asyncio
 import logging
 from abc import ABC, abstractmethod
-from enum import Enum
 from pathlib import Path
 from typing import Iterable, NamedTuple
 
@@ -12,20 +10,13 @@ from progtool.content.metadata import (ContentNodeMetadata, ExerciseMetadata,
                                        ExplanationMetadata, SectionMetadata,
                                        TopicsMetadata)
 from progtool.content.treepath import TreePath
-from progtool.judging import Judge, create_judge
+from progtool.judging.judge import Judge
+from progtool.judging.factory import create_judge_from_metadata
+from progtool.judging.judgment import Judgment
 
 
 class ContentError(Exception):
     pass
-
-
-class Judgement(Enum):
-    UNKNOWN = 0
-    PASS = 1
-    FAIL = -1
-
-    def __str__(self):
-        return self.name
 
 
 class Topics(NamedTuple):
@@ -89,15 +80,15 @@ class ContentNode(ABC):
         ...
 
     @abstractmethod
-    def judge_recursively(self, loop: asyncio.AbstractEventLoop) -> None:
-        ...
-
-    @abstractmethod
     def preorder_traversal(self) -> Iterable[ContentNode]:
         ...
 
     @abstractmethod
     def build_parent_mapping(self, mapping: dict[ContentNode, ContentTreeBranch]) -> None:
+        ...
+
+    @abstractmethod
+    def descend(self, parts: tuple[str, ...]) -> ContentNode:
         ...
 
 
@@ -126,6 +117,12 @@ class ContentTreeLeaf(ContentNode):
     def build_parent_mapping(self, mapping: dict[ContentNode, ContentTreeBranch]) -> None:
         pass
 
+    def descend(self, parts: tuple[str, ...]) -> ContentNode:
+        if len(parts) == 0:
+            return self
+        else:
+            raise ContentError("Invalid descent")
+
 
 class Explanation(ContentTreeLeaf):
     __file: Path
@@ -145,16 +142,13 @@ class Explanation(ContentTreeLeaf):
     def __repr__(self) -> str:
         return str(self)
 
-    def judge_recursively(self, loop: asyncio.AbstractEventLoop) -> None:
-        pass
-
 
 class Exercise(ContentTreeLeaf):
-    judgement: Judgement
-
     __difficulty: int
 
     __judge: Judge
+
+    judgment: Judgment
 
     def __init__(self, *, tree_path: TreePath, local_path: Path, name: str, difficulty: int, assignment_file: Path, judge: Judge, topics: Topics):
         super().__init__(
@@ -164,7 +158,6 @@ class Exercise(ContentTreeLeaf):
             topics=topics,
             markup_path=assignment_file,
         )
-        self.judgement = Judgement.UNKNOWN
         self.__difficulty = difficulty
         self.__judge = judge
 
@@ -178,18 +171,9 @@ class Exercise(ContentTreeLeaf):
     def difficulty(self) -> int:
         return self.__difficulty
 
-    def judge(self, loop: asyncio.AbstractEventLoop) -> None:
-        async def judge():
-            logging.info(f'Judging exercise {self.tree_path}')
-            tests_passed = await self.__judge.judge()
-            judgement = Judgement.PASS if tests_passed else Judgement.FAIL
-            logging.info(f'Judged exercise {self.tree_path}: {judgement}')
-            self.judgement = judgement
-        logging.info(f'Enqueueing exercise {self.tree_path}')
-        loop.create_task(judge())
-
-    def judge_recursively(self, loop: asyncio.AbstractEventLoop) -> None:
-        self.judge(loop)
+    @property
+    def judge(self) -> Judge:
+        return self.__judge
 
 
 class ContentTreeBranch(ContentNode):
@@ -220,10 +204,6 @@ class ContentTreeBranch(ContentNode):
     def __children_table(self) -> dict[str, ContentNode]:
         return self.__children_table_value
 
-    def judge_recursively(self, loop: asyncio.AbstractEventLoop) -> None:
-        for child in self.children:
-            child.judge_recursively(loop)
-
     def preorder_traversal(self) -> Iterable[ContentNode]:
         yield self
         for child in self.children:
@@ -233,6 +213,16 @@ class ContentTreeBranch(ContentNode):
         for child in self.children:
             mapping[child] = self
             child.build_parent_mapping(mapping)
+
+    def descend(self, parts: tuple[str, ...]) -> ContentNode:
+        if len(parts) == 0:
+            return self
+        else:
+            first, *rest = parts
+            if first not in self.__children_table:
+                raise ContentError('Invalid descent')
+            else:
+                return self.__children_table[first].descend(tuple(rest))
 
 
 class Section(ContentTreeBranch):
@@ -271,7 +261,7 @@ def build_tree(metadata: ContentNodeMetadata) -> ContentNode:
                     topics=Topics.from_metadata(topics_metadata),
                 )
             case ExerciseMetadata(path=path, name=name, difficulty=difficulty, documentation=documentation, judge=judge_metadata, topics=topics_metadata):
-                judge = create_judge(path, judge_metadata)
+                judge = create_judge_from_metadata(path, judge_metadata)
 
                 return Exercise(
                     tree_path=tree_path,

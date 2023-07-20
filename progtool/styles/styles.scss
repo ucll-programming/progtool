@@ -36,10 +36,12 @@ p {
   text-align: justify;
 }
 
-p code {
-  background: rgba(80, 80, 80, 0.5);
-  padding: 2px 4px;
-  font-family: 'Courier New', Courier, monospace;
+p,li {
+  code {
+    background: rgba(80, 80, 80, 0.5);
+    padding: 2px 4px;
+    font-family: 'Courier New', Courier, monospace;
+  }
 }
 
 .centered {

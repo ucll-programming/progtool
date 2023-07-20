@@ -17,6 +17,7 @@ from progtool.content.tree import (ContentNode, ContentTreeBranch,
 from progtool.content.treepath import TreePath
 from progtool.server import rest
 from progtool.server.protocols import find_protocol
+from progtool.judging.judgingservice import JudgingService
 
 
 class ServerError(Exception):
@@ -67,38 +68,20 @@ app = flask.Flask(__name__)
 
 _content: Optional[Content] = None
 
+_judging_service: Optional[JudgingService] = None
+
 def get_content() -> Content:
-    global _content
     if _content is None:
         raise ServerError("Content not yet loaded")
     else:
         return _content
 
 
-def start_event_loop_in_separate_thread() -> asyncio.AbstractEventLoop:
-    def thread_proc():
-        nonlocal event_loop
-        logging.info('Background thread reporting for duty')
-        event_loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(event_loop)
-
-        event.set()
-
-        try:
-            event_loop.run_forever()
-        finally:
-            event_loop.close()
-
-    event_loop: Optional[asyncio.AbstractEventLoop] = None
-    event = threading.Event()
-
-    thread = threading.Thread(target=thread_proc, daemon=True, name="BGThread")
-    thread.start()
-
-    event.wait()
-    assert event_loop is not None, 'BUG: event loop should have been created by thread'
-
-    return event_loop
+def get_judging_service() -> JudgingService:
+    if _judging_service is None:
+        raise ServerError("Judging service is inactive")
+    else:
+        return _judging_service
 
 
 @app.route('/')
@@ -156,7 +139,7 @@ class JudgementFailure(pydantic.BaseModel):
 def rest_judgement(node_path: str):
     content_node = find_node(TreePath.parse(node_path))
     match content_node:
-        case Exercise(judgement=judgement):
+        case Exercise(judgment=judgement):
             success = JudgementSuccess(judgement=str(judgement).lower())
             return flask.jsonify(success.dict())
         case _:
@@ -192,11 +175,12 @@ def run():
     global _content
     _content = load_content()
 
-    logging.info('Setting up background thread')
-    event_loop = start_event_loop_in_separate_thread()
+    logging.info('Setting up judging service')
+    global _judging_service
+    _judging_service = JudgingService()
 
     logging.info('Judging exercises in background')
-    event_loop.call_soon_threadsafe(lambda: _content.root.judge_recursively(event_loop))
+    _judging_service.judge_recursively(_content.root)
 
     # TODO Turn off debug mode
     logging.info('Starting up Flask')
