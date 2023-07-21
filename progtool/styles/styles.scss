@@ -307,6 +307,9 @@ p,li {
     flex-direction: row;
     justify-content: start;
     align-items: center;
+    background: rgba($color: #FFF, $alpha: 0.2);
+    padding: 0.2em 0.5em;
+    border-radius: 0.25em;
 
     & .admonition-symbol {
       margin-right: 0.5em;
