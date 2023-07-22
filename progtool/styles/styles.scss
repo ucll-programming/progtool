@@ -357,7 +357,7 @@ p,li {
   }
 
   &.warning {
-    background: #F00;
+    background: maroon;
   }
 
   &.important {
@@ -369,7 +369,7 @@ p,li {
   }
 
   &.question {
-    background: maroon;
+    background: yellowgreen;
   }
 
   &.task {
@@ -381,7 +381,7 @@ p,li {
   }
 
   &.example {
-    background: green;
+    background: #AAF;
   }
 }
 
