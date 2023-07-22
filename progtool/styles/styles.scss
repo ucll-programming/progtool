@@ -205,6 +205,35 @@ p,li {
         opacity: 75%;
         color: black;
         font-size: 1rem;
+
+        & > .symbol-container {
+          display: grid;
+
+          & > * {
+            grid-column-start: 1;
+            grid-row-start: 1;
+          }
+
+          &:hover {
+            & > .difficulty {
+              visibility: hidden;
+            }
+
+            & > .refresh {
+              visibility: visible;
+            }
+          }
+
+          &:not(:hover) {
+            & > .difficulty {
+              visibility: visible;
+            }
+
+            & > .refresh {
+              visibility: hidden;
+            }
+          }
+        }
       }
     }
 
