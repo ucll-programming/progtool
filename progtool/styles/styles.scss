@@ -191,6 +191,8 @@ p,li {
   }
 
   .overview-entry {
+    border-top: 1px solid rgba(#000, 0.1);
+
     & > .overview-entry-header {
       display: flex;
       flex-direction: row;
