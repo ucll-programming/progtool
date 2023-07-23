@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Any, Callable, Iterable, Literal, Optional
 
+import logging
 import pydantic
 import yaml
 
@@ -90,11 +91,23 @@ def parse_metadata(path: Path, data: Any, link_predicate: LinkPredicate) -> Opti
     data['path'] = path
     node_type = data['type']
     if node_type == TYPE_EXERCISE:
-        return ExerciseMetadata.parse_obj(data)
+        try:
+            return ExerciseMetadata.parse_obj(data)
+        except:
+            logging.error(f"Error occurred while parsing Exercise metadata from {path}")
+            raise
     elif node_type == TYPE_EXPLANATION:
-        return ExplanationMetadata.parse_obj(data)
+        try:
+            return ExplanationMetadata.parse_obj(data)
+        except:
+            logging.error(f"Error occurred while parsing Explanation metadata from {path}")
+            raise
     elif node_type == TYPE_LINK:
-        link_metadata = LinkMetadata.parse_obj(data)
+        try:
+            link_metadata = LinkMetadata.parse_obj(data)
+        except:
+            logging.error(f"Error occurred while parsing Link metadata from {path}")
+            raise
         if link_predicate(link_metadata):
             return load_metadata(path / link_metadata.location, link_predicate=link_predicate)
         else:
@@ -123,6 +136,7 @@ def parse_metadata(path: Path, data: Any, link_predicate: LinkPredicate) -> Opti
 
 def load_metadata(root_path: Path, *, link_predicate: LinkPredicate) -> Optional[ContentNodeMetadata]:
     file_path = root_path / 'metadata.yaml'
+    logging.info(f'Loading f{file_path}')
     if not file_path.is_file():
         raise MetadataError(f'Could not read {file_path}')
     with file_path.open() as file:
