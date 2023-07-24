@@ -1,10 +1,9 @@
 import asyncio
 import logging
 from typing import Optional
-from progtool.content.tree import ContentNode, Exercise, Explanation, Section
+from progtool.content.tree import ContentNode, Exercise
 import threading
 
-from progtool.judging.judge import JudgeError
 from progtool.judging.judgment import Judgment
 
 
