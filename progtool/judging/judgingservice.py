@@ -3,9 +3,10 @@ import logging
 from typing import Optional
 from progtool.content.tree import ContentNode, Exercise
 import threading
+import json
 
 from progtool.judging.judgment import Judgment
-
+from progtool import settings
 
 class JudgingService:
     __event_loop: asyncio.AbstractEventLoop
@@ -30,7 +31,30 @@ class JudgingService:
             self.judge(exercise)
 
     def initialize(self, root: ContentNode) -> None:
-        self.judge_recursively(root)
+        logging.info('Reading cache')
+        cache_path = settings.judgment_cache()
+        if cache_path.is_file():
+            with cache_path.open() as file:
+                cache: dict[str, str] = json.load(file)
+        else:
+            logging.info('No cache found')
+            cache = {}
+
+        logging.info('Initializing exercise judgments')
+        for exercise in root.exercises:
+            path = str(exercise.tree_path)
+            if path in cache:
+                exercise.judgment = Judgment[cache[path]]
+            else:
+                self.judge(exercise)
+
+    def write_cache(self, root: ContentNode) -> None:
+        cache = {}
+        for exercise in root.exercises:
+            if exercise.judgment != Judgment.UNKNOWN:
+                cache[str(exercise.tree_path)] = str(exercise.judgment)
+        with settings.judgment_cache().open('w') as file:
+            json.dump(cache, file)
 
     def __start_event_loop_in_separate_thread(self) -> asyncio.AbstractEventLoop:
         def thread_proc():
