@@ -27,16 +27,8 @@ class JudgingService:
         self.__event_loop.call_soon_threadsafe(lambda: self.__event_loop.create_task(perform_judging()))
 
     def judge_recursively(self, content_node: ContentNode) -> None:
-        match content_node:
-            case Exercise():
-                self.judge(content_node)
-            case Explanation():
-                pass
-            case Section(children=children):
-                for child in children:
-                    self.judge_recursively(child)
-            case _:
-                raise JudgeError(f"Unrecognized node type {type(content_node)}")
+        for exercise in content_node.exercises:
+            self.judge(exercise)
 
     def __start_event_loop_in_separate_thread(self) -> asyncio.AbstractEventLoop:
         def thread_proc():

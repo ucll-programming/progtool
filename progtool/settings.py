@@ -22,3 +22,7 @@ def repository_root() -> Path:
         return Path('C:/repos/ucll/programming/course-material')
     else:
         return Path('G:/repos/ucll/programming/course-material')
+
+
+def judgment_cache() -> Path:
+    return Path("~/progtool-cache.json")

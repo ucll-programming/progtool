@@ -91,6 +91,11 @@ class ContentNode(ABC):
     def descend(self, parts: tuple[str, ...]) -> ContentNode:
         ...
 
+    @property
+    @abstractmethod
+    def exercises(self) -> Iterable[Exercise]:
+        ...
+
 
 class ContentTreeLeaf(ContentNode):
     __markup_path: Path
@@ -142,6 +147,10 @@ class Explanation(ContentTreeLeaf):
     def __repr__(self) -> str:
         return str(self)
 
+    @property
+    def exercises(self) -> Iterable[Exercise]:
+        return iter([])
+
 
 class Exercise(ContentTreeLeaf):
     __difficulty: int
@@ -174,6 +183,10 @@ class Exercise(ContentTreeLeaf):
     @property
     def judge(self) -> Judge:
         return self.__judge
+
+    @property
+    def exercises(self) -> Iterable[Exercise]:
+        yield self
 
 
 class ContentTreeBranch(ContentNode):
@@ -223,6 +236,10 @@ class ContentTreeBranch(ContentNode):
                 raise ContentError('Invalid descent')
             else:
                 return self.__children_table[first].descend(tuple(rest))
+
+    @property
+    def exercises(self) -> Iterable[Exercise]:
+        return (exercise for child in self.children for exercise in child.exercises)
 
 
 class Section(ContentTreeBranch):
