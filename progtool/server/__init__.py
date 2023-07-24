@@ -197,7 +197,7 @@ def run():
     _judging_service = JudgingService()
 
     logging.info('Judging exercises in background')
-    _judging_service.judge_recursively(_content.root)
+    _judging_service.initialize(_content.root)
 
     # TODO Turn off debug mode
     logging.info('Starting up Flask')

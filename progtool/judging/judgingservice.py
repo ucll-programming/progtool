@@ -29,6 +29,9 @@ class JudgingService:
         for exercise in content_node.exercises:
             self.judge(exercise)
 
+    def initialize(self, root: ContentNode) -> None:
+        self.judge_recursively(root)
+
     def __start_event_loop_in_separate_thread(self) -> asyncio.AbstractEventLoop:
         def thread_proc():
             nonlocal event_loop
