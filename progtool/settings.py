@@ -25,4 +25,8 @@ def repository_root() -> Path:
 
 
 def judgment_cache() -> Path:
-    return Path("~/progtool-cache.json")
+    return Path.home() / "progtool-cache.json"
+
+
+def cache_delay() -> float:
+    return 5

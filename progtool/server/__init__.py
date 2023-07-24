@@ -11,6 +11,7 @@ from progtool import settings
 from progtool.content.tree import (ContentNode, ContentTreeBranch,
                                    ContentTreeLeaf, Exercise)
 from progtool.content.treepath import TreePath
+from progtool.judging.cachingservice import CachingService
 from progtool.judging.judgingservice import JudgingService
 from progtool.server import rest
 from progtool.server.bgthread import create_background_worker
@@ -146,14 +147,16 @@ def run():
     global _content
     _content = load_content()
 
-    background_worker = create_background_worker()
+    logging.info('Creating background worker')
+    event_loop = create_background_worker()
+
+    logging.info('Setting up caching service')
+    caching_service = CachingService(_content.root, event_loop)
 
     logging.info('Setting up judging service')
     global _judging_service
-    _judging_service = JudgingService(background_worker)
-
-    logging.info('Judging exercises in background')
-    _judging_service.initialize(_content.root)
+    _judging_service = JudgingService(event_loop)
+    _judging_service.judge_recursively(_content.root, only_unknown=True)
 
     # TODO Turn off debug mode
     logging.info('Starting up Flask')

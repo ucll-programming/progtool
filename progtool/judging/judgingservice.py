@@ -25,26 +25,9 @@ class JudgingService:
         exercise.judgment = Judgment.UNKNOWN
         self.__event_loop.call_soon_threadsafe(lambda: self.__event_loop.create_task(perform_judging()))
 
-    def judge_recursively(self, content_node: ContentNode) -> None:
+    def judge_recursively(self, content_node: ContentNode, only_unknown=False) -> None:
         for exercise in content_node.exercises:
-            self.judge(exercise)
-
-    def initialize(self, root: ContentNode) -> None:
-        logging.info('Reading cache')
-        cache_path = settings.judgment_cache()
-        if cache_path.is_file():
-            with cache_path.open() as file:
-                cache: dict[str, str] = json.load(file)
-        else:
-            logging.info('No cache found')
-            cache = {}
-
-        logging.info('Initializing exercise judgments')
-        for exercise in root.exercises:
-            path = str(exercise.tree_path)
-            if path in cache:
-                exercise.judgment = Judgment[cache[path]]
-            else:
+            if not only_unknown or exercise.judgment is Judgment.UNKNOWN:
                 self.judge(exercise)
 
     def write_cache(self, root: ContentNode) -> None:

@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Iterable, NamedTuple
+from typing import Callable, Iterable, NamedTuple
 
 from progtool import settings
 from progtool.content.metadata import (ContentNodeMetadata, ExerciseMetadata,
@@ -159,6 +159,8 @@ class Exercise(ContentTreeLeaf):
 
     __judgment: Judgment
 
+    __judgment_observers: list[Callable[[], None]]
+
     def __init__(self, *, tree_path: TreePath, local_path: Path, name: str, difficulty: int, assignment_file: Path, judge: Judge, topics: Topics):
         super().__init__(
             tree_path=tree_path,
@@ -170,6 +172,7 @@ class Exercise(ContentTreeLeaf):
         self.__difficulty = difficulty
         self.__judge = judge
         self.__judgment = Judgment.UNKNOWN
+        self.__judgment_observers = []
 
     def __str__(self) -> str:
         return f'Exercise[{self.tree_path}]'
@@ -194,8 +197,17 @@ class Exercise(ContentTreeLeaf):
         return self.__judgment
 
     @judgment.setter
-    def judgment(self, value) -> None:
-        self.__judgment = value
+    def judgment(self, value: Judgment) -> None:
+        if self.__judgment is not value:
+            self.__judgment = value
+            self.__notify_judgment_observers()
+
+    def observe_judgment(self, callback: Callable[[], None]) -> None:
+        self.__judgment_observers.append(callback)
+
+    def __notify_judgment_observers(self) -> None:
+        for observer in self.__judgment_observers:
+            observer()
 
 
 class ContentTreeBranch(ContentNode):
