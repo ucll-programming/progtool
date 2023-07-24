@@ -128,9 +128,7 @@ def stylesheet():
 
 def serve_html() -> str:
     with settings.html_path().open(encoding='utf-8') as file:
-        html_contents = file.read()
-
-    return html_contents
+        return file.read()
 
 
 def find_node(tree_path: TreePath) -> ContentNode:
