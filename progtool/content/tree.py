@@ -157,7 +157,7 @@ class Exercise(ContentTreeLeaf):
 
     __judge: Judge
 
-    judgment: Judgment
+    __judgment: Judgment
 
     def __init__(self, *, tree_path: TreePath, local_path: Path, name: str, difficulty: int, assignment_file: Path, judge: Judge, topics: Topics):
         super().__init__(
@@ -169,6 +169,7 @@ class Exercise(ContentTreeLeaf):
         )
         self.__difficulty = difficulty
         self.__judge = judge
+        self.__judgment = Judgment.UNKNOWN
 
     def __str__(self) -> str:
         return f'Exercise[{self.tree_path}]'
@@ -187,6 +188,14 @@ class Exercise(ContentTreeLeaf):
     @property
     def exercises(self) -> Iterable[Exercise]:
         yield self
+
+    @property
+    def judgment(self) -> Judgment:
+        return self.__judgment
+
+    @judgment.setter
+    def judgment(self, value) -> None:
+        self.__judgment = value
 
 
 class ContentTreeBranch(ContentNode):

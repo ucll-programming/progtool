@@ -8,6 +8,7 @@ import json
 from progtool.judging.judgment import Judgment
 from progtool import settings
 
+
 class JudgingService:
     __event_loop: asyncio.AbstractEventLoop
 
