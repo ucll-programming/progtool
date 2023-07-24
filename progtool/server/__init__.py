@@ -134,12 +134,7 @@ def serve_html() -> str:
 
 
 def find_node(tree_path: TreePath) -> ContentNode:
-    current = get_content().root
-    for part in tree_path.parts:
-        if not isinstance(current, ContentTreeBranch):
-            raise ServerError("Invalid content path")
-        current = current[part]
-    return current
+    return get_content().root.descend(tree_path)
 
 
 def run():
