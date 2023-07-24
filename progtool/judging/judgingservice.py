@@ -1,8 +1,6 @@
 import asyncio
 import logging
-from typing import Optional
 from progtool.content.tree import ContentNode, Exercise
-import threading
 import json
 
 from progtool.judging.judgment import Judgment
@@ -12,8 +10,8 @@ from progtool import settings
 class JudgingService:
     __event_loop: asyncio.AbstractEventLoop
 
-    def __init__(self):
-        self.__event_loop = self.__start_event_loop_in_separate_thread()
+    def __init__(self, event_loop: asyncio.AbstractEventLoop):
+        self.__event_loop = event_loop
 
     def judge(self, exercise: Exercise) -> None:
         async def perform_judging():
@@ -56,29 +54,3 @@ class JudgingService:
                 cache[str(exercise.tree_path)] = str(exercise.judgment)
         with settings.judgment_cache().open('w') as file:
             json.dump(cache, file)
-
-    def __start_event_loop_in_separate_thread(self) -> asyncio.AbstractEventLoop:
-        def thread_proc():
-            nonlocal event_loop
-            logging.info('Background thread reporting for duty')
-            event_loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(event_loop)
-
-            event.set()
-
-            try:
-                logging.info('Background thread getting ready to process tasks')
-                event_loop.run_forever()
-            finally:
-                event_loop.close()
-
-        event_loop: Optional[asyncio.AbstractEventLoop] = None
-        event = threading.Event()
-
-        thread = threading.Thread(target=thread_proc, daemon=True, name="BGThread")
-        thread.start()
-
-        event.wait()
-        assert event_loop is not None, 'BUG: event loop should have been created by background thread'
-
-        return event_loop

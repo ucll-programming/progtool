@@ -13,6 +13,7 @@ from progtool.content.tree import (ContentNode, ContentTreeBranch,
 from progtool.content.treepath import TreePath
 from progtool.judging.judgingservice import JudgingService
 from progtool.server import rest
+from progtool.server.bgthread import create_background_worker
 from progtool.server.content import Content, load_content
 from progtool.server.error import ServerError
 from progtool.server.protocols import find_protocol
@@ -145,9 +146,11 @@ def run():
     global _content
     _content = load_content()
 
+    background_worker = create_background_worker()
+
     logging.info('Setting up judging service')
     global _judging_service
-    _judging_service = JudgingService()
+    _judging_service = JudgingService(background_worker)
 
     logging.info('Judging exercises in background')
     _judging_service.initialize(_content.root)
