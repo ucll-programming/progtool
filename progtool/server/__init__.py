@@ -82,7 +82,7 @@ def rest_markup(node_path: str):
 
 class JudgmentSuccess(pydantic.BaseModel):
     status: Literal['ok'] = pydantic.Field(default = 'ok')
-    judgment: str
+    judgments: dict[str, str]
 
 
 class JudgmentFailure(pydantic.BaseModel):
@@ -92,14 +92,14 @@ class JudgmentFailure(pydantic.BaseModel):
 @app.route('/api/v1/judgment/', defaults={'node_path': ''})
 @app.route('/api/v1/judgment/<path:node_path>')
 def rest_judgment(node_path: str):
-    content_node = find_node(TreePath.parse(node_path))
-    match content_node:
-        case Exercise(judgment=judgment):
-            success = JudgmentSuccess(judgment=str(judgment).lower())
-            return flask.jsonify(success.dict())
-        case _:
-            failure = JudgmentFailure()
-            return flask.Response(failure.json(), status=404)
+    try:
+        content_node = find_node(TreePath.parse(node_path))
+        judgments = {}
+        for exercise in content_node.exercises:
+            judgments[str(exercise.tree_path)] = str(exercise.judgment).lower()
+        return flask.jsonify(JudgmentSuccess(judgments=judgments).dict())
+    except:
+        return flask.jsonify(JudgmentFailure())
 
 
 class RejudgeResponse(pydantic.BaseModel):

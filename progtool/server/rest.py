@@ -21,6 +21,7 @@ class Node(BaseModel):
 
 class Section(Node):
     children: list[Node]
+    judgment_url: str
 
 
 class Leaf(Node):
@@ -65,6 +66,7 @@ def convert_tree(root: content.ContentNode) -> Node:
                     successor=format_tree_path_of(successor),
                     predecessor=format_tree_path_of(predecessor),
                     parent=format_tree_path_of(parent),
+                    judgment_url=judgment_url(content_node.tree_path),
                 )
             case content.Explanation():
                 return Explanation(
