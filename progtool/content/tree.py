@@ -88,7 +88,7 @@ class ContentNode(ABC):
         ...
 
     @abstractmethod
-    def descend(self, parts: tuple[str, ...]) -> ContentNode:
+    def descend(self, parts: TreePath | tuple[str, ...]) -> ContentNode:
         ...
 
     @property
@@ -122,7 +122,9 @@ class ContentTreeLeaf(ContentNode):
     def build_parent_mapping(self, mapping: dict[ContentNode, ContentTreeBranch]) -> None:
         pass
 
-    def descend(self, parts: tuple[str, ...]) -> ContentNode:
+    def descend(self, parts: TreePath | tuple[str, ...]) -> ContentNode:
+        if isinstance(parts, TreePath):
+            parts = parts.parts
         if len(parts) == 0:
             return self
         else:
@@ -248,7 +250,9 @@ class ContentTreeBranch(ContentNode):
             mapping[child] = self
             child.build_parent_mapping(mapping)
 
-    def descend(self, parts: tuple[str, ...]) -> ContentNode:
+    def descend(self, parts: TreePath | tuple[str, ...]) -> ContentNode:
+        if isinstance(parts, TreePath):
+            parts = parts.parts
         if len(parts) == 0:
             return self
         else:
