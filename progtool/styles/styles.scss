@@ -258,6 +258,15 @@ p,li {
       }
     }
 
+    &.child-selected {
+      & > .overview-entry-header {
+        & > a {
+          background: lighten($section-background, 30%);
+          font-weight: 600;
+        }
+      }
+    }
+
     &.section {
       border-left: #44a 4px solid;
       margin: 2px 0 0 4px;
