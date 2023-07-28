@@ -40,8 +40,10 @@ class CachingService:
             return {}
 
     def write_cache(self):
+        logging.info("Writing judgment cache")
         data = self.__collect_judgments()
         self.__write_cache_data(data)
+        self.__dirty = False
 
     def __collect_judgments(self) -> dict[str, str]:
         data = {}
@@ -64,5 +66,6 @@ class CachingService:
 
     def __schedule_write(self) -> None:
         def write_after_delay():
+            logging.info(f"Scheduling a cache write in {settings.cache_delay()}s")
             self.__event_loop.call_later(settings.cache_delay(), self.write_cache)
         self.__event_loop.call_soon_threadsafe(write_after_delay)
