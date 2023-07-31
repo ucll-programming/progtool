@@ -40,6 +40,7 @@ def get_judging_service() -> JudgingService:
 
 
 @app.route('/')
+@app.route('/nodes/')
 def root():
     return serve_html()
 
