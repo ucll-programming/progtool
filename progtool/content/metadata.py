@@ -9,12 +9,10 @@ from progtool.judging.judge import JudgeMetadata
 
 
 class TopicsMetadata(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(extra='forbid')
     introduces: list[str] = pydantic.Field(default_factory=lambda: [])
     must_come_before: list[str] = pydantic.Field(default_factory=lambda: [])
     must_come_after: list[str] = pydantic.Field(default_factory=lambda: [])
-
-    class Config:
-        extra=pydantic.Extra.forbid
 
 
 class NodeMetadata(pydantic.BaseModel):
@@ -23,12 +21,10 @@ class NodeMetadata(pydantic.BaseModel):
 
 
 class LinkMetadata(NodeMetadata):
+    model_config = pydantic.ConfigDict(extra='forbid')
     location: Path
     tags: set[str] = pydantic.Field(default_factory=lambda: set())
     available_by_default: bool = True
-
-    class Config:
-        extra=pydantic.Extra.forbid
 
 
 class ContentNodeMetadata(NodeMetadata):
@@ -38,13 +34,13 @@ class ContentNodeMetadata(NodeMetadata):
 
 
 class SectionMetadata(ContentNodeMetadata):
+    model_config = pydantic.ConfigDict(extra='forbid')
     contents: list[ContentNodeMetadata]
-
-    class Config:
-        extra=pydantic.Extra.forbid
 
 
 class ExerciseMetadata(ContentNodeMetadata):
+    model_config = pydantic.ConfigDict(extra='forbid')
+
     difficulty: int
 
     # Maps languages to files, e.g. { 'en' => 'assignment.en.md', 'nl' => 'assignment.nl.md' }
@@ -59,15 +55,11 @@ class ExerciseMetadata(ContentNodeMetadata):
         else:
             return value
 
-    class Config:
-        extra=pydantic.Extra.forbid
-
 
 class ExplanationMetadata(ContentNodeMetadata):
-    documentation: dict[str, str]
+    model_config = pydantic.ConfigDict(extra='forbid')
 
-    class Config:
-        extra=pydantic.Extra.forbid
+    documentation: dict[str, str]
 
 
 TYPE_EXPLANATION: Literal['explanation'] = 'explanation'
@@ -92,19 +84,19 @@ def parse_metadata(path: Path, data: Any, link_predicate: LinkPredicate) -> Opti
     node_type = data['type']
     if node_type == TYPE_EXERCISE:
         try:
-            return ExerciseMetadata.parse_obj(data)
+            return ExerciseMetadata.model_validate(data)
         except:
             logging.error(f"Error occurred while parsing Exercise metadata from {path}")
             raise
     elif node_type == TYPE_EXPLANATION:
         try:
-            return ExplanationMetadata.parse_obj(data)
+            return ExplanationMetadata.model_validate(data)
         except:
             logging.error(f"Error occurred while parsing Explanation metadata from {path}")
             raise
     elif node_type == TYPE_LINK:
         try:
-            link_metadata = LinkMetadata.parse_obj(data)
+            link_metadata = LinkMetadata.model_validate(data)
         except:
             logging.error(f"Error occurred while parsing Link metadata from {path}")
             raise

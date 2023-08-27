@@ -28,7 +28,7 @@ def section(ctx, name):
     os.mkdir(dirname)
     with open(dirname / 'metadata.yaml', 'w') as file:
         metadata = SectionMetadata(name=name, type=TYPE_SECTION)
-        yaml.dump(metadata.dict(), file, default_flow_style=False)
+        yaml.dump(metadata.model_dump(), file, default_flow_style=False)
 
 
 @create.command(help='Create new exercise')
@@ -43,7 +43,7 @@ def exercise(ctx, name, difficulty):
     os.mkdir(dirname)
     with open(dirname / 'metadata.yaml', 'w') as file:
         metadata = ExerciseMetadata(name=name, type=TYPE_EXERCISE, difficulty=difficulty)
-        yaml.dump(metadata.dict(), file, default_flow_style=False)
+        yaml.dump(metadata.model_dump(), file, default_flow_style=False)
     with open(dirname / 'assignment.md', 'w') as file:
         file.write(f'# {name}\n\nTODO')
     with open(dirname / 'solution.py', 'w') as file:

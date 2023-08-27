@@ -67,7 +67,7 @@ def rest_overview():
     content = get_content()
     root = content.root
     data = rest.convert_tree(root)
-    return flask.jsonify(data.dict())
+    return flask.jsonify(data.model_dump(mode='json'))
 
 
 @app.route('/api/v1/markdown/', defaults={'node_path': ''})
@@ -98,7 +98,7 @@ def rest_judgment(node_path: str):
         judgments = {}
         for exercise in content_node.exercises:
             judgments[str(exercise.tree_path)] = str(exercise.judgment).lower()
-        return flask.jsonify(JudgmentSuccess(judgments=judgments).dict())
+        return flask.jsonify(JudgmentSuccess(judgments=judgments).model_dump())
     except:
         return flask.jsonify(JudgmentFailure())
 
@@ -117,7 +117,7 @@ def rest_rejudge(node_path: str):
     except:
         response = RejudgeResponse(status='fail')
 
-    return flask.jsonify(response.dict())
+    return flask.jsonify(response.model_dump())
 
 
 @app.route('/styles.css')

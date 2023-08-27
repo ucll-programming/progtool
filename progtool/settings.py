@@ -36,6 +36,8 @@ def load_settings():
         create_settings_file()
     with open(path) as file:
         raw_settings = yaml.load(file)
+        return Settings.model_validate(raw_settings)
+
 
 
 def language_priorities():

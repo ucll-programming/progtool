@@ -1,14 +1,15 @@
+from __future__ import annotations
 from typing import Literal, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, SerializeAsAny
 
 from progtool.content import tree as content
 from progtool.content.navigator import ContentNavigator
 
+
 RestTreePath = tuple[str, ...]
 
 NodeType = Literal['section'] | Literal['exercise'] | Literal['explanation']
-
 
 class Node(BaseModel):
     name: str
@@ -20,7 +21,7 @@ class Node(BaseModel):
 
 
 class Section(Node):
-    children: list[Node]
+    children: list[SerializeAsAny[Node]]   # Without SerializeAsAny, model_dump will disregard subclasses and only serialize Node's fields
     judgment_url: str
 
 
