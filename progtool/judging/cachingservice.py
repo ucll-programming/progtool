@@ -36,6 +36,7 @@ class CachingService:
             with path.open() as file:
                 return json.load(file)
         else:
+            logging.critical("BUG: This should never happen (but if it does, it's okay, we deal with the situation appropriately)")
             logging.info('No cache found')
             return {}
 

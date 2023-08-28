@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 import github
 import git
 import logging
@@ -6,7 +7,10 @@ import sys
 import re
 
 from urllib.request import urlretrieve
+
+import yaml
 from progtool.constants import *
+from progtool.repository import find_repository_root
 import progtool.settings
 from progtool.settings import Settings
 
@@ -26,6 +30,18 @@ def initialize_judgment_cache_path(settings_file_path: Path, settings: Settings)
         logging.debug(f'Judgment cache path not set; setting to default {default_path}')
         settings.judgment_cache = default_path
         progtool.settings.write_settings_file(settings=settings, path=settings_file_path)
+    path = settings.judgment_cache
+    logging.debug(f'Checking if judgment cache file exists at {path}')
+    if not settings.judgment_cache.is_file():
+        logging.debug(f'No file found with path {path}; creating it now')
+        create_empty_judgment_cache(path)
+    logging.info(f'Judgment cache exists at {path}')
+
+
+def create_empty_judgment_cache(path: Path) -> None:
+    data: dict[str, Any] = {}
+    with path.open('w') as file:
+        yaml.dump(data, file)
 
 
 def initialize_html_path(settings_file_path: Path, settings: Settings) -> None:
@@ -71,39 +87,7 @@ def load_existing_or_create_default_settings_file(path: Path) -> Settings:
     return settings
 
 
-def find_repository_root(directory: Path) -> Path:
-    logging.info('Looking for git repository root starting in {directory}')
-    repo = git.Repo(str(directory), search_parent_directories=True)
 
-    logging.debug('Found a repository; getting root directory')
-    root = Path(repo.git.rev_parse("--show-toplevel")).absolute()
-    logging.debug(f'Determined that root directory is {root}')
-
-    identifier_file_path = root / IDENTIFIER_FILE
-    logging.debug(f'Looking for identifier file {identifier_file_path}')
-    if not identifier_file_path.is_file():
-        logging.critical("\n".join([
-            f'Could not find identifier file {IDENTIFIER_FILE}',
-            f"This either means you have removed it or that you're running this script in the wrong repository",
-            f"Make sure to run it inside the course material repository",
-            f"{COURSE_MATERIAL_DOCUMENTATION_URL}/troubleshooting/missing-identifier-file.html"
-        ]))
-        sys.exit(ERROR_CODE_MISSING_IDENTIFIER_FILE)
-    logging.debug(f'Found identifier file!')
-
-    logging.debug(f'Checking contents of identifier file')
-    contents = identifier_file_path.read_text()
-    if contents != IDENTIFIER_FILE_CONTENTS:
-        logging.critical("\n".join([
-            f"The identifier file has the wrong contents",
-            f"This is very surprising and really shouldn't happen."
-            f"{COURSE_MATERIAL_DOCUMENTATION_URL}/troubleshooting/wrong-identifier-file-contents.html"
-        ]))
-        sys.exit(ERROR_CODE_WRONG_IDENTIFIER_CONTENTS)
-    logging.debug(f'Identifier file has right contents!')
-
-    logging.info(f'Repository root directory has been found at {root}')
-    return root
 
 
 def download_html(target: Path):

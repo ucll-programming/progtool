@@ -1,3 +1,4 @@
+import logging
 from typing import cast
 
 import click
@@ -8,13 +9,16 @@ from progtool.content.metadata import (filter_by_tags, load_everything,
                                        load_metadata)
 from progtool.content.tree import (ContentNode, Exercise, Explanation, Section,
                                    build_tree)
-from progtool.repository import find_exercises_root
+from progtool import settings
 
 
 @click.command()
 @click.option("--tags", multiple=True, help="Show only nodes with specified tags")
 @click.option("--all", "show_all", default=False, is_flag=True, help="Show all nodes, even those unavailable by default")
 def tree(tags, show_all) -> None:
+    """
+    Prints out an overview of all content
+    """
     def recurse(node: ContentNode, tree: Tree):
         match node:
             case Section():
@@ -39,7 +43,7 @@ def tree(tags, show_all) -> None:
 
     console = Console()
     tree = Tree('root')
-    root_path = find_exercises_root()
+    root_path = settings.repository_exercise_root()
     link_predicate = create_link_predicate()
     metadata = load_metadata(root_path, link_predicate=link_predicate)
 

@@ -6,7 +6,7 @@ import yaml
 import pydantic
 
 SerializableFilePath = Annotated[pydantic.FilePath, pydantic.PlainSerializer(lambda path: str(path), return_type=str, when_used='always')]
-SerializableDirectoryPath = Annotated[pydantic.FilePath, pydantic.PlainSerializer(lambda path: str(path), return_type=str, when_used='always')]
+SerializableDirectoryPath = Annotated[pydantic.DirectoryPath, pydantic.PlainSerializer(lambda path: str(path), return_type=str, when_used='always')]
 
 
 class Settings(pydantic.BaseModel):
@@ -15,8 +15,6 @@ class Settings(pydantic.BaseModel):
     repository_root: Optional[SerializableDirectoryPath]
     judgment_cache: Optional[SerializableFilePath]
     cache_delay: float
-
-    # @pydantic.field_serializer()
 
 
 _settings: Optional[Settings]
@@ -85,25 +83,28 @@ def language_priorities() -> list[str]:
 
 
 def html_path() -> Path:
-    computer_name = os.environ['COMPUTERNAME']
-
-    if computer_name == 'LT2180298':
-        return Path('C:/repos/ucll/programming/frontend/dist/index.html')
-    else:
-        return Path('G:/repos/ucll/programming/frontend/dist/index.html')
+    path = get_settings().html_path
+    if path is None:
+        raise RuntimeError('Incomplete settings')
+    return path
 
 
 def repository_root() -> Path:
-    computer_name = os.environ['COMPUTERNAME']
+    root = get_settings().repository_root
+    if root is None:
+        raise RuntimeError('Incomplete settings')
+    return root
 
-    if computer_name == 'LT2180298':
-        return Path('C:/repos/ucll/programming/course-material')
-    else:
-        return Path('G:/repos/ucll/programming/course-material')
+
+def repository_exercise_root() -> Path:
+    return repository_root() / 'exercises'
 
 
 def judgment_cache() -> Path:
-    return Path(get_settings().judgment_cache)
+    path = get_settings().judgment_cache
+    if path is None:
+        raise RuntimeError('Incomplete settings')
+    return path
 
 
 def cache_delay() -> float:

@@ -4,7 +4,7 @@ from pathlib import Path
 import click
 from rich.console import Console
 
-from progtool import repository
+from progtool import repository, settings
 from progtool.content.metadata import (ContentNodeMetadata, ExerciseMetadata,
                                        ExplanationMetadata, SectionMetadata,
                                        load_everything, load_metadata)
@@ -49,7 +49,7 @@ class Checker:
     __error_count: int
 
     def __init__(self):
-        self.__root_path = repository.find_exercises_root()
+        self.__root_path = settings.repository_exercise_root()
         metadata = load_metadata(self.__root_path, link_predicate=load_everything(force_all=True))
         if metadata is None:
             raise CheckerError("No nodes loaded")
