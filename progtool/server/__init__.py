@@ -8,8 +8,7 @@ import pydantic
 import sass
 
 from progtool import settings
-from progtool.content.tree import (ContentNode, ContentTreeBranch,
-                                   ContentTreeLeaf, Exercise)
+from progtool.content.tree import (ContentNode, ContentTreeLeaf)
 from progtool.content.treepath import TreePath
 from progtool.judging.cachingservice import CachingService
 from progtool.judging.judgingservice import JudgingService

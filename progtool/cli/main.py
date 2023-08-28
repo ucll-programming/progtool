@@ -11,7 +11,7 @@ from progtool.cli.create import create
 from progtool.cli.index import index
 from progtool.cli.server import server
 from progtool.cli.tree import tree
-from progtool import settings
+from progtool import constants, settings
 
 import sys
 import os
@@ -53,18 +53,18 @@ def _configure_logging(*, verbosity_level: Optional[int], log_file: Optional[str
 @click.group()
 @click.option('-v', '--verbose', count=True)
 @click.option('--log-file', default=None)
-@click.option('--config-file', default=lambda: os.environ.get("PROGTOOL_CONFIGURATION_PATH", str(settings.default_settings_path())))
-def cli(verbose, log_file, config_file):
+@click.option('--settings', "settings_path_string", default=lambda: os.environ.get(constants.SETTINGS_FILE_ENVIRONMENT_VARIABLE, str(settings.default_settings_path())))
+def cli(verbose: int, log_file: str, settings_path_string: str):
     _configure_logging(verbosity_level=verbose, log_file=log_file)
 
-    config_file_path = Path(config_file)
-    logging.info(f"Looking for configuration file {config_file_path}")
-    if not config_file_path.is_file():
-        logging.info(f"No configuration file found at {config_file_path}")
-        setup.initialize(config_file_path)
+    settings_path = Path(settings_path_string)
+    logging.info(f"Loading settings at {settings_path}")
+    if settings.load_and_verify_settings(settings_path) != settings.LoadSettingsResult.SUCCESS:
+        logging.info(f"Could not load settings successfully; attempting to fix it")
+        setup.initialize(settings_path)
         sys.exit(0)
     else:
-        settings.load_settings(config_file_path)
+        settings.load_and_verify_settings(settings_path)
 
 
 def process_command_line_arguments():

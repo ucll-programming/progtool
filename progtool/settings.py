@@ -1,9 +1,12 @@
+from enum import Enum, auto
 import logging
 import os
 from pathlib import Path
 from typing import Annotated, Optional
 import yaml
 import pydantic
+
+from progtool.repository import RepositoryIdentifierResult, check_repository_identifier
 
 SerializableFilePath = Annotated[pydantic.FilePath, pydantic.PlainSerializer(lambda path: str(path), return_type=str, when_used='always')]
 SerializableDirectoryPath = Annotated[pydantic.DirectoryPath, pydantic.PlainSerializer(lambda path: str(path), return_type=str, when_used='always')]
@@ -62,11 +65,78 @@ def write_settings_file(*, settings: Settings, path: Path) -> None:
     logging.debug(f'Finished writing to {path}')
 
 
-def load_settings(path: Path):
-    global _settings
+
+def load_settings(path: Path) -> Settings:
     with open(path) as file:
+        logging.debug("Parsing yaml")
         raw_data = yaml.safe_load(file)
+    return Settings.model_validate(raw_data)
+
+
+class LoadSettingsResult(Enum):
+    SUCCESS = auto()
+    MISSING_SETTINGS_FILE = auto()
+    SETTINGS_FILE_UNPARSABLE = auto()
+    MISSING_HTML_SETTING = auto()
+    MISSING_HTML_FILE = auto()
+    MISSING_JUDGMENT_CACHE_SETTING = auto()
+    MISSING_JUDGMENT_CACHE_FILE = auto()
+    MISSING_REPOSITORY_ROOT_SETTING = auto()
+    INVALID_REPOSITORY_ROOT = auto()
+
+
+def load_and_verify_settings(path: Path) -> LoadSettingsResult:
+    global _settings
+
+    logging.info(f"Loading settings from {path}")
+
+    logging.debug(f'Checking if {path} exists')
+    if not path.is_file():
+        logging.info(f'File {path} does not exist')
+        return LoadSettingsResult.MISSING_SETTINGS_FILE
+
+    try:
+        with open(path) as file:
+            logging.debug("Parsing yaml")
+            raw_data = yaml.safe_load(file)
+    except Exception:
+        logging.info(f'Failed to parse file {path}')
+        return LoadSettingsResult.SETTINGS_FILE_UNPARSABLE
+
+    logging.debug('Validating contents of settings file')
     _settings = Settings.model_validate(raw_data)
+
+    logging.debug('Checking if html_path is set')
+    if _settings.html_path is None:
+        logging.info(f'No html path set in {path}')
+        return LoadSettingsResult.MISSING_HTML_SETTING
+
+    logging.debug('Checking if html file exists')
+    if not _settings.html_path.is_file():
+        logging.info(f'File {_settings.html_path} does not exist')
+        return LoadSettingsResult.MISSING_HTML_FILE
+
+    logging.debug('Checking if judgment cache is set')
+    if _settings.judgment_cache is None:
+        logging.info(f'No judgment cache is set in {path}')
+        return LoadSettingsResult.MISSING_JUDGMENT_CACHE_SETTING
+
+    logging.debug('Checking if judgment cache exists')
+    if not _settings.judgment_cache.is_file():
+        logging.info(f'Judgment cache {_settings.judgment_cache} does not exist')
+        return LoadSettingsResult.MISSING_JUDGMENT_CACHE_FILE
+
+    logging.debug('Checking if repository root is set')
+    if _settings.repository_root is None:
+        logging.info('Repository root not set')
+        return LoadSettingsResult.MISSING_REPOSITORY_ROOT_SETTING
+
+    logging.debug('Checking validity of repository root')
+    if check_repository_identifier(_settings.repository_root) != RepositoryIdentifierResult.SUCCESS:
+        logging.debug(f'Repository root {_settings.repository_root} is not a valid repository')
+        return LoadSettingsResult.INVALID_REPOSITORY_ROOT
+
+    return LoadSettingsResult.SUCCESS
 
 
 def get_settings() -> Settings:

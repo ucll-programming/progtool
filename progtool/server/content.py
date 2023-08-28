@@ -27,7 +27,7 @@ class Content:
 
 def load_content() -> Content:
     logging.info("Loading content...")
-    root_path = repository.find_exercises_root()
+    root_path = settings.repository_exercise_root()
 
     logging.info("Loading metadata")
     # TODO Add tag filtering functionality

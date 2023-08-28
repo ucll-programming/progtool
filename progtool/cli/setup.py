@@ -49,13 +49,19 @@ def initialize_html_path(settings_file_path: Path, settings: Settings) -> None:
     if settings.html_path is None:
         logging.debug('No HTML path set; updating settings with default path ')
         settings.html_path = progtool.settings.default_html_path()
-        progtool.settings.write_settings_file(settings=settings, path=settings_file_path)
         logging.debug(f'HTML path set to {settings.html_path}')
+        updated_settings_file = True
+    else:
+        updated_settings_file = False
     html_path: Path = settings.html_path
     logging.debug(f'Checking if HTML path {settings.html_path} points to existing file')
     if not html_path.is_file():
         logging.debug(f'No file found with path {settings.html_path}; downloading it')
         download_html(html_path)
+    # Needs to be done separately in case downloading HTML file fails
+    if updated_settings_file:
+        logging.debug('Writing settings file')
+        progtool.settings.write_settings_file(settings=settings, path=settings_file_path)
     logging.info(f'HTML file ready at {html_path}')
 
 
@@ -86,25 +92,30 @@ def load_existing_or_create_default_settings_file(path: Path) -> Settings:
     return settings
 
 
-
-
-
 def download_html(target: Path):
     url = find_url_of_latest_html()
     download_file_to(url, target)
 
 
 def download_file_to(url: str, target: Path) -> None:
+    logging.info(f'Downloading {url} to {target}')
     urlretrieve(url, str(target))
 
 
 def find_url_of_latest_html() -> str:
+    def get_organization():
+        logging.debug(f'Looking for organization named {GITHUB_ORGANIZATION_NAME}')
+        try:
+            return gh.get_organization(GITHUB_ORGANIZATION_NAME)
+        except Exception as e:
+            logging.critical(f'An error occurred trying to find the GitHub organization {GITHUB_ORGANIZATION_NAME}: {e}')
+            sys.exit(ERROR_CODE_GITHUB_ORGANIZATION_NOT_FOUND)
+
     logging.info('Looking for latest version of index.html on GitHub')
     logging.debug('Creating GitHub instance')
     gh = github.Github()
 
-    logging.debug(f'Looking for organization named {GITHUB_ORGANIZATION_NAME}')
-    organization = gh.get_organization(GITHUB_ORGANIZATION_NAME)
+    organization = get_organization()
 
     logging.debug(f'Looking for repository named {GITHUB_FRONTEND_REPOSITORY_NAME}')
     repository = organization.get_repo(GITHUB_FRONTEND_REPOSITORY_NAME)
@@ -136,6 +147,7 @@ def find_url_of_latest_html() -> str:
     logging.info(f'URL found: {url}')
 
     return url
+
 
 
 def parse_release_title(title: str) -> tuple[int, int, int]:
