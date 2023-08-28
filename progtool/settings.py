@@ -10,14 +10,13 @@ import pydantic
 from progtool.repository import InvalidIdentifierFile, MissingIdentifierFile, check_repository_identifier
 
 
-SerializableFilePath = Annotated[pydantic.FilePath, pydantic.PlainSerializer(lambda path: str(path), return_type=str, when_used='always')]
-SerializableDirectoryPath = Annotated[pydantic.DirectoryPath, pydantic.PlainSerializer(lambda path: str(path), return_type=str, when_used='always')]
+SerializablePath = Annotated[Path, pydantic.PlainSerializer(lambda path: str(path), return_type=str, when_used='always')]
 
 class Settings(pydantic.BaseModel):
     language_priorities: list[str]
-    html_path: Optional[SerializableFilePath]
-    repository_root: Optional[SerializableDirectoryPath]
-    judgment_cache: Optional[SerializableFilePath]
+    html_path: Optional[SerializablePath]
+    repository_root: Optional[SerializablePath]
+    judgment_cache: Optional[SerializablePath]
     cache_delay: float
 
 
@@ -83,7 +82,10 @@ def load_settings(path: Path) -> Settings:
         raise UnparseableSettingsFile(path)
 
     logging.debug('Validating contents of settings file')
-    return Settings.model_validate(raw_data)
+    try:
+        return Settings.model_validate(raw_data)
+    except Exception:
+        raise InvalidSettings()
 
 
 def verify_settings(settings: Settings) -> None:
@@ -202,3 +204,8 @@ class MissingRepositoryRootSetting(SettingsException):
 class InvalidRepositoryRoot(SettingsException):
     def __init__(self, path: Path):
         super().__init__(f'Invalid repository root {path}')
+
+
+class InvalidSettings(SettingsException):
+    def __init__(self):
+        super().__init__(f'Settings file contained invalid entries')

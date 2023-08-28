@@ -11,7 +11,7 @@ from progtool.content.metadata import (filter_by_tags, load_everything,
 from progtool.content.tree import (ContentNode, Exercise, Explanation, Section,
                                    build_tree)
 from progtool import settings
-from progtool.html import determine_version, fetch_list_of_releases
+from progtool.html import determine_html_version, fetch_list_of_releases
 
 from rich.console import Console
 from rich.table import Table
@@ -40,8 +40,8 @@ def version():
     Determine version of local html file.
     """
     needs_settings()
-    version = determine_version(settings.html_path())
-    print(".".join(str(number) for number in version))
+    version = determine_html_version(settings.html_path())
+    print(version)
 
 
 @html.command()
@@ -58,7 +58,6 @@ def available():
     table.add_column('URL')
 
     for release in releases:
-        version_string = ".".join(str(n) for n in release.version)
-        table.add_row(version_string, release.url)
+        table.add_row(str(release.version), release.url)
 
     console.print(table)
