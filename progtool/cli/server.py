@@ -1,6 +1,6 @@
 import click
 
-from progtool.cli.settings import needs_settings
+from progtool.cli.util import needs_settings
 
 
 @click.command()

@@ -4,7 +4,7 @@ from typing import cast
 import click
 from rich.console import Console
 from rich.tree import Tree
-from progtool.cli.settings import needs_settings
+from progtool.cli.util import needs_settings
 
 from progtool.content.metadata import (filter_by_tags, load_everything,
                                        load_metadata)

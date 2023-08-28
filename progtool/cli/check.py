@@ -5,7 +5,7 @@ import click
 from rich.console import Console
 
 from progtool import settings
-from progtool.cli.settings import needs_settings
+from progtool.cli.util import needs_settings
 from progtool.content.metadata import (ContentNodeMetadata, ExerciseMetadata,
                                        ExplanationMetadata, SectionMetadata,
                                        load_everything, load_metadata)
