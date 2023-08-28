@@ -1,17 +1,16 @@
+import logging
+import re
+import sys
 from pathlib import Path
 from typing import Any
-import github
-import git
-import logging
-import sys
-import re
-
 from urllib.request import urlretrieve
 
+import github
 import yaml
+
+import progtool.settings
 from progtool.constants import *
 from progtool.repository import find_repository_root
-import progtool.settings
 from progtool.settings import Settings
 
 
