@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from progtool.html import download_html
+from progtool.html import download_latest_html
 
 import progtool.settings
 from progtool.constants import *
@@ -56,7 +56,7 @@ def initialize_html_path(settings_file_path: Path, settings: Settings) -> None:
     logging.debug(f'Checking if HTML path {settings.html_path} points to existing file')
     if not html_path.is_file():
         logging.debug(f'No file found with path {settings.html_path}; downloading it')
-        download_html(html_path)
+        download_latest_html(html_path)
 
     # Needs to be done separately in case downloading HTML file fails
     if updated_settings_file:

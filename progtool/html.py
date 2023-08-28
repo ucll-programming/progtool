@@ -1,4 +1,5 @@
 import logging
+from operator import attrgetter
 from pathlib import Path
 import re
 import sys
@@ -9,16 +10,6 @@ import github
 
 from progtool.constants import *
 from progtool.version import Version
-
-
-def find_url_of_latest_html() -> str:
-    releases = fetch_list_of_releases()
-
-    logging.debug(f'Looking for latest release')
-    latest_release = find_latest_release(releases)
-    logging.debug(f'Identified {latest_release.version} as latest release')
-
-    return latest_release.url
 
 
 class Release(NamedTuple):
@@ -62,13 +53,14 @@ def fetch_list_of_releases() -> list[Release]:
     return [decode(release) for release in releases]
 
 
-def find_latest_release(releases: list[Release]) -> Release:
-    return max(releases, key=lambda release: release.version)
+def find_latest_release() -> Release:
+    releases = fetch_list_of_releases()
+    return max(releases, key=attrgetter('version'))
 
 
-def download_html(target: Path) -> None:
-    url = find_url_of_latest_html()
-    download_file_to(url, target)
+def download_latest_html(target: Path) -> None:
+    latest_release = find_latest_release()
+    download_file_to(latest_release.url, target)
 
 
 def download_file_to(url: str, target: Path) -> None:

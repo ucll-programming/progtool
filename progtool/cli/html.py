@@ -11,7 +11,7 @@ from progtool.content.metadata import (filter_by_tags, load_everything,
 from progtool.content.tree import (ContentNode, Exercise, Explanation, Section,
                                    build_tree)
 from progtool import settings
-from progtool.html import determine_html_version, fetch_list_of_releases
+from progtool.html import determine_html_version, download_latest_html, fetch_list_of_releases, find_latest_release
 
 from rich.console import Console
 from rich.table import Table
@@ -61,3 +61,24 @@ def available():
         table.add_row(str(release.version), release.url)
 
     console.print(table)
+
+
+@html.command()
+def update():
+    """
+    Updates to the latest HTML version
+    """
+    needs_settings()
+
+    current_version = determine_html_version(settings.html_path())
+    latest_release = find_latest_release()
+
+    print(f'Currently installed version: {current_version}')
+    print(f'Latest available version: {latest_release.version}')
+
+    if current_version < latest_release.version:
+        print('Downloading latest version...')
+        download_latest_html(settings.html_path)
+        print('Done!')
+    else:
+        print('Latest version already installed')
