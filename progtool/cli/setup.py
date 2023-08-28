@@ -15,11 +15,22 @@ def initialize(settings_file_path: Path):
     settings = load_existing_or_create_default_settings_file(settings_file_path)
     initialize_repository_root(settings_file_path, settings)
     initialize_html_path(settings_file_path, settings)
+    initialize_judgment_cache_path(settings_file_path, settings)
+
+
+def initialize_judgment_cache_path(settings_file_path: Path, settings: Settings) -> None:
+    logging.info('Initializing judgment cache path')
+    logging.debug('Checking if judgment cache path is already set')
+    if settings.judgment_cache is None:
+        default_path = progtool.settings.default_judgment_cache_path()
+        logging.debug(f'Judgment cache path not set; setting to default {default_path}')
+        settings.judgment_cache = default_path
+        progtool.settings.write_settings_file(settings=settings, path=settings_file_path)
 
 
 def initialize_html_path(settings_file_path: Path, settings: Settings) -> None:
     logging.info('Initializing HTML path')
-    logging.debug('Checking if repository has HTML path setting')
+    logging.debug('Checking if HTML path is set')
     if settings.html_path is None:
         logging.debug('No HTML path set; updating settings with default path ')
         settings.html_path = progtool.settings.default_html_path()
@@ -31,7 +42,6 @@ def initialize_html_path(settings_file_path: Path, settings: Settings) -> None:
         logging.debug(f'No file found with path {settings.html_path}; downloading it')
         download_html(html_path)
     logging.info(f'HTML file ready at {html_path}')
-
 
 
 def initialize_repository_root(settings_file_path: Path, settings: Settings) -> None:
@@ -92,14 +102,8 @@ def find_repository_root(directory: Path) -> Path:
         sys.exit(ERROR_CODE_WRONG_IDENTIFIER_CONTENTS)
     logging.debug(f'Identifier file has right contents!')
 
-    logging.info(f'Repository root directory is {root}')
+    logging.info(f'Repository root directory has been found at {root}')
     return root
-
-
-# def create_settings_file(settings_file_path: Path, repository_root: Path) -> Settings:
-#     settings = progtool.settings.create_default_settings(repository_root)
-#     progtool.settings.write_settings_file(settings, settings_file_path)
-#     return settings
 
 
 def download_html(target: Path):
@@ -163,7 +167,7 @@ def parse_release_title(title: str) -> tuple[int, int, int]:
         raise ValueError(f'Could not parse release title {title}; expected vN.N.N')
 
 
-# Using indices is roundabout way so as to not lose static typing
+# Using indices is roundabout way to not lose static typing
 def find_index_of_latest_release(releases) -> int:
     def release_version(index):
         return parse_release_title(releases[index].title)
