@@ -4,6 +4,7 @@ from typing import cast
 import click
 from rich.console import Console
 from rich.tree import Tree
+from progtool.cli.settings import needs_settings
 
 from progtool.content.metadata import (filter_by_tags, load_everything,
                                        load_metadata)
@@ -15,7 +16,7 @@ from progtool import settings
 @click.command()
 @click.option("--tags", multiple=True, help="Show only nodes with specified tags")
 @click.option("--all", "show_all", default=False, is_flag=True, help="Show all nodes, even those unavailable by default")
-def tree(tags, show_all) -> None:
+def tree(tags: list[str], show_all: bool) -> None:
     """
     Prints out an overview of all content
     """
@@ -40,6 +41,8 @@ def tree(tags, show_all) -> None:
             return load_everything(force_all=show_all)
         else:
             return filter_by_tags(tags)
+
+    needs_settings() # type: ignore[call-arg]
 
     console = Console()
     tree = Tree('root')

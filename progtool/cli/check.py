@@ -4,7 +4,8 @@ from pathlib import Path
 import click
 from rich.console import Console
 
-from progtool import repository, settings
+from progtool import settings
+from progtool.cli.settings import needs_settings
 from progtool.content.metadata import (ContentNodeMetadata, ExerciseMetadata,
                                        ExplanationMetadata, SectionMetadata,
                                        load_everything, load_metadata)
@@ -14,7 +15,7 @@ from progtool.content.tree import ContentNode, build_tree
 
 @click.group(help="Checks content for mistakes")
 def check() -> None:
-    pass
+    needs_settings() # type: ignore[call-arg]
 
 
 @check.command(help="Verifies files")

@@ -10,14 +10,10 @@ from progtool.cli.check import check
 from progtool.cli.create import create
 from progtool.cli.index import index
 from progtool.cli.server import server
-from progtool.cli.settings import load_settings
 from progtool.cli.tree import tree
 from progtool import constants, settings
 
-import sys
 import os
-
-from progtool.result import Success, Failure
 
 
 def _configure_verbosity(verbosity_level: Optional[int]) -> None:
@@ -60,7 +56,7 @@ def _configure_logging(*, verbosity_level: Optional[int], log_file: Optional[str
 @click.pass_context
 def cli(ctx: click.Context, verbose: int, log_file: str, settings_path_string: str):
     _configure_logging(verbosity_level=verbose, log_file=log_file)
-    load_settings(ctx)
+    ctx.obj = { 'settings_path': Path(settings_path_string) }
 
 
 def process_command_line_arguments():
