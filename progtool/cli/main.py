@@ -16,6 +16,8 @@ from progtool import constants, settings
 import sys
 import os
 
+from progtool.result import Success, Failure
+
 
 def _configure_verbosity(verbosity_level: Optional[int]) -> None:
     match verbosity_level:
@@ -59,12 +61,15 @@ def cli(verbose: int, log_file: str, settings_path_string: str):
 
     settings_path = Path(settings_path_string)
     logging.info(f"Loading settings at {settings_path}")
-    if settings.load_and_verify_settings(settings_path) != settings.LoadSettingsResult.SUCCESS:
-        logging.info(f"Could not load settings successfully; attempting to fix it")
-        setup.initialize(settings_path)
-        sys.exit(0)
-    else:
-        settings.load_and_verify_settings(settings_path)
+    match settings.load_and_verify_settings(settings_path):
+        case Success():
+            # Settings have been stored in global variable, just proceed
+            pass
+
+        case Failure():
+            logging.info(f"Could not load settings successfully; attempting to fix it")
+            setup.initialize(settings_path)
+            sys.exit(0)
 
 
 def process_command_line_arguments():
