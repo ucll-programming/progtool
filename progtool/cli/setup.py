@@ -10,7 +10,7 @@ import yaml
 
 import progtool.settings
 from progtool.constants import *
-from progtool.repository import find_repository_root
+from progtool.repository import InvalidIdentifierFile, MissingIdentifierFile, NoGitRepository, find_repository_root
 from progtool.settings import Settings
 
 
@@ -71,13 +71,38 @@ def initialize_repository_root(settings_file_path: Path, settings: Settings) -> 
     if settings.repository_root is None:
         current_directory = Path.cwd()
         logging.debug(f'No repository root set in settings file; looking for it starting in current directory {current_directory}')
-        root_path = find_repository_root(current_directory)
+        try:
+            root_path = find_repository_root(current_directory)
+        except NoGitRepository:
+            logging.critical("\n".join([
+                f'There is no Git repository at {current_directory}',
+                f'I also looked in all parent directories and found nothing',
+                f'Make sure you have *cloned* the repository, not merely downloaded it',
+                f"{COURSE_MATERIAL_DOCUMENTATION_URL}/troubleshooting/no-git-repository.html"
+            ]))
+            sys.exit(ERROR_CODE_NO_GIT_REPOSITORY)
+        except MissingIdentifierFile:
+            logging.critical("\n".join([
+                f'Could not find identifier file {IDENTIFIER_FILE}',
+                f"This either means you have removed it or that you're running this script in the wrong repository",
+                f"Make sure to run it inside the course material repository",
+                f"{COURSE_MATERIAL_DOCUMENTATION_URL}/troubleshooting/missing-identifier-file.html"
+            ]))
+            sys.exit(ERROR_CODE_MISSING_IDENTIFIER_FILE)
+        except InvalidIdentifierFile:
+            logging.critical("\n".join([
+                f"The identifier file has the wrong contents",
+                f"This is very surprising and really shouldn't happen."
+                f"{COURSE_MATERIAL_DOCUMENTATION_URL}/troubleshooting/wrong-identifier-file-contents.html"
+            ]))
+            sys.exit(ERROR_CODE_WRONG_IDENTIFIER_CONTENTS)
+
         logging.debug(f'Updating settings file with repository root')
         settings.repository_root = root_path
         progtool.settings.write_settings_file(settings=settings, path=settings_file_path)
         logging.info('Found repository root and updated settings')
     else:
-        logging.info('Root repository setting exists; leaving it at that')
+        logging.info('Root repository setting exists')
 
 
 def load_existing_or_create_default_settings_file(path: Path) -> Settings:

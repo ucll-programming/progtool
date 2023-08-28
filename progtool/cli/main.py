@@ -64,6 +64,7 @@ def cli(verbose: int, log_file: str, settings_path_string: str):
     try:
         settings.load_and_verify_settings(settings_path)
     except settings.SettingsException as e:
+        print("Things are not set up correctly. Trying to fix that now...")
         logging.info(f"Could not load settings successfully ({str(e)}); attempting to fix it")
         setup.initialize(settings_path)
         sys.exit(0)

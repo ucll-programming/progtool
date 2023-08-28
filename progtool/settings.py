@@ -7,8 +7,7 @@ from typing import Annotated, Optional
 import yaml
 import pydantic
 
-from progtool.repository import RepositoryIdentifierResult, check_repository_identifier
-from progtool.result import Result, Failure, Success
+from progtool.repository import InvalidIdentifierFile, MissingIdentifierFile, check_repository_identifier
 
 SerializableFilePath = Annotated[pydantic.FilePath, pydantic.PlainSerializer(lambda path: str(path), return_type=str, when_used='always')]
 SerializableDirectoryPath = Annotated[pydantic.DirectoryPath, pydantic.PlainSerializer(lambda path: str(path), return_type=str, when_used='always')]
@@ -77,7 +76,6 @@ def load_settings(path: Path) -> Settings:
 
 class SettingsException(Exception, abc.ABC):
     pass
-
 
 class MissingSettingsFile(SettingsException):
     def __init__(self, path: Path):
@@ -159,8 +157,10 @@ def load_and_verify_settings(path: Path) -> None:
         raise MissingRepositoryRootSetting()
 
     logging.debug('Checking validity of repository root')
-    if check_repository_identifier(_settings.repository_root) != RepositoryIdentifierResult.SUCCESS:
-        logging.debug(f'Repository root {_settings.repository_root} is not a valid repository')
+    try:
+        check_repository_identifier(_settings.repository_root)
+    except (MissingIdentifierFile, InvalidIdentifierFile) as e:
+        logging.debug(f'Repository root {_settings.repository_root} is not a valid repository: {str(e)}')
         raise InvalidRepositoryRoot(_settings.repository_root)
 
 
