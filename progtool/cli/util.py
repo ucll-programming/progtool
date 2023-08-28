@@ -14,14 +14,15 @@ from progtool.constants import ERROR_CODE_FAILED_TO_INITIALIZE
 
 
 @click.pass_context
-def needs_settings(context: click.Context):
+def needs_settings(ctx: click.Context):
     """
     Loads and verifies settings.
     If settings are missing, tries to fix them.
     Performs sys.exit on error.
     Meant to be used as first line in click commands that needs settings to be correct.
     """
-    settings_path: Path = context.obj['settings_path']
+    ctx.ensure_object(dict)
+    settings_path: Path = ctx.obj['settings_path']
 
     logging.info(f"Loading settings at {settings_path}")
     try:

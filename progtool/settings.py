@@ -9,9 +9,9 @@ import pydantic
 
 from progtool.repository import InvalidIdentifierFile, MissingIdentifierFile, check_repository_identifier
 
+
 SerializableFilePath = Annotated[pydantic.FilePath, pydantic.PlainSerializer(lambda path: str(path), return_type=str, when_used='always')]
 SerializableDirectoryPath = Annotated[pydantic.DirectoryPath, pydantic.PlainSerializer(lambda path: str(path), return_type=str, when_used='always')]
-
 
 class Settings(pydantic.BaseModel):
     language_priorities: list[str]

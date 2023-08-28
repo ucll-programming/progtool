@@ -11,6 +11,7 @@ from progtool.cli.create import create
 from progtool.cli.index import index
 from progtool.cli.server import server
 from progtool.cli.tree import tree
+from progtool.cli.html import html
 from progtool import constants, settings
 
 import os
@@ -56,7 +57,8 @@ def _configure_logging(*, verbosity_level: Optional[int], log_file: Optional[str
 @click.pass_context
 def cli(ctx: click.Context, verbose: int, log_file: str, settings_path_string: str):
     _configure_logging(verbosity_level=verbose, log_file=log_file)
-    ctx.obj = { 'settings_path': Path(settings_path_string) }
+    ctx.ensure_object(dict)
+    ctx.obj['settings_path'] = Path(settings_path_string)
 
 
 def process_command_line_arguments():
@@ -66,6 +68,7 @@ def process_command_line_arguments():
         index,
         create,
         check,
+        html,
     ]
 
     for command in commands:
