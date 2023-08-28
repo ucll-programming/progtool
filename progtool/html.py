@@ -77,7 +77,13 @@ def fetch_list_of_releases() -> list[Release]:
     def decode(release_data) -> Release:
         title = release_data.title
         version = parse_release_version_string(title)
-        url = release_data.assets[0].browser_download_url
+        assets = release_data.assets
+
+        if len(assets) != 1:
+            raise WrongNumberOfAssets(version, len(assets))
+
+        asset = assets[0]
+        url = asset.browser_download_url
         return Release(version, url)
 
     logging.info('Looking for latest version of index.html on GitHub')
@@ -160,3 +166,8 @@ class NoVersionMetaElementFound(HtmlException):
 class InvalidVersionString(HtmlException):
     def __init__(self, faulty_string: str):
         super().__init__(f"Could not parse {faulty_string} as version string")
+
+
+class WrongNumberOfAssets(HtmlException):
+    def __init__(self, release_version: Version, asset_count: int):
+        super().__init__(f"Release {release_version} has unexpected number of assets ({asset_count})")
