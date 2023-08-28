@@ -1,7 +1,9 @@
+from collections import namedtuple
 import logging
 from pathlib import Path
 import re
 import sys
+from typing import NamedTuple
 from urllib.request import urlretrieve
 
 import github
@@ -56,7 +58,44 @@ def find_url_of_latest_html() -> str:
     return url
 
 
-def parse_release_version_string(title: str) -> tuple[int, int, int]:
+Version = tuple[int, int, int]
+
+class Release(NamedTuple):
+    version: Version
+    url: str
+
+
+def fetch_list_of_releases() -> list[Release]:
+    def get_organization():
+        logging.debug(f'Looking for organization named {GITHUB_ORGANIZATION_NAME}')
+        try:
+            return gh.get_organization(GITHUB_ORGANIZATION_NAME)
+        except Exception as e:
+            logging.critical(f'An error occurred trying to find the GitHub organization {GITHUB_ORGANIZATION_NAME}: {e}')
+            sys.exit(ERROR_CODE_GITHUB_ORGANIZATION_NOT_FOUND)
+
+    def decode(release_data) -> Release:
+        title = release_data.title
+        version = parse_release_version_string(title)
+        url = release_data.assets[0].browser_download_url
+        return Release(version, url)
+
+    logging.info('Looking for latest version of index.html on GitHub')
+    logging.debug('Creating GitHub instance')
+    gh = github.Github()
+
+    organization = get_organization()
+
+    logging.debug(f'Looking for repository named {GITHUB_FRONTEND_REPOSITORY_NAME}')
+    repository = organization.get_repo(GITHUB_FRONTEND_REPOSITORY_NAME)
+
+    logging.debug(f'Fetching list of releases')
+    releases = repository.get_releases()
+
+    return [decode(release) for release in releases]
+
+
+def parse_release_version_string(title: str) -> Version:
     regex = r'v(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)'
     if match := re.fullmatch(regex, title):
         groups = match.groupdict()
