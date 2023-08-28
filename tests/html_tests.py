@@ -1,5 +1,5 @@
 import pytest
-from progtool.cli.setup import parse_release_title
+from progtool.html import parse_release_title
 
 
 @pytest.mark.parametrize('title, expected', [
