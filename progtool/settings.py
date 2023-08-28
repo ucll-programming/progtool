@@ -1,3 +1,4 @@
+import abc
 from enum import Enum, auto
 import logging
 import os
@@ -74,18 +75,44 @@ def load_settings(path: Path) -> Settings:
     return Settings.model_validate(raw_data)
 
 
-class LoadSettingsError(Enum):
-    MISSING_SETTINGS_FILE = auto()
-    SETTINGS_FILE_UNPARSABLE = auto()
-    MISSING_HTML_SETTING = auto()
-    MISSING_HTML_FILE = auto()
-    MISSING_JUDGMENT_CACHE_SETTING = auto()
-    MISSING_JUDGMENT_CACHE_FILE = auto()
-    MISSING_REPOSITORY_ROOT_SETTING = auto()
-    INVALID_REPOSITORY_ROOT = auto()
+class SettingsException(Exception, abc.ABC):
+    pass
 
 
-def load_and_verify_settings(path: Path) -> Result[None, LoadSettingsError]:
+class MissingSettingsFile(SettingsException):
+    def __init__(self, path: Path):
+        super().__init__(f'Missing settings file at {path}')
+
+class UnparseableSettingsFile(SettingsException):
+    def __init__(self, path: Path):
+        super().__init__(f'Could not parse file {path}')
+
+class MissingHtmlSetting(SettingsException):
+    def __init__(self):
+        super().__init__(f'Missing html path setting in settings file')
+
+class MissingHtmlFile(SettingsException):
+    def __init__(self, path: Path):
+        super().__init__(f'No file found at {path}')
+
+class MissingJudgmentCacheSetting(SettingsException):
+    def __init__(self):
+        super().__init__(f'Missing judgment cache setting')
+
+class MissingJudgmentCacheFile(SettingsException):
+    def __init__(self, path: Path):
+        super().__init__(f'No file found at {path}')
+
+class MissingRepositoryRootSetting(SettingsException):
+    def __init__(self):
+        super().__init__(f'Missing repository root setting')
+
+class InvalidRepositoryRoot(SettingsException):
+    def __init__(self, path: Path):
+        super().__init__(f'Invalid repository root {path}')
+
+
+def load_and_verify_settings(path: Path) -> None:
     global _settings
 
     logging.info(f"Loading settings from {path}")
@@ -93,7 +120,7 @@ def load_and_verify_settings(path: Path) -> Result[None, LoadSettingsError]:
     logging.debug(f'Checking if {path} exists')
     if not path.is_file():
         logging.info(f'File {path} does not exist')
-        return Failure(LoadSettingsError.MISSING_SETTINGS_FILE)
+        raise MissingSettingsFile(path)
 
     try:
         with open(path) as file:
@@ -101,7 +128,7 @@ def load_and_verify_settings(path: Path) -> Result[None, LoadSettingsError]:
             raw_data = yaml.safe_load(file)
     except Exception:
         logging.info(f'Failed to parse file {path}')
-        return Failure(LoadSettingsError.SETTINGS_FILE_UNPARSABLE)
+        raise UnparseableSettingsFile(path)
 
     logging.debug('Validating contents of settings file')
     _settings = Settings.model_validate(raw_data)
@@ -109,34 +136,32 @@ def load_and_verify_settings(path: Path) -> Result[None, LoadSettingsError]:
     logging.debug('Checking if html_path is set')
     if _settings.html_path is None:
         logging.info(f'No html path set in {path}')
-        return Failure(LoadSettingsError.MISSING_HTML_SETTING)
+        raise MissingHtmlSetting()
 
     logging.debug('Checking if html file exists')
     if not _settings.html_path.is_file():
         logging.info(f'File {_settings.html_path} does not exist')
-        return Failure(LoadSettingsError.MISSING_HTML_FILE)
+        raise MissingHtmlFile(_settings.html_path)
 
     logging.debug('Checking if judgment cache is set')
     if _settings.judgment_cache is None:
         logging.info(f'No judgment cache is set in {path}')
-        return Failure(LoadSettingsError.MISSING_JUDGMENT_CACHE_SETTING)
+        raise MissingJudgmentCacheSetting()
 
     logging.debug('Checking if judgment cache exists')
     if not _settings.judgment_cache.is_file():
         logging.info(f'Judgment cache {_settings.judgment_cache} does not exist')
-        return Failure(LoadSettingsError.MISSING_JUDGMENT_CACHE_FILE)
+        raise MissingJudgmentCacheFile(_settings.judgment_cache)
 
     logging.debug('Checking if repository root is set')
     if _settings.repository_root is None:
         logging.info('Repository root not set')
-        return Failure(LoadSettingsError.MISSING_REPOSITORY_ROOT_SETTING)
+        raise MissingRepositoryRootSetting()
 
     logging.debug('Checking validity of repository root')
     if check_repository_identifier(_settings.repository_root) != RepositoryIdentifierResult.SUCCESS:
         logging.debug(f'Repository root {_settings.repository_root} is not a valid repository')
-        return Failure(LoadSettingsError.INVALID_REPOSITORY_ROOT)
-
-    return Success(None)
+        raise InvalidRepositoryRoot(_settings.repository_root)
 
 
 def get_settings() -> Settings:
