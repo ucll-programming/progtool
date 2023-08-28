@@ -7,18 +7,63 @@ import re
 
 from urllib.request import urlretrieve
 from progtool.constants import *
-from progtool import settings
+import progtool.settings
+from progtool.settings import Settings
 
 
-def initialize(config_file_path: Path):
-    repository_root = find_repository_root()
-    settings = create_settings_file(config_file_path, repository_root)
-    download_html(settings.html_path)
+def initialize(settings_file_path: Path):
+    settings = load_existing_or_create_default_settings_file(settings_file_path)
+    initialize_repository_root(settings_file_path, settings)
+    initialize_html_path(settings_file_path, settings)
 
 
-def find_repository_root() -> Path:
-    logging.info('Looking for git repository root')
-    repo = git.Repo('.', search_parent_directories=True)
+def initialize_html_path(settings_file_path: Path, settings: Settings) -> None:
+    logging.info('Initializing HTML path')
+    logging.debug('Checking if repository has HTML path setting')
+    if settings.html_path is None:
+        logging.debug('No HTML path set; updating settings with default path ')
+        settings.html_path = progtool.settings.default_html_path()
+        progtool.settings.write_settings_file(settings=settings, path=settings_file_path)
+        logging.debug(f'HTML path set to {settings.html_path}')
+    html_path: Path = settings.html_path
+    logging.debug(f'Checking if HTML path {settings.html_path} points to existing file')
+    if not html_path.is_file():
+        logging.debug(f'No file found with path {settings.html_path}; downloading it')
+        download_html(html_path)
+    logging.info(f'HTML file ready at {html_path}')
+
+
+
+def initialize_repository_root(settings_file_path: Path, settings: Settings) -> None:
+    logging.info('Initializing repository root')
+    logging.debug('Checking if repository root setting exists')
+    if settings.repository_root is None:
+        current_directory = Path.cwd()
+        logging.debug(f'No repository root set in settings file; looking for it starting in current directory {current_directory}')
+        root_path = find_repository_root(current_directory)
+        logging.debug(f'Updating settings file with repository root')
+        settings.repository_root = root_path
+        progtool.settings.write_settings_file(settings=settings, path=settings_file_path)
+        logging.info('Found repository root and updated settings')
+    else:
+        logging.info('Root repository setting exists; leaving it at that')
+
+
+def load_existing_or_create_default_settings_file(path: Path) -> Settings:
+    logging.info(f'Looking for existing settings file at {path}')
+    if not path.is_file():
+        logging.info(f'No settings file found at {path}; creating one with default settings')
+        settings: Settings = progtool.settings.create_default_settings()
+        progtool.settings.write_settings_file(settings=settings, path=path)
+    else:
+        logging.info(f'Found existing settings file at {path}')
+        settings = progtool.settings.load_settings(path)
+    return settings
+
+
+def find_repository_root(directory: Path) -> Path:
+    logging.info('Looking for git repository root starting in {directory}')
+    repo = git.Repo(str(directory), search_parent_directories=True)
 
     logging.debug('Found a repository; getting root directory')
     root = Path(repo.git.rev_parse("--show-toplevel")).absolute()
@@ -51,10 +96,10 @@ def find_repository_root() -> Path:
     return root
 
 
-def create_settings_file(settings_file_path: Path, repository_root: Path) -> settings.Settings:
-    settings_data = settings.create_default_settings(repository_root)
-    settings.write_settings_file(settings_data, settings_file_path)
-    return settings_data
+# def create_settings_file(settings_file_path: Path, repository_root: Path) -> Settings:
+#     settings = progtool.settings.create_default_settings(repository_root)
+#     progtool.settings.write_settings_file(settings, settings_file_path)
+#     return settings
 
 
 def download_html(target: Path):

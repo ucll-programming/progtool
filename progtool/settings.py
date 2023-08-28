@@ -5,13 +5,15 @@ from typing import Annotated, Optional
 import yaml
 import pydantic
 
-# Annotated[Path, pydantic.PlainSerializer(str, return_type=str)]
+SerializableFilePath = Annotated[pydantic.FilePath, pydantic.PlainSerializer(lambda path: str(path), return_type=str, when_used='always')]
+SerializableDirectoryPath = Annotated[pydantic.FilePath, pydantic.PlainSerializer(lambda path: str(path), return_type=str, when_used='always')]
+
 
 class Settings(pydantic.BaseModel):
     language_priorities: list[str]
-    html_path: Annotated[Path, pydantic.PlainSerializer(lambda path: str(path), return_type=str, when_used='always')]
-    repository_root: Annotated[Path, pydantic.PlainSerializer(lambda path: str(path), return_type=str, when_used='always')]
-    judgment_cache: Annotated[Path, pydantic.PlainSerializer(lambda path: str(path), return_type=str, when_used='always')]
+    html_path: Optional[SerializableFilePath]
+    repository_root: Optional[SerializableDirectoryPath]
+    judgment_cache: Optional[SerializableFilePath]
     cache_delay: float
 
     # @pydantic.field_serializer()
@@ -36,30 +38,30 @@ def default_html_path() -> Path:
     return default_storage_path() / "progtool-index.html"
 
 
-def create_default_settings(repository_root: Path) -> Settings:
+def create_default_settings() -> Settings:
     return Settings(
         cache_delay=5,
-        html_path=default_html_path(),
-        judgment_cache=default_judgment_cache_path(),
+        html_path=None,
+        judgment_cache=None,
         language_priorities=['en', 'nl'],
-        repository_root=repository_root,
+        repository_root=None,
     )
 
 
-def write_settings_file(settings: Settings, target: Path) -> None:
-    logging.info(f"Writing settings file at {target}")
+def write_settings_file(*, settings: Settings, path: Path) -> None:
+    logging.info(f"Writing settings file at {path}")
 
-    parent = target.parent
+    parent = path.parent
     logging.debug(f'Checking if parent directory {parent} exists')
     if not parent.is_dir():
         logging.debug(f'Parent directory {parent} does not exist; creating it now')
-        target.parent.mkdir(parents=True)
+        path.parent.mkdir(parents=True)
         logging.debug(f'Creating directory {parent}')
 
-    logging.debug(f'Writing to {target}')
-    with target.open('w') as file:
+    logging.debug(f'Writing to {path}')
+    with path.open('w') as file:
         yaml.dump(settings.model_dump(), file)
-    logging.debug(f'Finished writing to {target}')
+    logging.debug(f'Finished writing to {path}')
 
 
 def load_settings(path: Path):
