@@ -74,8 +74,7 @@ def load_settings(path: Path) -> Settings:
     return Settings.model_validate(raw_data)
 
 
-class LoadSettingsResult(Enum):
-    SUCCESS = auto()
+class LoadSettingsError(Enum):
     MISSING_SETTINGS_FILE = auto()
     SETTINGS_FILE_UNPARSABLE = auto()
     MISSING_HTML_SETTING = auto()
@@ -86,7 +85,7 @@ class LoadSettingsResult(Enum):
     INVALID_REPOSITORY_ROOT = auto()
 
 
-def load_and_verify_settings(path: Path) -> Result[None, LoadSettingsResult]:
+def load_and_verify_settings(path: Path) -> Result[None, LoadSettingsError]:
     global _settings
 
     logging.info(f"Loading settings from {path}")
@@ -94,7 +93,7 @@ def load_and_verify_settings(path: Path) -> Result[None, LoadSettingsResult]:
     logging.debug(f'Checking if {path} exists')
     if not path.is_file():
         logging.info(f'File {path} does not exist')
-        return Failure(LoadSettingsResult.MISSING_SETTINGS_FILE)
+        return Failure(LoadSettingsError.MISSING_SETTINGS_FILE)
 
     try:
         with open(path) as file:
@@ -102,7 +101,7 @@ def load_and_verify_settings(path: Path) -> Result[None, LoadSettingsResult]:
             raw_data = yaml.safe_load(file)
     except Exception:
         logging.info(f'Failed to parse file {path}')
-        return Failure(LoadSettingsResult.SETTINGS_FILE_UNPARSABLE)
+        return Failure(LoadSettingsError.SETTINGS_FILE_UNPARSABLE)
 
     logging.debug('Validating contents of settings file')
     _settings = Settings.model_validate(raw_data)
@@ -110,32 +109,32 @@ def load_and_verify_settings(path: Path) -> Result[None, LoadSettingsResult]:
     logging.debug('Checking if html_path is set')
     if _settings.html_path is None:
         logging.info(f'No html path set in {path}')
-        return Failure(LoadSettingsResult.MISSING_HTML_SETTING)
+        return Failure(LoadSettingsError.MISSING_HTML_SETTING)
 
     logging.debug('Checking if html file exists')
     if not _settings.html_path.is_file():
         logging.info(f'File {_settings.html_path} does not exist')
-        return Failure(LoadSettingsResult.MISSING_HTML_FILE)
+        return Failure(LoadSettingsError.MISSING_HTML_FILE)
 
     logging.debug('Checking if judgment cache is set')
     if _settings.judgment_cache is None:
         logging.info(f'No judgment cache is set in {path}')
-        return Failure(LoadSettingsResult.MISSING_JUDGMENT_CACHE_SETTING)
+        return Failure(LoadSettingsError.MISSING_JUDGMENT_CACHE_SETTING)
 
     logging.debug('Checking if judgment cache exists')
     if not _settings.judgment_cache.is_file():
         logging.info(f'Judgment cache {_settings.judgment_cache} does not exist')
-        return Failure(LoadSettingsResult.MISSING_JUDGMENT_CACHE_FILE)
+        return Failure(LoadSettingsError.MISSING_JUDGMENT_CACHE_FILE)
 
     logging.debug('Checking if repository root is set')
     if _settings.repository_root is None:
         logging.info('Repository root not set')
-        return Failure(LoadSettingsResult.MISSING_REPOSITORY_ROOT_SETTING)
+        return Failure(LoadSettingsError.MISSING_REPOSITORY_ROOT_SETTING)
 
     logging.debug('Checking validity of repository root')
     if check_repository_identifier(_settings.repository_root) != RepositoryIdentifierResult.SUCCESS:
         logging.debug(f'Repository root {_settings.repository_root} is not a valid repository')
-        return Failure(LoadSettingsResult.INVALID_REPOSITORY_ROOT)
+        return Failure(LoadSettingsError.INVALID_REPOSITORY_ROOT)
 
     return Success(None)
 
