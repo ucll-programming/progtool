@@ -10,6 +10,7 @@ from progtool.cli.check import check
 from progtool.cli.create import create
 from progtool.cli.index import index
 from progtool.cli.server import server
+from progtool.cli.settings import load_settings
 from progtool.cli.tree import tree
 from progtool import constants, settings
 
@@ -56,18 +57,10 @@ def _configure_logging(*, verbosity_level: Optional[int], log_file: Optional[str
 @click.option('-v', '--verbose', count=True)
 @click.option('--log-file', default=None)
 @click.option('--settings', "settings_path_string", default=lambda: os.environ.get(constants.SETTINGS_FILE_ENVIRONMENT_VARIABLE, str(settings.default_settings_path())))
-def cli(verbose: int, log_file: str, settings_path_string: str):
+@click.pass_context
+def cli(ctx: click.Context, verbose: int, log_file: str, settings_path_string: str):
     _configure_logging(verbosity_level=verbose, log_file=log_file)
-
-    settings_path = Path(settings_path_string)
-    logging.info(f"Loading settings at {settings_path}")
-    try:
-        settings.load_and_verify_settings(settings_path)
-    except settings.SettingsException as e:
-        print("Things are not set up correctly. Trying to fix that now...")
-        logging.info(f"Could not load settings successfully ({str(e)}); attempting to fix it")
-        setup.initialize(settings_path)
-        sys.exit(0)
+    load_settings(ctx)
 
 
 def process_command_line_arguments():
