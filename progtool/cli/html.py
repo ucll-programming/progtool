@@ -11,6 +11,7 @@ from progtool.content.metadata import (filter_by_tags, load_everything,
 from progtool.content.tree import (ContentNode, Exercise, Explanation, Section,
                                    build_tree)
 from progtool import settings
+from progtool.html import determine_version
 
 
 @click.group()
@@ -27,11 +28,15 @@ def path():
     Show path of html file.
     """
     needs_settings()
-    print(settings.get_settings().html_path)
+    print(settings.html_path())
 
 
-# @html.command()
-# def version():
-#     """
-#     Determine version of local html file.
-#     """
+@html.command()
+def version():
+    """
+    Determine version of local html file.
+    """
+    needs_settings()
+    path = settings.html_path()
+    version = determine_version(path)
+    print(".".join(str(number) for number in version))

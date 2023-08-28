@@ -1,5 +1,5 @@
 import pytest
-from progtool.html import parse_release_title
+from progtool.html import parse_release_version_string
 
 
 @pytest.mark.parametrize('title, expected', [
@@ -9,5 +9,5 @@ from progtool.html import parse_release_title
     for patch in [0, 1, 8, 23]
 ])
 def test_parse_release_title(title, expected):
-    actual = parse_release_title(title)
+    actual = parse_release_version_string(title)
     assert expected == actual

@@ -56,7 +56,7 @@ def find_url_of_latest_html() -> str:
     return url
 
 
-def parse_release_title(title: str) -> tuple[int, int, int]:
+def parse_release_version_string(title: str) -> tuple[int, int, int]:
     regex = r'v(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)'
     if match := re.fullmatch(regex, title):
         groups = match.groupdict()
@@ -65,13 +65,17 @@ def parse_release_title(title: str) -> tuple[int, int, int]:
         patch = int(groups['patch'])
         return (major, minor, patch)
     else:
-        raise ValueError(f'Could not parse release title {title}; expected vN.N.N')
+        raise InvalidVersionString(f'Could not parse release title {title}; expected vN.N.N')
+
+
+def parse_html_version_string(version_string: str) -> tuple[int, int, int]:
+    return parse_release_version_string(f'v{version_string}')
 
 
 # Using indices is roundabout way to not lose static typing
 def find_index_of_latest_release(releases) -> int:
     def release_version(index):
-        return parse_release_title(releases[index].title)
+        return parse_release_version_string(releases[index].title)
 
     return max(range(len(releases)), key=release_version)
 
@@ -84,3 +88,36 @@ def download_html(target: Path):
 def download_file_to(url: str, target: Path) -> None:
     logging.info(f'Downloading {url} to {target}')
     urlretrieve(url, str(target))
+
+
+def determine_version(html_path: Path) -> tuple[int, int, int]:
+    logging.info(f'Determining version of html at {html_path}')
+    if not html_path.is_file():
+        logging.info(f'No file at {html_path}')
+        raise RuntimeError()
+
+    logging.debug(f'Reading content of {html_path}')
+    html_source = html_path.read_text(encoding='utf-8')
+    version_string = find_version_meta_element_in_html_source(html_source)
+    return parse_html_version_string(version_string)
+
+
+def find_version_meta_element_in_html_source(html_source: str) -> str:
+    regex = r'<meta\s+name="version"\s+content="(.*?)">'
+    if not (match := re.search(regex, html_source)):
+        raise NoVersionMetaElementFound()
+    return match.group(1)
+
+
+class HtmlException(Exception):
+    pass
+
+
+class NoVersionMetaElementFound(HtmlException):
+    def __init__(self):
+        super().__init__("Could not find version meta tag in HTML file")
+
+
+class InvalidVersionString(HtmlException):
+    def __init__(self, faulty_string: str):
+        super().__init__(f"Could not parse {faulty_string} as version string")
