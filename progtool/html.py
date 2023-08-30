@@ -2,7 +2,6 @@ import logging
 from operator import attrgetter
 from pathlib import Path
 import re
-import sys
 from typing import NamedTuple
 from urllib.request import urlretrieve
 
