@@ -9,7 +9,7 @@ import github
 
 from progtool.constants import *
 from progtool.version import Version
-import  progtool.settings as settings
+import progtool.settings as settings
 
 
 class Release(NamedTuple):
