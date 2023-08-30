@@ -62,9 +62,9 @@ def download_latest_html(target: Path) -> None:
     download_file_to(latest_release.url, target)
 
 
-def download_file_to(url: str, target: Path) -> None:
-    logging.info(f'Downloading {url} to {target}')
-    urlretrieve(url, str(target))
+def download_file_to(url: str, destination_path: Path) -> None:
+    logging.info(f'Downloading {url} to {destination_path}')
+    urlretrieve(url, str(destination_path))
 
 
 def determine_local_html_version(html_path: Path) -> Version:
