@@ -10,6 +10,7 @@ import github
 
 from progtool.constants import *
 from progtool.version import Version
+import  progtool.settings as settings
 
 
 class Release(NamedTuple):
@@ -67,7 +68,7 @@ def download_file_to(url: str, target: Path) -> None:
     urlretrieve(url, str(target))
 
 
-def determine_html_version(html_path: Path) -> Version:
+def determine_local_html_version(html_path: Path) -> Version:
     logging.info(f'Determining version of html at {html_path}')
     if not html_path.is_file():
         logging.info(f'No file at {html_path}')
@@ -84,6 +85,13 @@ def find_version_meta_element_in_html_source(html_source: str) -> str:
     if not (match := re.search(regex, html_source)):
         raise NoVersionMetaElementFound()
     return match.group(1)
+
+
+def new_html_version_available() -> bool:
+    html_path = settings.html_path()
+    local_version = determine_local_html_version(html_path)
+    newest_version = find_latest_release().version
+    return local_version < newest_version
 
 
 class HtmlException(Exception):

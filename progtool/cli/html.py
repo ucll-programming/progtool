@@ -5,7 +5,7 @@ from progtool.cli.util import needs_settings
 
 from progtool import settings
 from progtool.constants import COURSE_MATERIAL_DOCUMENTATION_URL, GITHUB_ORGANIZATION_NAME
-from progtool.html import GitHubOrganizationNotFound, determine_html_version, download_latest_html, fetch_list_of_releases, find_latest_release
+from progtool.html import GitHubOrganizationNotFound, determine_local_html_version, download_latest_html, fetch_list_of_releases, find_latest_release
 
 from rich.console import Console
 from rich.table import Table
@@ -34,7 +34,7 @@ def version():
     Determine version of local html file.
     """
     needs_settings()
-    version = determine_html_version(settings.html_path())
+    version = determine_local_html_version(settings.html_path())
     print(version)
 
 
@@ -70,7 +70,7 @@ def update():
     """
     needs_settings()
 
-    current_version = determine_html_version(settings.html_path())
+    current_version = determine_local_html_version(settings.html_path())
     latest_release = find_latest_release()
 
     print(f'Currently installed version: {current_version}')
