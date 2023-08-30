@@ -45,6 +45,12 @@ class Theme:
     def url(self) -> str:
         return self.__url
 
+    def __str__(self) -> str:
+        return f'Theme {self.name}'
+
+    def __repr__(self) -> str:
+        return f'Theme({self.name!r}, {self.url!r})'
+
 
 def fetch_themes() -> list[Theme]:
     gh = github.Github()
@@ -53,7 +59,7 @@ def fetch_themes() -> list[Theme]:
     branch = repository.get_branch('master')
     files = branch.commit.files
     return [
-        Theme(file.filename.rstrip('.scss'), file.blob_url)
+        Theme(file.filename.rstrip('.scss'), file.raw_url)
         for file in files
         if file.filename.endswith('.scss')
     ]
@@ -62,10 +68,9 @@ def fetch_themes() -> list[Theme]:
 def find_theme(name: str) -> Theme:
     themes = fetch_themes()
     for theme in themes:
-        if theme == name:
+        if theme.name == name:
             return theme
     raise NoSuchTheme(name)
-
 
 
 class StylesException(Exception):
