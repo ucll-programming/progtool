@@ -5,3 +5,4 @@ from .html import html
 from .server import server
 from .tree import tree
 from .theme import theme
+from .cache import cache

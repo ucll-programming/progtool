@@ -64,6 +64,7 @@ def process_command_line_arguments():
         progtool.cli.html,
         progtool.cli.settings,
         progtool.cli.theme,
+        progtool.cli.cache,
     ]
 
     for command in commands:
