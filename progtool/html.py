@@ -23,8 +23,7 @@ def fetch_list_of_releases() -> list[Release]:
         try:
             return gh.get_organization(GITHUB_ORGANIZATION_NAME)
         except Exception as e:
-            logging.critical(f'An error occurred trying to find the GitHub organization {GITHUB_ORGANIZATION_NAME}: {e}')
-            sys.exit(ERROR_CODE_GITHUB_ORGANIZATION_NOT_FOUND)
+            raise GitHubOrganizationNotFound(GITHUB_ORGANIZATION_NAME)
 
     def decode(release_data) -> Release:
         title = release_data.title
@@ -104,3 +103,8 @@ class InvalidVersionString(HtmlException):
 class WrongNumberOfAssets(HtmlException):
     def __init__(self, release_version: Version, asset_count: int):
         super().__init__(f"Release {release_version} has unexpected number of assets ({asset_count})")
+
+
+class GitHubOrganizationNotFound(HtmlException):
+    def __init__(self, organization: str):
+        super().__init__(f"Could not find GitHub organization {organization}")

@@ -1,11 +1,11 @@
-from typing import cast
-
+import logging
 import click
 from rich.console import Console
 from progtool.cli.util import needs_settings
 
 from progtool import settings
-from progtool.html import determine_html_version, download_latest_html, fetch_list_of_releases, find_latest_release
+from progtool.constants import COURSE_MATERIAL_DOCUMENTATION_URL, GITHUB_ORGANIZATION_NAME
+from progtool.html import GitHubOrganizationNotFound, determine_html_version, download_latest_html, fetch_list_of_releases, find_latest_release
 
 from rich.console import Console
 from rich.table import Table
@@ -43,18 +43,24 @@ def available():
     """
     Looks online for which HTML versions are available.
     """
-    releases = fetch_list_of_releases()
-    releases.sort(key=lambda release: release.version, reverse=True)
+    try:
+        releases = fetch_list_of_releases()
+        releases.sort(key=lambda release: release.version, reverse=True)
 
-    console = Console()
-    table = Table()
-    table.add_column('Version')
-    table.add_column('URL')
+        console = Console()
+        table = Table()
+        table.add_column('Version')
+        table.add_column('URL')
 
-    for release in releases:
-        table.add_row(str(release.version), release.url)
+        for release in releases:
+            table.add_row(str(release.version), release.url)
 
-    console.print(table)
+        console.print(table)
+    except GitHubOrganizationNotFound:
+        logging.critical([
+            f'Could not find GitHub organization {GITHUB_ORGANIZATION_NAME}',
+            f'{COURSE_MATERIAL_DOCUMENTATION_URL}/missing-github-organization.html'
+        ])
 
 
 @html.command()
