@@ -4,14 +4,8 @@ from typing import Optional
 
 import click
 from rich.logging import RichHandler
-from progtool.cli import setup
 
-from progtool.cli.check import check
-from progtool.cli.create import create
-from progtool.cli.index import index
-from progtool.cli.server import server
-from progtool.cli.tree import tree
-from progtool.cli.html import html
+import progtool.cli
 from progtool import constants, settings
 
 import os
@@ -63,12 +57,13 @@ def cli(ctx: click.Context, verbose: int, log_file: str, settings_path_string: s
 
 def process_command_line_arguments():
     commands = [
-        tree,
-        server,
-        index,
-        create,
-        check,
-        html,
+        progtool.cli.tree,
+        progtool.cli.server,
+        progtool.cli.index,
+        progtool.cli.create,
+        progtool.cli.check,
+        progtool.cli.html,
+        progtool.cli.settings,
     ]
 
     for command in commands:

@@ -21,7 +21,6 @@ def needs_settings(ctx: click.Context):
     Performs sys.exit on error.
     Meant to be used as first line in click commands that needs settings to be correct.
     """
-    ctx.ensure_object(dict)
     settings_path: Path = ctx.obj['settings_path']
 
     logging.info(f"Loading settings at {settings_path}")
