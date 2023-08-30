@@ -1,15 +1,9 @@
-import logging
 from typing import cast
 
 import click
 from rich.console import Console
-from rich.tree import Tree
 from progtool.cli.util import needs_settings
 
-from progtool.content.metadata import (filter_by_tags, load_everything,
-                                       load_metadata)
-from progtool.content.tree import (ContentNode, Exercise, Explanation, Section,
-                                   build_tree)
 from progtool import settings
 from progtool.html import determine_html_version, download_latest_html, fetch_list_of_releases, find_latest_release
 
