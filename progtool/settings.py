@@ -40,6 +40,10 @@ def default_html_path() -> Path:
     return default_storage_path() / "progtool-index.html"
 
 
+def default_style_path() -> Path:
+    return default_storage_path() / "progtool-style.scss"
+
+
 def create_default_settings() -> Settings:
     return Settings(
         cache_delay=5,
