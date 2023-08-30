@@ -122,7 +122,7 @@ def rest_rejudge(node_path: str):
 
 @app.route('/styles.css')
 def stylesheet():
-    scss = pkg_resources.resource_string('progtool.styles', 'styles.scss')
+    scss = settings.get_settings().style_path.read_text()
     css = sass.compile(string=scss)
     return flask.Response(css, mimetype='text/css')
 
