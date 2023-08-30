@@ -57,9 +57,9 @@ def find_latest_release() -> Release:
     return max(releases, key=attrgetter('version'))
 
 
-def download_latest_html(target: Path) -> None:
+def download_latest_html(destination_path: Path) -> None:
     latest_release = find_latest_release()
-    download_file_to(latest_release.url, target)
+    download_file_to(latest_release.url, destination_path)
 
 
 def download_file_to(url: str, destination_path: Path) -> None:
