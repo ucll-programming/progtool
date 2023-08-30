@@ -15,6 +15,7 @@ SerializablePath = Annotated[Path, pydantic.PlainSerializer(lambda path: str(pat
 class Settings(pydantic.BaseModel):
     language_priorities: list[str]
     html_path: Optional[SerializablePath]
+    style_path: Optional[SerializablePath]
     repository_root: Optional[SerializablePath]
     judgment_cache: Optional[SerializablePath]
     cache_delay: float
@@ -43,6 +44,7 @@ def create_default_settings() -> Settings:
     return Settings(
         cache_delay=5,
         html_path=None,
+        style_path=None,
         judgment_cache=None,
         language_priorities=['en', 'nl'],
         repository_root=None,
@@ -99,6 +101,11 @@ def verify_settings(settings: Settings) -> None:
         logging.info(f'File {settings.html_path} does not exist')
         raise MissingHtmlFile(settings.html_path)
 
+    logging.debug('Checking if style path is set')
+    if settings.html_path is None:
+        logging.info(f'No html path set')
+        raise MissingStyleSetting()
+
     logging.debug('Checking if judgment cache is set')
     if settings.judgment_cache is None:
         logging.info(f'No judgment cache is set')
@@ -148,6 +155,13 @@ def html_path() -> Path:
     return path
 
 
+def style_path() -> Path:
+    path = get_settings().style_path
+    if path is None:
+        raise RuntimeError('Incomplete settings')
+    return path
+
+
 def repository_root() -> Path:
     root = get_settings().repository_root
     if root is None:
@@ -187,7 +201,15 @@ class MissingHtmlSetting(SettingsException):
 
 class MissingHtmlFile(SettingsException):
     def __init__(self, path: Path):
-        super().__init__(f'No file found at {path}')
+        super().__init__(f'No html file found at {path}')
+
+class MissingStyleSetting(SettingsException):
+    def __init__(self):
+        super().__init__(f'Missing style path setting in settings file')
+
+class MissingStyleFile(SettingsException):
+    def __init__(self, path: Path):
+        super().__init__(f'No style file found at {path}')
 
 class MissingJudgmentCacheSetting(SettingsException):
     def __init__(self):
@@ -204,7 +226,6 @@ class MissingRepositoryRootSetting(SettingsException):
 class InvalidRepositoryRoot(SettingsException):
     def __init__(self, path: Path):
         super().__init__(f'Invalid repository root {path}')
-
 
 class InvalidSettings(SettingsException):
     def __init__(self):

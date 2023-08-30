@@ -18,6 +18,7 @@ from progtool.server.content import Content, load_content
 from progtool.server.error import ServerError
 from progtool.server.protocols import find_protocol
 
+
 app = flask.Flask(__name__)
 
 _content: Optional[Content] = None
