@@ -12,5 +12,5 @@ def server():
     Set up server.
     """
     import progtool.server
-    needs_settings()  # type: ignore[call-arg]
+    needs_settings(autofix=True)  # type: ignore[call-arg]
     progtool.server.run()

@@ -1,6 +1,8 @@
 from pathlib import Path
 import click
 
+from progtool.cli.util import needs_settings
+
 
 @click.group()
 def settings() -> None:
@@ -18,3 +20,11 @@ def path(ctx: click.Context):
     """
     settings_path: Path = ctx.obj['settings_path']
     print(settings_path)
+
+
+@settings.command()
+def fix():
+    """
+    Show path of settings file.
+    """
+    needs_settings(autofix=True)

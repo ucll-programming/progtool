@@ -10,11 +10,11 @@ import click
 
 from progtool import settings
 from progtool.cli import setup
-from progtool.constants import ERROR_CODE_FAILED_TO_INITIALIZE
+from progtool.constants import ERROR_CODE_FAILED_TO_INITIALIZE, TOOL_NAME
 
 
 @click.pass_context
-def needs_settings(ctx: click.Context):
+def needs_settings(ctx: click.Context, autofix: bool=False):
     """
     Loads and verifies settings.
     If settings are missing, tries to fix them.
@@ -27,18 +27,25 @@ def needs_settings(ctx: click.Context):
     try:
         settings.load_and_verify_settings(settings_path)
     except settings.SettingsException as e:
-        print("Things are not set up correctly. Give me some time to fix that now...", file=sys.stderr)
-        logging.info(f"Could not load settings successfully ({str(e)}); attempting to fix it")
-        setup.initialize(settings_path)
-        print("I believe I have been able to configure everything correctly", file=sys.stderr)
-        try:
-            settings.load_and_verify_settings(settings_path)
-        except settings.SettingsException as e:
+        if autofix:
+            print("Things are not set up correctly. Give me some time to fix that now...", file=sys.stderr)
+            logging.info(f"Could not load settings successfully ({str(e)}); attempting to fix it")
+            setup.initialize(settings_path)
+            print("I believe I have been able to configure everything correctly", file=sys.stderr)
+            try:
+                settings.load_and_verify_settings(settings_path)
+            except settings.SettingsException as e:
+                logging.critical("\n".join([
+                    'It looks like I failed :-(',
+                    "I'm afraid you'll have to set things up manually",
+                    f"Error message: {str(e)}",
+                    "f'{COURSE_MATERIAL_DOCUMENTATION_URL}/troubleshooting/manual-setup.html'"
+                ]))
+                sys.exit(ERROR_CODE_FAILED_TO_INITIALIZE)
+        else:
             logging.critical("\n".join([
-                'It looks like I failed :-(',
-                "I'm afraid you'll have to set things up manually",
-                f"Error message: {str(e)}",
-                "f'{COURSE_MATERIAL_DOCUMENTATION_URL}/troubleshooting/manual-setup.html'"
+                "Failed to load settings",
+                f"You can try to fix them using {TOOL_NAME} settings fix",
             ]))
             sys.exit(ERROR_CODE_FAILED_TO_INITIALIZE)
 
