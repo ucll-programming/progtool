@@ -60,7 +60,6 @@ def process_command_line_arguments():
         progtool.cli.tree,
         progtool.cli.server,
         progtool.cli.index,
-        progtool.cli.create,
         progtool.cli.check,
         progtool.cli.html,
         progtool.cli.settings,
