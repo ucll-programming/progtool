@@ -57,10 +57,10 @@ def available():
 
         console.print(table)
     except GitHubOrganizationNotFound:
-        logging.critical([
+        logging.critical("\n".join([
             f'Could not find GitHub organization {GITHUB_ORGANIZATION_NAME}',
             f'{COURSE_MATERIAL_DOCUMENTATION_URL}/missing-github-organization.html'
-        ])
+        ]))
 
 
 @html.command()
