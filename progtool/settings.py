@@ -147,7 +147,7 @@ def load_and_verify_settings(path: Path) -> None:
 def get_settings() -> Settings:
     global _settings
     if _settings is None:
-        logging.critical('Bug: settings not loaded')
+        logging.critical('Bug: settings not loaded; needs_settings() should have been called')
         raise RuntimeError()
     else:
         return _settings
