@@ -14,10 +14,10 @@ SerializablePath = Annotated[Path, pydantic.PlainSerializer(lambda path: str(pat
 
 class Settings(pydantic.BaseModel):
     language_priorities: list[str]
-    html_path: Optional[SerializablePath]
-    style_path: Optional[SerializablePath]
-    repository_root: Optional[SerializablePath]
-    judgment_cache: Optional[SerializablePath]
+    html_path: Optional[SerializablePath] = None
+    style_path: Optional[SerializablePath] = None
+    repository_root: Optional[SerializablePath] = None
+    judgment_cache: Optional[SerializablePath] = None
     cache_delay: float
 
 
@@ -90,8 +90,8 @@ def load_settings(path: Path) -> Settings:
     logging.debug('Validating contents of settings file')
     try:
         return Settings.model_validate(raw_data)
-    except Exception:
-        raise InvalidSettings()
+    except Exception as e:
+        raise InvalidSettings(e)
 
 
 def verify_settings(settings: Settings) -> None:
@@ -102,13 +102,18 @@ def verify_settings(settings: Settings) -> None:
 
     logging.debug('Checking if html file exists')
     if not settings.html_path.is_file():
-        logging.info(f'File {settings.html_path} does not exist')
+        logging.info(f'HTML file {settings.html_path} does not exist')
         raise MissingHtmlFile(settings.html_path)
 
     logging.debug('Checking if style path is set')
-    if settings.html_path is None:
-        logging.info(f'No html path set')
+    if settings.style_path is None:
+        logging.info(f'No style path set')
         raise MissingStyleSetting()
+
+    logging.debug('Checking if style file exists')
+    if not settings.style_path.is_file():
+        logging.info(f'Style file {settings.style_path} does not exist')
+        raise MissingStyleFile(settings.style_path)
 
     logging.debug('Checking if judgment cache is set')
     if settings.judgment_cache is None:
@@ -232,5 +237,5 @@ class InvalidRepositoryRoot(SettingsException):
         super().__init__(f'Invalid repository root {path}')
 
 class InvalidSettings(SettingsException):
-    def __init__(self):
-        super().__init__(f'Settings file contained invalid entries')
+    def __init__(self, cause: Exception):
+        super().__init__(f'Settings file contained invalid entries: {cause}')

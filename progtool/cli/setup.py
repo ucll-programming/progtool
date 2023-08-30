@@ -10,12 +10,14 @@ import progtool.settings
 from progtool.constants import *
 from progtool.repository import InvalidIdentifierFile, MissingIdentifierFile, NoGitRepository, find_repository_root
 from progtool.settings import Settings
+from progtool.styles import download_default_style
 
 
 def initialize(settings_file_path: Path):
     settings = load_existing_or_create_default_settings_file(settings_file_path)
     initialize_repository_root(settings_file_path, settings)
     initialize_html_path(settings_file_path, settings)
+    initialize_style_path(settings_file_path, settings)
     initialize_judgment_cache_path(settings_file_path, settings)
 
 
@@ -53,9 +55,9 @@ def initialize_html_path(settings_file_path: Path, settings: Settings) -> None:
         updated_settings_file = False
     html_path: Path = settings.html_path
 
-    logging.debug(f'Checking if HTML path {settings.html_path} points to existing file')
+    logging.debug(f'Checking if HTML path {html_path} points to existing file')
     if not html_path.is_file():
-        logging.debug(f'No file found with path {settings.html_path}; downloading it')
+        logging.debug(f'No file found with path {html_path}; downloading it')
         download_latest_html(html_path)
 
     # Needs to be done separately in case downloading HTML file fails
@@ -63,6 +65,30 @@ def initialize_html_path(settings_file_path: Path, settings: Settings) -> None:
         logging.debug('Writing settings file')
         progtool.settings.write_settings_file(settings=settings, path=settings_file_path)
     logging.info(f'HTML file ready at {html_path}')
+
+
+def initialize_style_path(settings_file_path: Path, settings: Settings) -> None:
+    logging.info('Initializing style path')
+    logging.debug('Checking if style path is set')
+    if settings.style_path is None:
+        logging.debug('No style path set; updating settings with default path ')
+        settings.style_path = progtool.settings.default_style_path()
+        logging.debug(f'Style path set to {settings.style_path}')
+        updated_settings_file = True
+    else:
+        updated_settings_file = False
+    style_path: Path = settings.style_path
+
+    logging.debug(f'Checking if style path {style_path} points to existing file')
+    if not style_path.is_file():
+        logging.debug(f'No file found with path {style_path}; downloading it')
+        download_default_style(style_path)
+
+    # Needs to be done separately in case downloading HTML file fails
+    if updated_settings_file:
+        logging.debug('Writing settings file')
+        progtool.settings.write_settings_file(settings=settings, path=settings_file_path)
+    logging.info(f'Style file ready at {style_path}')
 
 
 def initialize_repository_root(settings_file_path: Path, settings: Settings) -> None:
