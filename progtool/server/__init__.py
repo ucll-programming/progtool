@@ -136,7 +136,7 @@ def find_node(tree_path: TreePath) -> ContentNode:
     return get_content().root.descend(tree_path)
 
 
-def run():
+def run(debug: bool = False):
     logging.info("Loading content")
     global _content
     _content = load_content()
@@ -152,6 +152,5 @@ def run():
     _judging_service = JudgingService(event_loop)
     _judging_service.judge_recursively(_content.root, only_unknown=True)
 
-    # TODO Turn off debug mode
     logging.info('Starting up Flask')
-    app.run(debug=True)
+    app.run(debug=debug)
