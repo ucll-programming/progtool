@@ -9,7 +9,7 @@ from typing import Optional
 import click
 
 from progtool import settings
-from progtool.cli import setup
+from progtool import setup
 from progtool.constants import ERROR_CODE_FAILED_TO_INITIALIZE, TOOL_NAME
 
 
