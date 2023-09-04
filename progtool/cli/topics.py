@@ -34,11 +34,11 @@ def overview():
             case Exercise():
                 exercise = cast(Exercise, node)
                 if topics := exercise.topics.introduces:
-                    table.add_row(exercise.name, ", ".join(exercise.topics.introduces))
+                    table.add_row(exercise.name, ", ".join(topics))
             case Explanation():
                 explanation = cast(Explanation, node)
                 if topics := explanation.topics.introduces:
-                    table.add_row(explanation.name, ", ".join(explanation.topics.introduces))
+                    table.add_row(explanation.name, ", ".join(topics))
             case _:
                 assert False, 'Unrecognized node type'
 
