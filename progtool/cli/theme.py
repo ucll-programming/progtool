@@ -14,6 +14,15 @@ def theme():
 
 
 @theme.command()
+def path():
+    """
+    Shows path of scss file
+    """
+    needs_settings()
+    print(settings.style_path())
+
+
+@theme.command()
 def default():
     """
     Downloads the default theme
