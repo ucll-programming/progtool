@@ -41,27 +41,35 @@ def find_protocol(extension: str) -> Optional[Protocol]:
 
 @protocol('png')
 def serve_png(content_node: ContentNode, filename: str) -> flask.Response:
-    return serve_file(content_node.local_path / filename, 'image/png')
+    return serve_binary_file(content_node.local_path / filename, 'image/png')
 
 
 @protocol('jpg')
 def serve_jpg(content_node: ContentNode, filename: str) -> flask.Response:
-    return serve_file(content_node.local_path / filename, 'image/jpeg')
+    return serve_binary_file(content_node.local_path / filename, 'image/jpeg')
 
 
 @protocol('jpeg')
 def serve_jpeg(content_node: ContentNode, filename: str) -> flask.Response:
-    return serve_file(content_node.local_path / filename, 'image/jpeg')
+    return serve_binary_file(content_node.local_path / filename, 'image/jpeg')
 
 
 @protocol('svg')
 def serve_svg(content_node: ContentNode, filename: str) -> flask.Response:
-    return serve_file(content_node.local_path / filename, 'image/svg+xml')
+    return serve_text_file(content_node.local_path / filename, 'image/svg+xml')
 
 
-def serve_file(path: Path, mimetype: str) -> flask.Response:
+def serve_text_file(path: Path, mimetype: str) -> flask.Response:
     logging.info(f"Serving file {path}")
     if not path.is_file():
         return flask.Response(f"File {path} not found", status=404)
     data = path.read_text(encoding='utf-8')
+    return flask.Response(data, mimetype=mimetype)
+
+
+def serve_binary_file(path: Path, mimetype: str) -> flask.Response:
+    logging.info(f"Serving file {path}")
+    if not path.is_file():
+        return flask.Response(f"File {path} not found", status=404)
+    data = path.read_bytes()
     return flask.Response(data, mimetype=mimetype)

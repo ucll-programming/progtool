@@ -3,7 +3,6 @@ import re
 from typing import Literal, Optional
 
 import flask
-import pkg_resources
 import pydantic
 import sass
 
