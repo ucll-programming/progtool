@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -7,8 +8,6 @@ from rich.logging import RichHandler
 
 import progtool.cli
 from progtool import constants, settings
-
-import os
 
 
 def _configure_verbosity(verbosity_level: Optional[int]) -> None:
