@@ -75,28 +75,34 @@ class MetadataError(Exception):
 LinkPredicate = Callable[[LinkMetadata], bool]
 
 
-def parse_metadata(path: Path, data: Any, link_predicate: LinkPredicate) -> Optional[ContentNodeMetadata]:
-    if not isinstance(data, dict):
+def parse_metadata(path: Path, metadata: Any, link_predicate: LinkPredicate) -> Optional[ContentNodeMetadata]:
+    """
+    Parses the data stored in parameter metadata.
+    Parameter path contains the path from which the metadata originates.
+    Parameter link_predicate selects which links to follow.
+    """
+    logging.info(f'Parsing metadata in {path}')
+    if not isinstance(metadata, dict):
         raise MetadataError('Metadata should be dict at top level')
-    if 'type' not in data:
+    if 'type' not in metadata:
         raise MetadataError('No type field found')
-    data['path'] = path
-    node_type = data['type']
+    metadata['path'] = path
+    node_type = metadata['type']
     if node_type == TYPE_EXERCISE:
         try:
-            return ExerciseMetadata.model_validate(data)
+            return ExerciseMetadata.model_validate(metadata)
         except:
             logging.error(f"Error occurred while parsing Exercise metadata from {path}")
             raise
     elif node_type == TYPE_EXPLANATION:
         try:
-            return ExplanationMetadata.model_validate(data)
+            return ExplanationMetadata.model_validate(metadata)
         except:
             logging.error(f"Error occurred while parsing Explanation metadata from {path}")
             raise
     elif node_type == TYPE_LINK:
         try:
-            link_metadata = LinkMetadata.model_validate(data)
+            link_metadata = LinkMetadata.model_validate(metadata)
         except:
             logging.error(f"Error occurred while parsing Link metadata from {path}")
             raise
@@ -105,9 +111,9 @@ def parse_metadata(path: Path, data: Any, link_predicate: LinkPredicate) -> Opti
         else:
             return None
     elif node_type == TYPE_SECTION:
-        identifier = data['id']
-        name = data['name']
-        children_objects = data['contents']
+        identifier = metadata['id']
+        name = metadata['name']
+        children_objects = metadata['contents']
         if not isinstance(children_objects, list):
             raise MetadataError("A section's content should be a list")
         children = [
