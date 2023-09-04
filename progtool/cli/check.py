@@ -20,21 +20,29 @@ def check() -> None:
 
 @check.command(help="Verifies files")
 def files() -> None:
-    error_count = Checker().check_files()
-    print(f"{error_count} error(s) found")
+    try:
+        error_count = Checker().check_files()
+        print(f"{error_count} error(s) found")
+    except Exception as e:
+        print(f"Error occurred: {e}")
 
 
 @check.command(help="Verifies topics")
 def topics() -> None:
-    error_count = Checker().check_topics_order()
-    print(f"{error_count} error(s) found")
+    try:
+        error_count = Checker().check_topics_order()
+        print(f"{error_count} error(s) found")
+    except Exception as e:
+        print(f"Error occurred: {e}")
 
 
 @check.command(help="Full verification")
 def all() -> None:
-    error_count = Checker().check_everything()
-    print(f"{error_count} error(s) found")
-
+    try:
+        error_count = Checker().check_everything()
+        print(f"{error_count} error(s) found")
+    except Exception as e:
+        print(f"Error occurred: {e}")
 
 
 class CheckerError(Exception):

@@ -130,7 +130,7 @@ def load_metadata(root_path: Path, *, link_predicate: LinkPredicate) -> Optional
     file_path = root_path / 'metadata.yaml'
     logging.info(f'Loading f{file_path}')
     if not file_path.is_file():
-        raise MetadataError(f'Could not read {file_path}')
+        raise MetadataError(f'Link to {file_path} does not exist')
     with file_path.open() as file:
         data = yaml.safe_load(file)
     return parse_metadata(root_path, data, link_predicate)
