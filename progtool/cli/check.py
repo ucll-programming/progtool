@@ -25,6 +25,7 @@ def files() -> None:
         print(f"{error_count} error(s) found")
     except Exception as e:
         print(f"Error occurred: {e}")
+        print(f'Add -v flag for more information')
 
 
 @check.command(help="Verifies topics")
@@ -34,6 +35,7 @@ def topics() -> None:
         print(f"{error_count} error(s) found")
     except Exception as e:
         print(f"Error occurred: {e}")
+        print(f'Add -v flag for more information')
 
 
 @check.command(help="Full verification")
@@ -43,6 +45,7 @@ def all() -> None:
         print(f"{error_count} error(s) found")
     except Exception as e:
         print(f"Error occurred: {e}")
+        print(f'Add -v flag for more information')
 
 
 class CheckerError(Exception):
