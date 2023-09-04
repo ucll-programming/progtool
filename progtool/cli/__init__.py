@@ -7,3 +7,4 @@ from .tree import tree
 from .theme import theme
 from .cache import cache
 from .setup import setup
+from .topics import topics
