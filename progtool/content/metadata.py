@@ -128,7 +128,7 @@ def parse_metadata(path: Path, data: Any, link_predicate: LinkPredicate) -> Opti
 
 def load_metadata(root_path: Path, *, link_predicate: LinkPredicate) -> Optional[ContentNodeMetadata]:
     file_path = root_path / 'metadata.yaml'
-    logging.info(f'Loading f{file_path}')
+    logging.info(f'Loading {file_path}')
     if not file_path.is_file():
         raise MetadataError(f'Link to {file_path} does not exist')
     with file_path.open() as file:
