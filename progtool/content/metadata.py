@@ -81,9 +81,9 @@ def parse_metadata(path: Path, metadata: Any, link_predicate: LinkPredicate) -> 
     Parameter path contains the path from which the metadata originates.
     Parameter link_predicate selects which links to follow.
     """
-    logging.info(f'Parsing metadata in {path}')
+    logging.info(f'Parsing metadata from {path}')
     if not isinstance(metadata, dict):
-        raise MetadataError('Metadata should be dict at top level')
+        raise MetadataError('Metadata should be dict')
     if 'type' not in metadata:
         raise MetadataError('No type field found')
     metadata['path'] = path
