@@ -33,7 +33,7 @@ def default():
 
 @theme.command()
 @click.argument('name')
-def select(name):
+def download(name):
     """
     Downloads a new theme
     """
