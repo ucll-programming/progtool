@@ -8,7 +8,7 @@ from progtool.constants import TOOL_NAME
 
 @click.command()
 @click.option('--debug', is_flag=True, default=False)
-def server(debug):
+def server(debug: bool) -> None:
     """
     Set up server.
     """
