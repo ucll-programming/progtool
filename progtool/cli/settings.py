@@ -23,8 +23,8 @@ def path(ctx: click.Context):
 
 
 @settings.command()
-def fix():
+def fix() -> None:
     """
     Show path of settings file.
     """
-    needs_settings(autofix=True)
+    needs_settings(autofix=True) # type: ignore[call-arg]
