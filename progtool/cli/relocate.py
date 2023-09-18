@@ -30,6 +30,7 @@ def relocate(ctx):
         logging.debug(f"Repository root found at {s.repository_root}")
         logging.debug(f"Overwriting setting file at {settings_path}")
         settings.write_settings_file(settings=s, path=settings_path)
+        print(f"Relocated to {s.repository_root}")
     except MissingIdentifierFile:
         logging.critical("\n".join([
             "No identifier file found",
