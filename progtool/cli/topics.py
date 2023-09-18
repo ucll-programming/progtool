@@ -1,14 +1,15 @@
+import sys
 from typing import cast
+
 import click
-from progtool import settings
-
-from progtool.cli.util import needs_settings
-from progtool.content.metadata import load_everything, load_metadata
-
 from rich.console import Console
 from rich.table import Table
 
-from progtool.content.tree import ContentNode, Exercise, Explanation, Section, build_tree
+from progtool import constants, settings
+from progtool.cli.util import needs_settings
+from progtool.content.metadata import load_everything, load_metadata
+from progtool.content.tree import (ContentNode, Exercise, Explanation, Section,
+                                   build_tree)
 
 
 @click.group()
@@ -20,7 +21,7 @@ def topics() -> None:
 
 
 @topics.command()
-def overview():
+def overview() -> None:
     """
     Lists all topics
     """
@@ -42,11 +43,16 @@ def overview():
             case _:
                 assert False, 'Unrecognized node type'
 
-    needs_settings()
+    needs_settings() # type: ignore[call-arg]
 
     root_path = settings.repository_exercise_root()
     link_predicate = load_everything(force_all=True)
     metadata = load_metadata(root_path, link_predicate=link_predicate)
+
+    if metadata is None:
+        print("Unable to load course material")
+        sys.exit(constants.ERROR_CODE_FAILED_TO_LOAD_METADATA)
+
     root = build_tree(metadata)
 
     console = Console()
