@@ -34,11 +34,14 @@ class NoGitRepository(RepositoryException):
     def __init__(self, path: Path):
         super().__init__(f'No Git repository found at {path}')
 
-class MissingIdentifierFile(RepositoryException):
+class IdentifierFileException(RepositoryException):
+    pass
+
+class MissingIdentifierFile(IdentifierFileException):
     def __init__(self):
         super().__init__(f'Identifier file {constants.IDENTIFIER_FILE} missing')
 
-class InvalidIdentifierFile(RepositoryException):
+class InvalidIdentifierFile(IdentifierFileException):
     def __init__(self):
         super().__init__(f'Identifier file has invalid contents')
 

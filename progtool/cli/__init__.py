@@ -9,3 +9,4 @@ from .cache import cache
 from .setup import setup
 from .topics import topics
 from .version import version
+from .relocate import relocate
