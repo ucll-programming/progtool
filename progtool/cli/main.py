@@ -68,6 +68,7 @@ def process_command_line_arguments():
         progtool.cli.topics,
         progtool.cli.version,
         progtool.cli.relocate,
+        progtool.cli.update,
     ]
 
     for command in commands:

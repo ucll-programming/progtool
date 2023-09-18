@@ -10,3 +10,4 @@ from .setup import setup
 from .topics import topics
 from .version import version
 from .relocate import relocate
+from .update import update
