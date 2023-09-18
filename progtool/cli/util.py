@@ -14,7 +14,7 @@ from progtool.constants import COURSE_MATERIAL_DOCUMENTATION_URL, ERROR_CODE_FAI
 
 
 @click.pass_context
-def needs_settings(ctx: click.Context, autofix: bool=False):
+def needs_settings(ctx: click.Context, autofix: bool=False) -> None:
     """
     Loads and verifies settings.
     If settings are missing, tries to fix them.
