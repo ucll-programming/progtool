@@ -2,7 +2,7 @@
 name = "progtool"
 version = "0.2.0"
 description = "Assistant for the Programming courses"
-authors = ["Frederic Vogels <frederic.vogels@ucll.be>"]
+authors = ["Frederic Vogels <frederic.vogels@kuleuven.be>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
