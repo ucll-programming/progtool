@@ -4,14 +4,15 @@ import progtool.settings as settings
 
 
 @click.group()
-def cache():
+def cache() -> None:
     """
     Manages judgment cache
     """
+    pass
 
 
 @cache.command()
-def clear():
+def clear() -> None:
     """
     Clears the judgment cache
     """
@@ -21,7 +22,7 @@ def clear():
 
 
 @cache.command
-def path():
+def path() -> None:
     """
     Prints path of judgment cache
     """

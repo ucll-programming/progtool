@@ -58,7 +58,7 @@ def process_command_line_arguments():
     commands = [
         progtool.cli.tree,
         progtool.cli.server,
-        progtool.cli.index,
+        # progtool.cli.index,
         progtool.cli.check,
         progtool.cli.html,
         progtool.cli.settings,

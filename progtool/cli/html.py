@@ -20,26 +20,26 @@ def html() -> None:
 
 
 @html.command()
-def path():
+def path() -> None:
     """
     Show path of html file.
     """
-    needs_settings()
+    needs_settings() # type: ignore[call-arg]
     print(settings.html_path())
 
 
 @html.command()
-def version():
+def version() -> None:
     """
     Determine version of local html file.
     """
-    needs_settings()
+    needs_settings() # type: ignore[call-arg]
     version = determine_local_html_version(settings.html_path())
     print(version)
 
 
 @html.command()
-def available():
+def available() -> None:
     """
     Looks online for which HTML versions are available.
     """
@@ -64,11 +64,11 @@ def available():
 
 
 @html.command()
-def update():
+def update() -> None:
     """
     Updates to the latest HTML version
     """
-    needs_settings()
+    needs_settings() # type: ignore[call-arg]
 
     current_version = determine_local_html_version(settings.html_path())
     latest_release = find_latest_release()
