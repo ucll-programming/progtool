@@ -235,6 +235,7 @@ class MissingRepositoryRootSetting(SettingsException):
 class InvalidRepositoryRoot(SettingsException):
     def __init__(self, path: Path):
         super().__init__(f'Invalid repository root {path}')
+        self.path = path
 
 class InvalidSettings(SettingsException):
     def __init__(self, cause: Exception):

@@ -10,7 +10,7 @@ import click
 
 from progtool import settings
 from progtool import setup
-from progtool.constants import ERROR_CODE_FAILED_TO_INITIALIZE, TOOL_NAME
+from progtool.constants import COURSE_MATERIAL_DOCUMENTATION_URL, ERROR_CODE_FAILED_TO_INITIALIZE, TOOL_NAME
 
 
 @click.pass_context
@@ -34,12 +34,23 @@ def needs_settings(ctx: click.Context, autofix: bool=False):
             print("I believe I have been able to configure everything correctly", file=sys.stderr)
             try:
                 settings.load_and_verify_settings(settings_path)
+            except settings.InvalidRepositoryRoot as e:
+                logging.critical("\n".join([
+                    f"Your settings claim that your repo is located in {e.path}",
+                    f"but that doesn't seem to be the case...",
+                    f"If you moved your repository, you can tell progtool",
+                    f"about its new location using progtool relocate",
+                    f"{COURSE_MATERIAL_DOCUMENTATION_URL}/troubleshooting/relocating.html",
+                    f"Otherwise, you can also try to go for a manual setup, as described here",
+                    f"{COURSE_MATERIAL_DOCUMENTATION_URL}/troubleshooting/manual-setup.html"
+                ]))
+                sys.exit(ERROR_CODE_FAILED_TO_INITIALIZE)
             except settings.SettingsException as e:
                 logging.critical("\n".join([
                     'It looks like I failed :-(',
                     "I'm afraid you'll have to set things up manually",
                     f"Error message: {str(e)}",
-                    "f'{COURSE_MATERIAL_DOCUMENTATION_URL}/troubleshooting/manual-setup.html'"
+                    f"{COURSE_MATERIAL_DOCUMENTATION_URL}/troubleshooting/manual-setup.html"
                 ]))
                 sys.exit(ERROR_CODE_FAILED_TO_INITIALIZE)
         else:
