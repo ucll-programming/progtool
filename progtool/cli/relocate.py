@@ -13,7 +13,7 @@ from progtool.repository import InvalidIdentifierFile, MissingIdentifierFile, fi
 
 @click.command()
 @click.pass_context
-def relocate(ctx):
+def relocate(ctx: click.Context) -> None:
     """
     Informs progtool about a relation
     """
