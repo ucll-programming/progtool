@@ -78,7 +78,7 @@ def update():
 
     if current_version < latest_release.version:
         print('Downloading latest version...')
-        download_latest_html(settings.html_path)
+        download_latest_html(settings.html_path())
         print('Done!')
     else:
         print('Latest version already installed')
