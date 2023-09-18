@@ -53,7 +53,7 @@ def check_repository_identifier(directory: Path) -> None:
 
 
 def check_existence_of_repository_identifier(identifier_file_path: Path) -> None:
-    logging.info('Looking for repository identifier')
+    logging.info('Checking repository identifier')
 
     logging.debug(f'Looking for identifier file {identifier_file_path}')
     if not identifier_file_path.is_file():
