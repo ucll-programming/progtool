@@ -1,14 +1,19 @@
 import logging
+import sys
+from pathlib import Path
+from typing import cast
+
 import click
 from rich.console import Console
-from progtool.cli.util import needs_settings
-
-from progtool import settings
-from progtool.constants import COURSE_MATERIAL_DOCUMENTATION_URL, GITHUB_ORGANIZATION_NAME
-from progtool.html import GitHubOrganizationNotFound, determine_local_html_version, download_latest_html, fetch_list_of_releases, find_latest_release
-
-from rich.console import Console
 from rich.table import Table
+
+from progtool import constants, settings
+from progtool.cli.util import needs_settings
+from progtool.constants import (COURSE_MATERIAL_DOCUMENTATION_URL,
+                                GITHUB_ORGANIZATION_NAME)
+from progtool.html import (GitHubOrganizationNotFound,
+                           determine_local_html_version, download_latest_html,
+                           fetch_list_of_releases, find_latest_release)
 
 
 @click.group()
@@ -26,6 +31,31 @@ def path() -> None:
     """
     needs_settings() # type: ignore[call-arg]
     print(settings.html_path())
+
+
+@html.command()
+@click.argument("path", type=str)
+@click.pass_context
+def setpath(ctx: click.Context, path: str) -> None:
+    """
+    Sets path of html file.
+    """
+    logging.info("Loading settings")
+    html_path = Path(path).absolute()
+
+    if html_path.suffix != '.html':
+        print(f'{html_path} should point to .html file')
+        sys.exit(constants.ERROR_CODE_GENERIC)
+
+    if not html_path.is_file():
+        print(f'No file found with path {html_path}')
+        sys.exit(constants.ERROR_CODE_GENERIC)
+
+    settings_path: Path = cast(Path, ctx.obj['settings_path'])
+    s = settings.load_settings(settings_path)
+    s.html_path = Path(path)
+    settings.write_settings_file(settings=s, path=settings_path)
+    print(f'index.html path set to {html_path}')
 
 
 @html.command()
