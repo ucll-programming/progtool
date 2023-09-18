@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "progtool"
-version = "0.2.0"
+version = "0.3.0"
 description = "Assistant for the Programming courses"
 authors = ["Frederic Vogels <frederic.vogels@kuleuven.be>"]
 readme = "README.md"
