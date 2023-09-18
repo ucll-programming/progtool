@@ -6,7 +6,7 @@ import progtool.setup
 
 @click.command()
 @click.pass_context
-def setup(ctx: click.Context):
+def setup(ctx: click.Context) -> None:
     """
     Sets things up
     """
