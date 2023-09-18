@@ -17,7 +17,7 @@ def index():
 
 @index.command()
 @click.option('-f', '--force', is_flag=True, help='Performs renames')
-def re(force):
+def re(force: bool):
     """
     Reindex subdirectories
     """
@@ -33,7 +33,7 @@ def re(force):
 
     if force:
         for original_name, new_name in mapping.items():
-            rename(original_name, new_name)
+            rename(str(original_name), str(new_name))
         print('Done!')
     else:
         console = Console()
@@ -51,7 +51,7 @@ def re(force):
 @index.command()
 @click.argument('directory', type=click.Path(exists=True, file_okay=False, dir_okay=True))
 @click.option('-n', '--dry-run', help="Show what will happen without actually taking action", is_flag=True)
-def add(directory, dry_run):
+def add(directory: str, dry_run: bool):
     """
     Add index to unindexed subdirectory
     """
@@ -71,7 +71,7 @@ def add(directory, dry_run):
 @click.argument('start', type=int)
 @click.option('-d', '--delta', type=int, default=1)
 @click.option('-f', '--force', default=False, is_flag=True)
-def shift(start, delta, force):
+def shift(start: int, delta: int, force: bool):
     '''
     Shift indices by a a certain amount
     '''
@@ -90,7 +90,7 @@ def shift(start, delta, force):
     }
     if force:
         for original_name, new_name in rename_table.items():
-            rename(original_name, new_name)
+            rename(str(original_name), str(new_name))
         print('Done!')
     else:
         console = Console()
