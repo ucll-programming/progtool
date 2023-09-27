@@ -9,14 +9,10 @@ from progtool.repository import IdentifierFileException, InvalidIdentifierFile, 
 
 
 
-def is_lecturer_account(github_login: str) -> bool:
-    return github_login in [
-        'Frederic Vogels',
-        'Aimee Backiel',
-        'Aimee Lynn Backiel',
-        'Brecht Van Eylen',
-        'U0139490'
-    ]
+def is_student(actor: git.Actor) -> bool:
+    if not actor.email:
+        return False
+    return 'student' in actor.email and actor.name != 'Brecht Van Eylen'
 
 
 @click.group()
@@ -78,3 +74,11 @@ def count_commits(path: str):
         sys.exit(constants.ERROR_CODE_NO_GIT_REPOSITORY)
 
     logging.info(f'Found repository')
+
+    logging.info('Iterating through commits')
+    count = 0
+    for commit in repository.iter_commits('master'):
+        author = commit.author
+        if author and is_student(author):
+            count += 1
+    print(count)
