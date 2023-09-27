@@ -8,7 +8,7 @@ from progtool.html import download_latest_html
 
 import progtool.settings
 from progtool.constants import *
-from progtool.repository import InvalidIdentifierFile, MissingIdentifierFile, NoGitRepository, find_repository_root
+from progtool.repository import InvalidIdentifierFile, MissingIdentifierFile, NoGitRepository, find_course_material_repository_root
 from progtool.settings import Settings
 from progtool.styles import download_default_style
 
@@ -98,7 +98,7 @@ def initialize_repository_root(settings_file_path: Path, settings: Settings) -> 
         current_directory = Path.cwd()
         logging.debug(f'No repository root set in settings file; looking for it starting in current directory {current_directory}')
         try:
-            root_path = find_repository_root(current_directory)
+            root_path = find_course_material_repository_root(current_directory)
         except NoGitRepository:
             logging.critical("\n".join([
                 f'There is no Git repository at {current_directory}',
