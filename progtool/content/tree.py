@@ -98,7 +98,7 @@ class ContentNode(ABC):
 
 
 class ContentTreeLeaf(ContentNode):
-    __markup_path: Path
+    __markdown_path: Path
 
     def __init__(self, *, tree_path: TreePath, local_path: Path, name: str, topics: Topics, markup_path: Path):
         super().__init__(
@@ -107,14 +107,18 @@ class ContentTreeLeaf(ContentNode):
             name=name,
             topics=topics,
         )
-        self.__markup_path = markup_path
+        self.__markdown_path = markup_path
+
+    @property
+    def markdown_path(self) -> Path:
+        return self.__markdown_path
 
     @property
     def markdown(self) -> str:
-        if not self.__markup_path.is_file():
-            logging.error(f'File {self.__markup_path} not found!')
+        if not self.__markdown_path.is_file():
+            logging.error(f'File {self.__markdown_path} not found!')
             return 'Error'
-        return self.__markup_path.read_text(encoding='utf-8')
+        return self.__markdown_path.read_text(encoding='utf-8')
 
     def preorder_traversal(self) -> Iterable[ContentNode]:
         yield self

@@ -8,7 +8,7 @@ import click
 
 import progtool.settings as settings
 from progtool import constants
-from progtool.repository import InvalidIdentifierFile, MissingIdentifierFile, find_repository_root
+from progtool.repository import InvalidIdentifierFile, MissingIdentifierFile, find_course_material_repository_root
 
 
 @click.command()
@@ -26,7 +26,7 @@ def relocate(ctx: click.Context) -> None:
 
     try:
         logging.debug("Looking for repository root")
-        s.repository_root = find_repository_root(current_path)
+        s.repository_root = find_course_material_repository_root(current_path)
         logging.debug(f"Repository root found at {s.repository_root}")
         logging.debug(f"Overwriting setting file at {settings_path}")
         settings.write_settings_file(settings=s, path=settings_path)

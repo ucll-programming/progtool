@@ -69,6 +69,8 @@ def process_command_line_arguments():
         progtool.cli.version,
         progtool.cli.relocate,
         progtool.cli.update,
+        progtool.cli.student,
+        progtool.cli.table,
     ]
 
     for command in commands:
