@@ -1,11 +1,14 @@
+from typing import cast
 import click
 import git
 import logging
 import progtool.constants as constants
 import sys
 from pathlib import Path
+from progtool.content.metadata import ContentNodeMetadata, load_everything, load_metadata
 
 from progtool.repository import IdentifierFileException, InvalidIdentifierFile, MissingIdentifierFile, NoGitRepository, check_repository_identifier, find_course_material_repository, find_repository, root_of_repository
+from progtool.server.rest import Exercise, Explanation, Section
 
 
 
@@ -82,3 +85,34 @@ def count_commits(path: str):
         if author and is_student(author):
             count += 1
     print(count)
+
+
+
+# @student.command()
+# @click.argument('path', type=click.Path(exists=True, file_okay=False, dir_okay=True, resolve_path=True))
+# def test(path: str) -> None:
+#     """
+#     Runs tests
+#     """
+#     def recurse(node: ContentNodeMetadata):
+#         match node:
+#             case Section():
+#                 section = cast(Section, node)
+#                 for child in section.children:
+#                     recurse(child)
+#             case Exercise():
+#                 exercise = cast(Exercise, node)
+#                 print(exercise.name)
+#             case Explanation():
+#                 pass
+#             case _:
+#                 assert False, 'Unrecognized node type'
+
+#     try:
+#         repository = find_course_material_repository(Path(path))
+#     except NoGitRepository:
+#         logging.critical(f"No repository found at {path}; I have even looked in parent directories")
+#         sys.exit(constants.ERROR_CODE_NO_GIT_REPOSITORY)
+
+#     root = root_of_repository(repository)
+#     metadata = load_metadata(root, link_predicate=load_everything())
