@@ -4,6 +4,8 @@ from pathlib import Path
 from typing import Annotated, Optional
 import yaml
 import pydantic
+import platform
+import os
 
 from progtool.repository import InvalidIdentifierFile, MissingIdentifierFile, check_repository_identifier
 
@@ -23,7 +25,11 @@ _settings: Optional[Settings]
 
 
 def default_storage_path() -> Path:
-    return (Path.home() / 'progtool').absolute()
+    baseDir = Path.home()
+    if platform.system() == 'Windows':
+        baseDir = Path(os.getenv('APPDATA')) # type: ignore
+        
+    return (baseDir / '.progtool').absolute()
 
 
 def default_settings_path() -> Path:
