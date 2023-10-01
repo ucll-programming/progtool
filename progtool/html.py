@@ -64,7 +64,12 @@ def download_latest_html(destination_path: Path) -> None:
 
 def download_file_to(url: str, destination_path: Path) -> None:
     logging.info(f'Downloading {url} to {destination_path}')
-    urlretrieve(url, str(destination_path))
+    try:
+        urlretrieve(url, str(destination_path))
+    except Exception as e:
+        logging.critical(f"An error occurred while trying to download {url}")
+        logging.critical(f"Error details: {e!r}")
+        raise
 
 
 def determine_local_html_version(html_path: Path) -> Version:
