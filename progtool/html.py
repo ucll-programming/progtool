@@ -6,6 +6,7 @@ from typing import NamedTuple
 from urllib.request import urlretrieve
 
 import github
+from progtool import constants
 
 from progtool.constants import *
 from progtool.version import Version
@@ -58,8 +59,7 @@ def find_latest_release() -> Release:
 
 
 def find_latest_release_url() -> str:
-    latest_release = find_latest_release()
-    return latest_release.url
+    return constants.LATEST_HTML_URL
 
 
 def download_latest_html(destination_path: Path) -> None:

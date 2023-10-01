@@ -94,19 +94,24 @@ def available() -> None:
 
 
 @html.command()
-def update() -> None:
+@click.option('--force', help='Downloads newest version regardless of version installed', is_flag=True, default=False)
+def update(force: bool) -> None:
     """
     Updates to the latest HTML version
     """
     needs_settings() # type: ignore[call-arg]
 
-    current_version = determine_local_html_version(settings.html_path())
-    latest_release = find_latest_release()
+    if force:
+        should_download = True
+    else:
+        current_version = determine_local_html_version(settings.html_path())
+        latest_release = find_latest_release()
 
-    print(f'Currently installed version: {current_version}')
-    print(f'Latest available version: {latest_release.version}')
+        print(f'Currently installed version: {current_version}')
+        print(f'Latest available version: {latest_release.version}')
+        should_download = current_version < latest_release.version
 
-    if current_version < latest_release.version:
+    if should_download:
         print('Downloading latest version...')
         download_latest_html(settings.html_path())
         print('Done!')

@@ -4,6 +4,7 @@ GITHUB_THEMES_REPOSITORY_NAME = 'themes'
 IDENTIFIER_FILE = '.identifier'
 IDENTIFIER_FILE_CONTENTS = 'UCLL Programming Exercise Repository'
 COURSE_MATERIAL_DOCUMENTATION_URL = 'https://ucll-programming.github.io/course-material'
+LATEST_HTML_URL = 'https://github.com/ucll-programming/frontend/releases/latest/download/index.html'
 SETTINGS_FILE_ENVIRONMENT_VARIABLE = 'PROGTOOL_SETTINGS_PATH'
 TOOL_NAME = "progtool"
 DEFAULT_THEME_NAME = 'default'
