@@ -17,7 +17,7 @@ from progtool.constants import COURSE_MATERIAL_DOCUMENTATION_URL, ERROR_CODE_FAI
 def needs_settings(ctx: click.Context, autofix: bool=False) -> None:
     """
     Loads and verifies settings.
-    If settings are missing, tries to fix them.
+    If settings are missing, it can try to fix them if autofix is set to True.
     Performs sys.exit on error.
     Meant to be used as first line in click commands that needs settings to be correct.
     """
