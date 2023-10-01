@@ -20,7 +20,9 @@ def download_style(theme_name: str, destination_path: Path) -> None:
     logging.debug(f'Downloading {url} to {destination_path}')
     try:
         urlretrieve(url, str(destination_path))
-    except:
+    except Exception as e:
+        logging.critical("Error occurred while downloading {url}")
+        logging.critical(f"Error details: {e!r}")
         raise FailedDownload(url, destination_path)
 
     logging.info('Download completed successfully')
@@ -28,6 +30,7 @@ def download_style(theme_name: str, destination_path: Path) -> None:
 
 def determine_theme_url(theme_name: str) -> str:
     return find_theme(theme_name).url
+
 
 class Theme:
     __name: str
