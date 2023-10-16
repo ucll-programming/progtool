@@ -24,11 +24,15 @@ class PytestJudge(Judge):
 
             # -x flag interrupts tests after first failure
             command = f'pytest -x {filename}'
+            logging.info(f'[Pytest judge] Running {command} in {parent_directory}')
             process = await asyncio.create_subprocess_shell(command, stdout=asyncio.subprocess.PIPE, cwd=parent_directory)
             stdout, stderr = await process.communicate() # TODO Would process.wait() work?
             output = stdout.decode()
-            tests_passed = process.returncode == 0
+            logging.debug(f'[Pytest judge] STDOUT from pytest: {output}')
+            pytest_result = process.returncode
+            logging.info(f'[Pytest judge] Pytest ended with code {pytest_result} (0 indicates passed tests)')
+            tests_passed = pytest_result == 0
             return tests_passed
         except Exception as e:
-            logging.error(f"Error occurred while judging {self.__tests_path}: {e}")
+            logging.error(f"[Pytest judge] Error occurred while judging {self.__tests_path}: {e}")
             return False
