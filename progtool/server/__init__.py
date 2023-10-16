@@ -46,7 +46,7 @@ def root():
 
 @app.route('/nodes/<path:node_path>')
 def node_page(node_path: str):
-    regex = f'\.([a-zA-Z]+)$'
+    regex = fr'\.([a-zA-Z]+)$'
     if match := re.search(regex, node_path):
         extension = match.group(1)
         protocol = find_protocol(extension)
